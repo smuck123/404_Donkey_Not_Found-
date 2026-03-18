@@ -1,5 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pathlib import Path
 from datetime import datetime
@@ -47,6 +49,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def support_api_prefix(request: Request, call_next):
+    if request.scope["path"].startswith("/api/"):
+        request.scope["path"] = request.scope["path"][4:] or "/"
+    return await call_next(request)
 
 
 class ChatRequest(BaseModel):
@@ -672,3 +681,18 @@ def admin_git_sync(req: GitSyncRequest):
     if result.returncode != 0:
         raise HTTPException(status_code=500, detail=response)
     return response
+
+
+@app.get("/admin", include_in_schema=False)
+def admin_redirect():
+    return RedirectResponse(url="/admin/")
+
+
+@app.get("/editable", include_in_schema=False)
+def editable_redirect():
+    return RedirectResponse(url="/editable/")
+
+
+app.mount("/admin", StaticFiles(directory=ADMIN_ROOT, html=True), name="admin")
+app.mount("/editable", StaticFiles(directory=EDIT_ROOT, html=True), name="editable")
+app.mount("/", StaticFiles(directory=CHAT_ROOT, html=True), name="chat")
