@@ -1,0 +1,147 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #eef4ff 0%, #f6f7fb 100%);
+  color: #1f2937;
+}
+
+.topbar {
+  background: #0f172a;
+  color: white;
+  border-bottom: 1px solid #1e293b;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.nav {
+  display: flex;
+  gap: 18px;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.layout {
+  max-width: 1240px;
+  margin: 24px auto;
+  padding: 0 20px 40px 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.96);
+  padding: 24px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.hero h1 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 32px;
+}
+
+.hero p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.buttons {
+  flex-direction: row;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.inline-row {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  gap: 10px;
+}
+
+input, select, textarea, button {
+  font-size: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+}
+
+button {
+  width: fit-content;
+  cursor: pointer;
+  border: none;
+  background: #e5e7eb;
+}
+
+button:hover {
+  opacity: 0.96;
+}
+
+textarea {
+  resize: vertical;
+  font-family: monospace;
+  background: #fff;
+}
+
+pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 12px;
+  border-radius: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 980px) {
+  .topbar-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+  }
+
+  .buttons {
+    flex-direction: column;
+  }
+
+  .inline-row {
+    grid-template-columns: 1fr;
+  }
+}
