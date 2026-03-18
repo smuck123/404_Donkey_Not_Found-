@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 from datetime import datetime
+import subprocess
 import requests
 import shutil
 import json
@@ -14,7 +15,9 @@ OLLAMA_TAGS_URL = "http://127.0.0.1:11434/api/tags"
 OLLAMA_CHAT_URL = "http://127.0.0.1:11434/api/chat"
 DEFAULT_MODEL = "qwen3:8b"
 
-BASE_DIR = Path("/opt/chat_admin_webgui").resolve()
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEPLOY_BASE_DIR = Path("/opt/chat_admin_webgui").resolve()
+BASE_DIR = DEPLOY_BASE_DIR if DEPLOY_BASE_DIR.exists() else (REPO_ROOT / "chat_admin_webgui").resolve()
 CHAT_ROOT = (BASE_DIR / "frontend" / "chat").resolve()
 ADMIN_ROOT = (BASE_DIR / "frontend" / "admin").resolve()
 EDIT_ROOT = (BASE_DIR / "editable" / "chat_site").resolve()
@@ -23,6 +26,7 @@ SHARED_ROOT = (BASE_DIR / "shared_folders").resolve()
 DATA_ROOT = (BASE_DIR / "data").resolve()
 CHATS_ROOT = (DATA_ROOT / "chats").resolve()
 PROJECTS_FILE = (DATA_ROOT / "projects" / "projects.json").resolve()
+SYNC_SCRIPT = (REPO_ROOT / "sync_and_push.sh").resolve()
 
 ALLOWED_EDIT_SUFFIXES = {".html", ".css", ".js", ".txt", ".json", ".md", ".yaml", ".yml", ".py", ".sh"}
 
@@ -44,24 +48,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class ChatRequest(BaseModel):
     model: str = DEFAULT_MODEL
     messages: list
     stream: bool = False
 
+
 class ReadFileRequest(BaseModel):
     section: str
     relative_path: str
+
 
 class SaveFileRequest(BaseModel):
     section: str
     relative_path: str
     content: str
 
+
 class RollbackRequest(BaseModel):
     section: str
     relative_path: str
     backup_name: str
+
 
 class ImproveWebsiteRequest(BaseModel):
     model: str = DEFAULT_MODEL
@@ -69,14 +78,17 @@ class ImproveWebsiteRequest(BaseModel):
     target_files: list[str] = []
     section: str = "chat"
 
+
 class SharedReadRequest(BaseModel):
     folder_name: str
     relative_path: str
+
 
 class SharedSaveRequest(BaseModel):
     folder_name: str
     relative_path: str
     content: str
+
 
 class SharedImproveRequest(BaseModel):
     model: str = DEFAULT_MODEL
@@ -84,8 +96,10 @@ class SharedImproveRequest(BaseModel):
     task: str
     target_files: list[str]
 
+
 class SaveProjectRequest(BaseModel):
     name: str
+
 
 class SaveChatRequest(BaseModel):
     title: str
@@ -93,11 +107,26 @@ class SaveChatRequest(BaseModel):
     messages: list
     model: str = DEFAULT_MODEL
 
+
+class DeleteProjectRequest(BaseModel):
+    name: str
+
+
+class DeleteChatRequest(BaseModel):
+    chat_id: str
+
+
+class GitSyncRequest(BaseModel):
+    branch: str = "dev"
+    message: str | None = None
+
+
 def ensure_data_files():
     CHATS_ROOT.mkdir(parents=True, exist_ok=True)
     PROJECTS_FILE.parent.mkdir(parents=True, exist_ok=True)
     if not PROJECTS_FILE.exists():
         PROJECTS_FILE.write_text("[]", encoding="utf-8")
+
 
 def read_projects():
     ensure_data_files()
@@ -106,9 +135,11 @@ def read_projects():
     except Exception:
         return []
 
+
 def write_projects(projects):
     ensure_data_files()
     PROJECTS_FILE.write_text(json.dumps(projects, indent=2), encoding="utf-8")
+
 
 def list_chat_meta():
     ensure_data_files()
@@ -129,12 +160,14 @@ def list_chat_meta():
     items.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
     return items
 
+
 def get_chat_file(chat_id: str) -> Path:
     ensure_data_files()
     safe_id = "".join(c for c in chat_id if c.isalnum() or c in ("-", "_"))
     if not safe_id:
         raise HTTPException(status_code=400, detail="Invalid chat id")
     return (CHATS_ROOT / f"{safe_id}.json").resolve()
+
 
 def get_root(section: str) -> Path:
     if section == "chat":
@@ -145,15 +178,18 @@ def get_root(section: str) -> Path:
         return EDIT_ROOT
     raise HTTPException(status_code=400, detail=f"Unknown section: {section}")
 
+
 def safe_join(root: Path, relative_path: str) -> Path:
     target = (root / relative_path).resolve()
     if not str(target).startswith(str(root)):
         raise HTTPException(status_code=403, detail="Path not allowed")
     return target
 
+
 def validate_editable_file(path: Path):
     if path.suffix.lower() not in ALLOWED_EDIT_SUFFIXES:
         raise HTTPException(status_code=400, detail=f"File type not allowed: {path.suffix}")
+
 
 def backup_file(section: str, target: Path, root: Path):
     if not target.exists() or not target.is_file():
@@ -166,6 +202,7 @@ def backup_file(section: str, target: Path, root: Path):
     shutil.copy2(target, backup_file_path)
     return backup_file_path
 
+
 def collect_files_for_context(section: str, files: list[str]):
     root = get_root(section)
     chunks = []
@@ -177,10 +214,12 @@ def collect_files_for_context(section: str, files: list[str]):
             chunks.append(f"--- FILE: {rel} ---\n{content}\n")
     return "\n".join(chunks)
 
+
 def get_shared_folder_root(folder_name: str) -> Path:
     folder = safe_join(SHARED_ROOT, folder_name)
     folder.mkdir(parents=True, exist_ok=True)
     return folder
+
 
 def collect_shared_files(folder_name: str, files: list[str]):
     root = get_shared_folder_root(folder_name)
@@ -193,9 +232,11 @@ def collect_shared_files(folder_name: str, files: list[str]):
             chunks.append(f"--- FILE: {rel} ---\n{content}\n")
     return "\n".join(chunks)
 
+
 @app.get("/health")
 def health():
-    return {"status": "ok", "app": "404DonkeyNotFound"}
+    return {"status": "ok", "app": "404DonkeyNotFound", "base_dir": str(BASE_DIR)}
+
 
 @app.get("/models")
 def models():
@@ -217,6 +258,7 @@ def models():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to load models: {e}")
 
+
 @app.post("/chat/messages")
 def chat(req: ChatRequest):
     try:
@@ -234,6 +276,7 @@ def chat(req: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to chat with Ollama: {e}")
 
+
 @app.get("/chat/state")
 def chat_state():
     ensure_data_files()
@@ -241,8 +284,14 @@ def chat_state():
         "brand": "404DonkeyNotFound",
         "slogan": "if it works, make sure donkey can break IT!",
         "projects": read_projects(),
-        "chats": list_chat_meta()
+        "chats": list_chat_meta(),
+        "storage": {
+            "base_dir": str(BASE_DIR),
+            "projects_file": str(PROJECTS_FILE),
+            "chats_dir": str(CHATS_ROOT),
+        }
     }
+
 
 @app.post("/chat/project/save")
 def chat_project_save(req: SaveProjectRequest):
@@ -255,6 +304,31 @@ def chat_project_save(req: SaveProjectRequest):
         projects.sort()
         write_projects(projects)
     return {"status": "saved", "project": name, "projects": projects}
+
+
+@app.post("/chat/project/delete")
+def chat_project_delete(req: DeleteProjectRequest):
+    name = req.name.strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Project name is required")
+
+    projects = read_projects()
+    if name not in projects:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    remaining = [project for project in projects if project != name]
+    write_projects(remaining)
+
+    for chat_file in CHATS_ROOT.glob("*.json"):
+        try:
+            payload = json.loads(chat_file.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if payload.get("project") == name:
+            chat_file.unlink(missing_ok=True)
+
+    return {"status": "deleted", "project": name, "projects": remaining}
+
 
 @app.post("/chat/session/save")
 def chat_session_save(req: SaveChatRequest):
@@ -284,12 +358,23 @@ def chat_session_save(req: SaveChatRequest):
     chat_file.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return {"status": "saved", "chat_id": chat_id, "title": title, "project": project}
 
+
+@app.post("/chat/session/delete")
+def chat_session_delete(req: DeleteChatRequest):
+    chat_file = get_chat_file(req.chat_id)
+    if not chat_file.exists():
+        raise HTTPException(status_code=404, detail="Chat not found")
+    chat_file.unlink()
+    return {"status": "deleted", "chat_id": req.chat_id}
+
+
 @app.get("/chat/session/read")
 def chat_session_read(chat_id: str):
     chat_file = get_chat_file(chat_id)
     if not chat_file.exists():
         raise HTTPException(status_code=404, detail="Chat not found")
     return json.loads(chat_file.read_text(encoding="utf-8"))
+
 
 @app.get("/admin/files")
 def admin_list_files(section: str):
@@ -300,6 +385,7 @@ def admin_list_files(section: str):
         if p.is_file() and p.suffix.lower() in ALLOWED_EDIT_SUFFIXES:
             files.append(str(p.relative_to(root)))
     return {"section": section, "files": sorted(files)}
+
 
 @app.post("/admin/read")
 def admin_read_file(req: ReadFileRequest):
@@ -313,6 +399,7 @@ def admin_read_file(req: ReadFileRequest):
         "path": str(target.relative_to(root)),
         "content": target.read_text(encoding="utf-8", errors="replace")
     }
+
 
 @app.post("/admin/save")
 def admin_save_file(req: SaveFileRequest):
@@ -329,6 +416,7 @@ def admin_save_file(req: SaveFileRequest):
         "backup_created": str(backup_path) if backup_path else None
     }
 
+
 @app.get("/admin/backups")
 def admin_list_backups(section: str, relative_path: str):
     root = get_root(section)
@@ -340,6 +428,7 @@ def admin_list_backups(section: str, relative_path: str):
         return {"section": section, "relative_path": relative_path, "backups": []}
     backups = [p.name for p in sorted(backup_dir.glob("*.bak"), reverse=True)]
     return {"section": section, "relative_path": relative_path, "backups": backups}
+
 
 @app.get("/admin/backup/read")
 def admin_read_backup(section: str, relative_path: str, backup_name: str):
@@ -357,6 +446,7 @@ def admin_read_backup(section: str, relative_path: str, backup_name: str):
         "backup_name": backup_name,
         "content": backup_file_path.read_text(encoding="utf-8", errors="replace")
     }
+
 
 @app.post("/admin/rollback")
 def admin_rollback(req: RollbackRequest):
@@ -378,6 +468,7 @@ def admin_rollback(req: RollbackRequest):
         "restored_from": req.backup_name,
         "previous_version_backup": str(current_backup) if current_backup else None
     }
+
 
 @app.post("/admin/improve")
 def admin_improve_website(req: ImproveWebsiteRequest):
@@ -444,11 +535,13 @@ Rules:
         parsed = json.loads(raw[start:end+1])
     return parsed
 
+
 @app.get("/admin/shared-folders")
 def admin_list_shared_folders():
     SHARED_ROOT.mkdir(parents=True, exist_ok=True)
     folders = [p.name for p in SHARED_ROOT.iterdir() if p.is_dir()]
     return {"folders": sorted(folders)}
+
 
 @app.get("/admin/shared-files")
 def admin_list_shared_files(folder_name: str):
@@ -458,6 +551,7 @@ def admin_list_shared_files(folder_name: str):
         if p.is_file() and p.suffix.lower() in ALLOWED_EDIT_SUFFIXES:
             files.append(str(p.relative_to(root)))
     return {"folder_name": folder_name, "files": sorted(files)}
+
 
 @app.post("/admin/shared-read")
 def admin_shared_read(req: SharedReadRequest):
@@ -472,6 +566,7 @@ def admin_shared_read(req: SharedReadRequest):
         "content": target.read_text(encoding="utf-8", errors="replace")
     }
 
+
 @app.post("/admin/shared-save")
 def admin_shared_save(req: SharedSaveRequest):
     root = get_shared_folder_root(req.folder_name)
@@ -480,6 +575,7 @@ def admin_shared_save(req: SharedSaveRequest):
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(req.content, encoding="utf-8")
     return {"status": "saved", "folder_name": req.folder_name, "path": req.relative_path}
+
 
 @app.post("/admin/shared-improve")
 def admin_shared_improve(req: SharedImproveRequest):
@@ -542,3 +638,37 @@ Rules:
             raise HTTPException(status_code=500, detail="Ollama did not return valid JSON")
         parsed = json.loads(raw[start:end+1])
     return parsed
+
+
+@app.post("/admin/git/sync")
+def admin_git_sync(req: GitSyncRequest):
+    branch = (req.branch or "dev").strip() or "dev"
+    message = (req.message or f"AI website update {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%SZ')}").strip()
+
+    if not SYNC_SCRIPT.exists():
+        raise HTTPException(status_code=500, detail=f"Sync script not found: {SYNC_SCRIPT}")
+
+    try:
+        result = subprocess.run(
+            [str(SYNC_SCRIPT), branch, message],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            timeout=300,
+            check=False,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to run git sync: {e}")
+
+    response = {
+        "status": "ok" if result.returncode == 0 else "failed",
+        "branch": branch,
+        "message": message,
+        "code": result.returncode,
+        "stdout": result.stdout,
+        "stderr": result.stderr,
+        "script": str(SYNC_SCRIPT),
+    }
+    if result.returncode != 0:
+        raise HTTPException(status_code=500, detail=response)
+    return response

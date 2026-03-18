@@ -321,3 +321,22 @@ pre {
     max-width: 100%;
   }
 }
+
+
+.sidebar-entry {
+  display: grid;
+  grid-template-columns: 1fr 36px;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.danger-icon {
+  border: 1px solid #4b5563;
+  background: #1a1c20;
+  color: #fca5a5;
+  cursor: pointer;
+}
+
+.danger-icon:hover {
+  background: #3b1d24;
+}
