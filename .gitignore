@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.swp
+*.tmp
+*.log
+.env
+.venv/
+venv/
+node_modules/
+dist/
+build/
