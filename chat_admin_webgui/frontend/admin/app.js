@@ -426,6 +426,25 @@ async function applyImproveShared() {
   }
 }
 
+
+async function runGitSync() {
+  const branch = document.getElementById("gitBranch").value.trim() || "dev";
+  const message = document.getElementById("gitMessage").value.trim();
+  const status = document.getElementById("gitStatus");
+
+  status.textContent = `Syncing editable site to git branch ${branch}...`;
+
+  try {
+    const data = await api("/api/admin/git/sync", "POST", {
+      branch,
+      message: message || null
+    });
+    status.textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    status.textContent = "Git sync failed: " + e.message;
+  }
+}
+
 window.onload = async function () {
   await loadModels();
   loadSettingsFromStorage();

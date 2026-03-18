@@ -180,6 +180,27 @@
       <pre id="sharedStatus"></pre>
       <pre id="sharedPreview"></pre>
     </section>
+
+    <section class="card">
+      <h2>Git sync for AI website changes</h2>
+      <p>Use this after reviewing file edits to sync the website into the git repo and push it to the <strong>dev</strong> branch.</p>
+
+      <div class="row">
+        <label for="gitBranch">Branch</label>
+        <input id="gitBranch" type="text" value="dev" placeholder="dev">
+      </div>
+
+      <div class="row">
+        <label for="gitMessage">Commit message</label>
+        <input id="gitMessage" type="text" placeholder="AI website update">
+      </div>
+
+      <div class="row buttons">
+        <button onclick="runGitSync()">Sync website and push branch</button>
+      </div>
+
+      <pre id="gitStatus">Ready to push changes to git.</pre>
+    </section>
   </main>
 
   <script src="/admin/app.js"></script>

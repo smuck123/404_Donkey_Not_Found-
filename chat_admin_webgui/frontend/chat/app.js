@@ -4,6 +4,7 @@ let systemPrompt = "You are a helpful assistant for Linux, Bash, Python, web dev
 let activeProject = "General";
 let savedChats = [];
 let savedProjects = [];
+let selectedChatId = null;
 
 async function api(url, method = "GET", data = null) {
   const opts = {
@@ -58,7 +59,10 @@ function renderProjects() {
   }
 
   box.innerHTML = savedProjects.map(name => `
-    <button class="sidebar-item ${name === activeProject ? "active" : ""}" onclick="selectProject(${JSON.stringify(name)})">${escapeHtml(name)}</button>
+    <div class="sidebar-entry">
+      <button class="sidebar-item ${name === activeProject ? "active" : ""}" onclick="selectProject(${JSON.stringify(name)})">${escapeHtml(name)}</button>
+      <button class="danger-icon" onclick="deleteProject(${JSON.stringify(name)})" title="Delete project">×</button>
+    </div>
   `).join("");
 }
 
@@ -70,10 +74,13 @@ function renderChats() {
   }
 
   box.innerHTML = savedChats.map(chat => `
-    <button class="sidebar-item" onclick="loadSavedChat(${JSON.stringify(chat.id)})">
-      <div class="item-title">${escapeHtml(chat.title)}</div>
-      <div class="item-meta">${escapeHtml(chat.project)} • ${escapeHtml(chat.model)}</div>
-    </button>
+    <div class="sidebar-entry">
+      <button class="sidebar-item ${chat.id === selectedChatId ? "active" : ""}" onclick="loadSavedChat(${JSON.stringify(chat.id)})">
+        <div class="item-title">${escapeHtml(chat.title)}</div>
+        <div class="item-meta">${escapeHtml(chat.project)} • ${escapeHtml(chat.model)}</div>
+      </button>
+      <button class="danger-icon" onclick="deleteChat(${JSON.stringify(chat.id)})" title="Delete chat">×</button>
+    </div>
   `).join("");
 }
 
@@ -109,14 +116,18 @@ function selectProject(name) {
 
 function clearChat() {
   chatHistory = [];
+  selectedChatId = null;
   renderChat();
+  renderChats();
   setStatus("Chat cleared.");
 }
 
 function newChat() {
   chatHistory = [];
+  selectedChatId = null;
   document.getElementById("chatTitle").value = "";
   renderChat();
+  renderChats();
   setStatus("Started new chat.");
 }
 
@@ -128,10 +139,13 @@ async function loadState() {
   document.getElementById("mainBrand").textContent = data.brand || "404DonkeyNotFound";
   document.getElementById("mainSlogan").textContent = data.slogan || "if it works, make sure donkey can break IT!";
 
-  if (!savedProjects.includes(activeProject)) {
-    if (savedProjects.length > 0) {
-      activeProject = savedProjects[0];
-    }
+  const storage = data.storage || {};
+  document.getElementById("storagePathLabel").textContent = storage.projects_file
+    ? `Storage: ${storage.projects_file}`
+    : "Storage: unavailable";
+
+  if (!savedProjects.includes(activeProject) && savedProjects.length > 0) {
+    activeProject = savedProjects[0];
   }
 
   document.getElementById("activeProjectLabel").textContent = `Project: ${activeProject}`;
@@ -156,6 +170,25 @@ async function saveProject() {
   }
 }
 
+async function deleteProject(name) {
+  const ok = window.confirm(`Delete project \"${name}\" and all chats in it?`);
+  if (!ok) return;
+
+  try {
+    await api("/api/chat/project/delete", "POST", { name });
+    if (activeProject === name) {
+      activeProject = "General";
+    }
+    if (selectedChatId && !savedChats.some(chat => chat.id === selectedChatId && chat.project !== name)) {
+      newChat();
+    }
+    await loadState();
+    setStatus(`Project deleted: ${name}`);
+  } catch (err) {
+    setStatus("Failed to delete project: " + err.message);
+  }
+}
+
 async function saveCurrentChat() {
   const title = document.getElementById("chatTitle").value.trim();
   if (!title) {
@@ -169,22 +202,40 @@ async function saveCurrentChat() {
   }
 
   try {
-    await api("/api/chat/session/save", "POST", {
+    const result = await api("/api/chat/session/save", "POST", {
       title,
       project: activeProject || "General",
       messages: chatHistory,
       model: activeModel
     });
+    selectedChatId = result.chat_id || null;
     await loadState();
-    setStatus(`Chat saved as "${title}"`);
+    setStatus(`Chat saved as \"${title}\"`);
   } catch (err) {
     setStatus("Failed to save chat: " + err.message);
+  }
+}
+
+async function deleteChat(chatId) {
+  const ok = window.confirm("Delete this saved chat?");
+  if (!ok) return;
+
+  try {
+    await api("/api/chat/session/delete", "POST", { chat_id: chatId });
+    if (selectedChatId === chatId) {
+      newChat();
+    }
+    await loadState();
+    setStatus("Saved chat deleted.");
+  } catch (err) {
+    setStatus("Failed to delete chat: " + err.message);
   }
 }
 
 async function loadSavedChat(chatId) {
   try {
     const data = await api(`/api/chat/session/read?chat_id=${encodeURIComponent(chatId)}`);
+    selectedChatId = chatId;
     chatHistory = data.messages || [];
     activeProject = data.project || "General";
     document.getElementById("chatTitle").value = data.title || "";
@@ -192,6 +243,7 @@ async function loadSavedChat(chatId) {
     document.getElementById("activeProjectLabel").textContent = `Project: ${activeProject}`;
     document.getElementById("activeModelLabel").textContent = `Model: ${data.model || activeModel}`;
     renderProjects();
+    renderChats();
     renderChat();
     setStatus(`Loaded saved chat: ${data.title}`);
   } catch (err) {
