@@ -18,17 +18,15 @@ if [ ! -d ".git" ]; then
     exit 1
 fi
 
-# create branch locally if missing
+git remote remove origin 2>/dev/null || true
+git remote add origin git@github.com:smuck123/404_Donkey_Not_Found-.git
+
 if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
     git checkout "$BRANCH"
 else
     git checkout -b "$BRANCH"
 fi
 
-echo "[*] Git status"
-git status
-
-echo "[*] Add files"
 git add .
 
 if git diff --cached --quiet; then
@@ -37,10 +35,7 @@ else
     git commit -m "$MSG"
 fi
 
-echo "[*] Pull latest from origin/$BRANCH"
 git pull origin "$BRANCH" --rebase || true
-
-echo "[*] Push to origin/$BRANCH"
 git push -u origin "$BRANCH"
 
 echo "[+] Done"
