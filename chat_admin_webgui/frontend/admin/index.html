@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Admin Portal</title>
+  <title>404DonkeyNotFound Admin Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="/admin/style.css" rel="stylesheet">
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand">AI Chat Portal</div>
+      <div class="brand">404DonkeyNotFound Admin Portal</div>
       <nav class="nav">
         <a href="/">Chat</a>
-        <a href="/admin/">Admin</a>
+        <a href="/portal/">Admin Portal</a>
         <a href="/editable/">Editable Page</a>
       </nav>
     </div>
@@ -21,12 +21,11 @@
   <main class="layout">
     <section class="hero card">
       <h1>Admin Portal</h1>
-      <p>Choose the active language model, understand model strengths, manage website files, review backups, and give Ollama access to a selected project folder.</p>
+      <p>This portal is separate from the main chat UI. Use it to choose the model, edit the chat site or editable page, and control which shared project files the AI can open and update.</p>
     </section>
 
     <section class="card">
       <h2>Chat settings</h2>
-
       <div class="row">
         <label for="modelSelect">Model</label>
         <div class="inline-row">
@@ -34,27 +33,23 @@
           <button onclick="loadModels()">Refresh</button>
         </div>
       </div>
-
       <div class="row">
         <label>Model explanation</label>
         <pre id="modelInfo">Select a model to see what it is good for.</pre>
       </div>
-
       <div class="row">
         <label for="systemPrompt">System prompt</label>
         <textarea id="systemPrompt" rows="6">You are a helpful assistant for Linux, Bash, Python, web development, Ansible, Zabbix, and server administration.</textarea>
       </div>
-
       <div class="row">
         <button onclick="saveSettings()">Save chat settings</button>
       </div>
-
       <pre id="settingsStatus"></pre>
     </section>
 
     <section class="card">
-      <h2>Website files</h2>
-
+      <h2>Editable site files</h2>
+      <p>Switch between <strong>chat</strong>, <strong>admin</strong>, and <strong>editable</strong> so the AI can access those files and you can directly edit each page here.</p>
       <div class="row">
         <label for="sectionSelect">Section</label>
         <select id="sectionSelect" onchange="loadFiles()">
@@ -63,75 +58,62 @@
           <option value="editable">editable</option>
         </select>
       </div>
-
       <div class="row">
         <button onclick="loadFiles()">Refresh files</button>
       </div>
-
       <div class="row">
         <label for="fileList">Files</label>
         <select id="fileList" size="10"></select>
       </div>
-
       <div class="row buttons">
         <button onclick="openSelectedFile()">Open selected file</button>
         <button onclick="loadBackups()">Load backups</button>
       </div>
-
       <div class="row">
         <label for="filePath">Relative path</label>
         <input id="filePath" type="text" placeholder="index.html">
       </div>
-
       <div class="row">
         <label for="fileContent">Content</label>
         <textarea id="fileContent" rows="20"></textarea>
       </div>
-
       <div class="row">
         <button onclick="saveFile()">Save file</button>
       </div>
-
       <pre id="fileStatus"></pre>
     </section>
 
     <section class="card">
       <h2>Improve website with Ollama</h2>
-
       <div class="row">
         <label for="improveTask">Task</label>
         <textarea id="improveTask" rows="6">Improve the selected website files. Make the layout cleaner, modernize the header, improve spacing, and keep navigation consistent.</textarea>
       </div>
-
       <div class="row buttons">
         <button onclick="askImprove()">Ask Ollama to improve selected file</button>
         <button onclick="applyImproveResult()">Apply generated files</button>
       </div>
-
       <pre id="improveStatus"></pre>
       <pre id="improvePreview"></pre>
     </section>
 
     <section class="card">
       <h2>Backups and rollback</h2>
-
       <div class="row">
         <label for="backupList">Backups</label>
         <select id="backupList" size="10"></select>
       </div>
-
       <div class="row buttons">
         <button onclick="readBackup()">Preview backup</button>
         <button onclick="rollbackFile()">Rollback selected backup</button>
       </div>
-
       <pre id="backupStatus"></pre>
       <pre id="backupPreview"></pre>
     </section>
 
     <section class="card">
-      <h2>Shared project folder access</h2>
-
+      <h2>Shared project folder access for AI</h2>
+      <p>Choose which shared project folder is exposed to the AI. Files from the selected folder can be opened, edited, saved, or improved from this portal.</p>
       <div class="row">
         <label for="sharedFolderSelect">Folder</label>
         <div class="inline-row">
@@ -139,44 +121,35 @@
           <button onclick="loadSharedFolders()">Refresh</button>
         </div>
       </div>
-
       <div class="row">
         <button onclick="loadSharedFiles()">Load shared folder files</button>
       </div>
-
       <div class="row">
         <label for="sharedFileList">Shared files</label>
         <select id="sharedFileList" size="10"></select>
       </div>
-
       <div class="row buttons">
         <button onclick="openSharedFile()">Open shared file</button>
       </div>
-
       <div class="row">
         <label for="sharedPath">Shared relative path</label>
         <input id="sharedPath" type="text" placeholder="example.txt">
       </div>
-
       <div class="row">
         <label for="sharedContent">Shared file content</label>
         <textarea id="sharedContent" rows="16"></textarea>
       </div>
-
       <div class="row buttons">
         <button onclick="saveSharedFile()">Save shared file</button>
       </div>
-
       <div class="row">
         <label for="sharedTask">Ask Ollama to improve shared folder files</label>
         <textarea id="sharedTask" rows="5">Improve the selected file and make it clearer and more professional.</textarea>
       </div>
-
       <div class="row buttons">
         <button onclick="askImproveShared()">Ask Ollama to improve shared file</button>
         <button onclick="applyImproveShared()">Apply generated shared files</button>
       </div>
-
       <pre id="sharedStatus"></pre>
       <pre id="sharedPreview"></pre>
     </section>
@@ -184,21 +157,17 @@
     <section class="card">
       <h2>Git sync for AI website changes</h2>
       <p>Use this after reviewing file edits to sync the website into the git repo and push it to the <strong>dev</strong> branch.</p>
-
       <div class="row">
         <label for="gitBranch">Branch</label>
         <input id="gitBranch" type="text" value="dev" placeholder="dev">
       </div>
-
       <div class="row">
         <label for="gitMessage">Commit message</label>
         <input id="gitMessage" type="text" placeholder="AI website update">
       </div>
-
       <div class="row buttons">
         <button onclick="runGitSync()">Sync website and push branch</button>
       </div>
-
       <pre id="gitStatus">Ready to push changes to git.</pre>
     </section>
   </main>

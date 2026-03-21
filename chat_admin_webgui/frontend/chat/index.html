@@ -21,18 +21,18 @@
         <button class="new-chat-btn" onclick="newChat()">+ New chat</button>
       </div>
 
-      <div class="sidebar-section">
+      <div class="sidebar-section history-section">
         <div class="section-title">Projects</div>
         <div id="projectsList" class="list-stack"></div>
       </div>
 
-      <div class="sidebar-section">
-        <div class="section-title">Chats</div>
-        <div id="chatsList" class="list-stack"></div>
+      <div class="sidebar-section history-section">
+        <div class="section-title">History</div>
+        <div id="chatsList" class="list-stack scroll-list"></div>
       </div>
 
       <div class="sidebar-footer">
-        <a href="/admin/">Admin</a>
+        <a href="/portal/">Admin portal</a>
         <a href="/editable/">Editable Page</a>
       </div>
     </aside>
@@ -56,8 +56,8 @@
 
       <section class="composer-wrap">
         <div class="save-row">
-          <input id="chatTitle" type="text" placeholder="Chat name">
-          <input id="projectName" type="text" placeholder="Project name">
+          <input id="chatTitle" type="text" placeholder="Chat name (auto-generated if blank)">
+          <input id="projectName" type="text" placeholder="Project name (auto-saved)">
           <button onclick="saveProject()">Save project</button>
           <button onclick="saveCurrentChat()">Save chat</button>
         </div>

@@ -115,6 +115,7 @@ class SaveChatRequest(BaseModel):
     project: str = "General"
     messages: list
     model: str = DEFAULT_MODEL
+    chat_id: str | None = None
 
 
 class DeleteProjectRequest(BaseModel):
@@ -289,10 +290,13 @@ def chat(req: ChatRequest):
 @app.get("/chat/state")
 def chat_state():
     ensure_data_files()
+    projects = read_projects()
+    if "General" not in projects:
+        projects = ["General", *projects]
     return {
         "brand": "404DonkeyNotFound",
         "slogan": "if it works, make sure donkey can break IT!",
-        "projects": read_projects(),
+        "projects": projects,
         "chats": list_chat_meta(),
         "storage": {
             "base_dir": str(BASE_DIR),
@@ -347,12 +351,13 @@ def chat_session_save(req: SaveChatRequest):
         raise HTTPException(status_code=400, detail="Chat title is required")
 
     projects = read_projects()
-    if project not in projects:
+    if project != "General" and project not in projects:
         projects.append(project)
         projects.sort()
         write_projects(projects)
 
-    chat_id = str(uuid.uuid4())
+    chat_id = req.chat_id.strip() if req.chat_id else str(uuid.uuid4())
+    chat_file = get_chat_file(chat_id)
     now = datetime.utcnow().isoformat() + "Z"
     payload = {
         "id": chat_id,
@@ -363,7 +368,6 @@ def chat_session_save(req: SaveChatRequest):
         "messages": req.messages
     }
 
-    chat_file = get_chat_file(chat_id)
     chat_file.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return {"status": "saved", "chat_id": chat_id, "title": title, "project": project}
 
@@ -688,11 +692,17 @@ def admin_redirect():
     return RedirectResponse(url="/admin/")
 
 
+@app.get("/portal", include_in_schema=False)
+def portal_redirect():
+    return RedirectResponse(url="/admin/")
+
+
 @app.get("/editable", include_in_schema=False)
 def editable_redirect():
     return RedirectResponse(url="/editable/")
 
 
 app.mount("/admin", StaticFiles(directory=ADMIN_ROOT, html=True), name="admin")
+app.mount("/portal", StaticFiles(directory=ADMIN_ROOT, html=True), name="portal")
 app.mount("/editable", StaticFiles(directory=EDIT_ROOT, html=True), name="editable")
 app.mount("/", StaticFiles(directory=CHAT_ROOT, html=True), name="chat")
