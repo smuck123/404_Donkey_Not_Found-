@@ -5,6 +5,7 @@ let activeProject = "General";
 let savedChats = [];
 let savedProjects = [];
 let selectedChatId = null;
+let autosaveTimer = null;
 
 async function api(url, method = "GET", data = null) {
   const opts = {
@@ -51,6 +52,17 @@ function loadLocalSettings() {
   document.getElementById("activeModelLabel").textContent = `Model: ${activeModel}`;
 }
 
+function getChatTitle() {
+  const field = document.getElementById("chatTitle");
+  const current = field.value.trim();
+  if (current) return current;
+
+  const firstUserMessage = chatHistory.find(msg => msg.role === "user")?.content?.trim() || "";
+  const generated = firstUserMessage ? firstUserMessage.slice(0, 48) : "Untitled chat";
+  field.value = generated;
+  return generated;
+}
+
 function renderProjects() {
   const box = document.getElementById("projectsList");
   if (savedProjects.length === 0) {
@@ -61,7 +73,7 @@ function renderProjects() {
   box.innerHTML = savedProjects.map(name => `
     <div class="sidebar-entry">
       <button class="sidebar-item ${name === activeProject ? "active" : ""}" onclick="selectProject(${JSON.stringify(name)})">${escapeHtml(name)}</button>
-      <button class="danger-icon" onclick="deleteProject(${JSON.stringify(name)})" title="Delete project">×</button>
+      ${name === "General" ? "" : `<button class="danger-icon" onclick="deleteProject(${JSON.stringify(name)})" title="Delete project">×</button>`}
     </div>
   `).join("");
 }
@@ -91,7 +103,7 @@ function renderChat() {
     box.innerHTML = `
       <div class="empty-state">
         <h2>How can donkey help today?</h2>
-        <p>Save projects and chats in the left sidebar so they stay remembered.</p>
+        <p>Projects and chats are now auto-saved, so your history stays available.</p>
       </div>
     `;
     return;
@@ -112,11 +124,13 @@ function selectProject(name) {
   document.getElementById("projectName").value = name;
   document.getElementById("activeProjectLabel").textContent = `Project: ${name}`;
   renderProjects();
+  queueAutosave();
 }
 
 function clearChat() {
   chatHistory = [];
   selectedChatId = null;
+  document.getElementById("chatTitle").value = "";
   renderChat();
   renderChats();
   setStatus("Chat cleared.");
@@ -125,6 +139,7 @@ function clearChat() {
 function newChat() {
   chatHistory = [];
   selectedChatId = null;
+  activeProject = document.getElementById("projectName").value.trim() || activeProject || "General";
   document.getElementById("chatTitle").value = "";
   renderChat();
   renderChats();
@@ -144,29 +159,32 @@ async function loadState() {
     ? `Storage: ${storage.projects_file}`
     : "Storage: unavailable";
 
-  if (!savedProjects.includes(activeProject) && savedProjects.length > 0) {
-    activeProject = savedProjects[0];
+  if (!savedProjects.includes(activeProject)) {
+    activeProject = savedProjects.includes("General") ? "General" : (savedProjects[0] || "General");
   }
 
+  document.getElementById("projectName").value = activeProject;
   document.getElementById("activeProjectLabel").textContent = `Project: ${activeProject}`;
   renderProjects();
   renderChats();
 }
 
-async function saveProject() {
+async function saveProject(showStatus = true) {
   const name = document.getElementById("projectName").value.trim();
   if (!name) {
-    setStatus("Write a project name first.");
-    return;
+    if (showStatus) setStatus("Write a project name first.");
+    return null;
   }
 
   try {
     await api("/api/chat/project/save", "POST", { name });
     activeProject = name;
     await loadState();
-    setStatus(`Project saved: ${name}`);
+    if (showStatus) setStatus(`Project saved: ${name}`);
+    return name;
   } catch (err) {
-    setStatus("Failed to save project: " + err.message);
+    if (showStatus) setStatus("Failed to save project: " + err.message);
+    throw err;
   }
 }
 
@@ -189,31 +207,65 @@ async function deleteProject(name) {
   }
 }
 
-async function saveCurrentChat() {
-  const title = document.getElementById("chatTitle").value.trim();
+async function saveCurrentChat(showStatus = true) {
+  const title = getChatTitle();
   if (!title) {
-    setStatus("Write a chat name first.");
-    return;
+    if (showStatus) setStatus("Write a chat name first.");
+    return null;
   }
 
   if (chatHistory.length === 0) {
-    setStatus("Chat is empty.");
-    return;
+    if (showStatus) setStatus("Chat is empty.");
+    return null;
+  }
+
+  const projectName = document.getElementById("projectName").value.trim() || activeProject || "General";
+
+  try {
+    await saveProject(false);
+  } catch {
+    // saveCurrentChat will report its own error below if the next request fails.
   }
 
   try {
     const result = await api("/api/chat/session/save", "POST", {
+      chat_id: selectedChatId,
       title,
-      project: activeProject || "General",
+      project: projectName,
       messages: chatHistory,
       model: activeModel
     });
     selectedChatId = result.chat_id || null;
+    activeProject = result.project || projectName;
     await loadState();
-    setStatus(`Chat saved as \"${title}\"`);
+    if (showStatus) setStatus(`Chat saved as \"${title}\"`);
+    return result;
   } catch (err) {
-    setStatus("Failed to save chat: " + err.message);
+    if (showStatus) setStatus("Failed to save chat: " + err.message);
+    throw err;
   }
+}
+
+function queueAutosave() {
+  if (autosaveTimer) {
+    clearTimeout(autosaveTimer);
+  }
+
+  autosaveTimer = setTimeout(async () => {
+    autosaveTimer = null;
+    try {
+      const projectName = document.getElementById("projectName").value.trim();
+      if (projectName) {
+        await saveProject(false);
+      }
+      if (chatHistory.length > 0) {
+        await saveCurrentChat(false);
+        setStatus("Autosaved project and chat.");
+      }
+    } catch (err) {
+      setStatus("Autosave failed: " + err.message);
+    }
+  }, 600);
 }
 
 async function deleteChat(chatId) {
@@ -238,10 +290,11 @@ async function loadSavedChat(chatId) {
     selectedChatId = chatId;
     chatHistory = data.messages || [];
     activeProject = data.project || "General";
+    activeModel = data.model || activeModel;
     document.getElementById("chatTitle").value = data.title || "";
     document.getElementById("projectName").value = activeProject;
     document.getElementById("activeProjectLabel").textContent = `Project: ${activeProject}`;
-    document.getElementById("activeModelLabel").textContent = `Model: ${data.model || activeModel}`;
+    document.getElementById("activeModelLabel").textContent = `Model: ${activeModel}`;
     renderProjects();
     renderChats();
     renderChat();
@@ -276,6 +329,8 @@ async function sendMessage() {
   chatHistory.push({ role: "user", content: userText });
   renderChat();
   messageBox.value = "";
+  getChatTitle();
+  queueAutosave();
   setStatus(`Sending to ${activeModel}...`);
 
   try {
@@ -292,10 +347,12 @@ async function sendMessage() {
 
     chatHistory.push({ role: "assistant", content: answer });
     renderChat();
-    setStatus(`Reply received from ${activeModel}.`);
+    await saveCurrentChat(false);
+    setStatus(`Reply received from ${activeModel}. Chat autosaved.`);
   } catch (err) {
     chatHistory.push({ role: "assistant", content: "Error: " + err.message });
     renderChat();
+    queueAutosave();
     setStatus("Chat failed: " + err.message);
   }
 }
@@ -303,6 +360,8 @@ async function sendMessage() {
 window.onload = async function () {
   loadLocalSettings();
   renderChat();
+  document.getElementById("projectName").addEventListener("input", queueAutosave);
+  document.getElementById("chatTitle").addEventListener("input", queueAutosave);
   await loadState();
   setStatus(`Ready. Active model: ${activeModel}`);
 };
