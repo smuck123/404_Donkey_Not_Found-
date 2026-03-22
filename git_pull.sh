@@ -2,6 +2,7 @@
 set -euo pipefail
 
 PROJECT="/opt/git/404_Donkey_Not_Found"
+LIVE="/opt/404_donkey_not_found"
 DEFAULT_FILE="$PROJECT/.default_branch"
 
 if [ -f "$DEFAULT_FILE" ]; then
@@ -28,8 +29,8 @@ if ! git remote get-url origin >/dev/null 2>&1; then
     git remote add origin git@github.com:smuck123/404_Donkey_Not_Found-.git
 fi
 
-if ! git diff --quiet || ! git diff --cached --quiet; then
-    echo "[!] Working tree is not clean. Commit or stash changes first."
+if [ -n "$(git status --porcelain)" ]; then
+    echo "[!] Working tree is not clean. Commit, stash, or discard changes first."
     exit 1
 fi
 
@@ -43,4 +44,61 @@ fi
 
 git pull --rebase origin "$BRANCH"
 
-echo "[+] Updated branch $BRANCH"
+echo "[*] Syncing git workspace to live platform"
+
+mkdir -p "$LIVE/apps" "$LIVE/deploy" "$LIVE/docs"
+
+rsync -aHAX --delete \
+  --exclude '.git/' \
+  --exclude 'venv/' \
+  --exclude '__pycache__/' \
+  --exclude '*.pyc' \
+  --exclude '.env' \
+  --exclude 'telegram_chats.json' \
+  --exclude 'pending_fortigate_actions.json' \
+  --exclude 'openclaw/' \
+  "$PROJECT/apps/openclaw_zabbix_mcp/" "$LIVE/apps/openclaw_zabbix_mcp/"
+
+rsync -aHAX --delete \
+  --exclude '.git/' \
+  --exclude 'venv/' \
+  --exclude '__pycache__/' \
+  --exclude '*.pyc' \
+  --exclude 'cache/' \
+  --exclude 'data/' \
+  --exclude 'indexes/' \
+  --exclude 'models/' \
+  "$PROJECT/apps/404donkey_rag/" "$LIVE/apps/404donkey_rag/"
+
+rsync -aHAX --delete \
+  --exclude '.git/' \
+  --exclude 'venv/' \
+  --exclude 'node_modules/' \
+  --exclude '__pycache__/' \
+  --exclude '.env' \
+  --exclude 'data/' \
+  --exclude 'downloads/' \
+  --exclude 'exports/' \
+  --exclude 'backups/' \
+  --exclude 'repos/' \
+  --exclude 'shared_folders/' \
+  "$PROJECT/apps/chat_admin_webgui/" "$LIVE/apps/chat_admin_webgui/"
+
+rsync -aHAX --delete \
+  --exclude '.git/' \
+  --exclude 'venv/' \
+  --exclude 'node_modules/' \
+  --exclude '__pycache__/' \
+  "$PROJECT/apps/ollama_webgui/" "$LIVE/apps/ollama_webgui/"
+
+rsync -aHAX --delete \
+  "$PROJECT/deploy/" "$LIVE/deploy/"
+
+rsync -aHAX --delete \
+  "$PROJECT/docs/" "$LIVE/docs/"
+
+echo "[*] Restarting services"
+systemctl restart openclaw-zabbix-mcp
+systemctl restart telegram-zabbix-router
+
+echo "[+] Updated branch $BRANCH and deployed to $LIVE"
