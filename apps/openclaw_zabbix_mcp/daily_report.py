@@ -22,6 +22,22 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 SERVER_HOST = "zabbix.kivela.work"
 TORAKKA_IFACE = '{92B32988-BAC1-4911-9689-64FD64F7FB3F}'
+SEVERITY_LABELS = {
+    "0": "not classified",
+    "1": "information",
+    "2": "warning",
+    "3": "average",
+    "4": "high",
+    "5": "disaster",
+}
+SEVERITY_ICONS = {
+    "0": "ℹ️",
+    "1": "🟡",
+    "2": "🟠",
+    "3": "🔴",
+    "4": "🚨",
+    "5": "💥",
+}
 
 
 def _fmt_number(value, suffix: str = "") -> str:
@@ -36,6 +52,17 @@ def _fmt_number(value, suffix: str = "") -> str:
     if num.is_integer():
         return f"{int(num)}{suffix}"
     return f"{num:.2f}{suffix}"
+
+
+
+def _title(text: str) -> str:
+    return f"{'=' * 6} {text} {'=' * 6}"
+
+
+
+def _subtitle(text: str) -> str:
+    return f"-- {text} --"
+
 
 
 def _metric_stats(host: str, key: str, hours: int = 24) -> dict:
@@ -70,19 +97,21 @@ def _metric_stats(host: str, key: str, hours: int = 24) -> dict:
     return result
 
 
+
 def _format_metric_line(label: str, metric: dict, include_avg: bool = True) -> str:
     if not metric.get("found"):
-        return f"- {label}: n/a ({metric['key']} not found)"
+        return f"• {label}: n/a ({metric['key']} not found)"
 
     units = metric.get("units", "")
     latest = _fmt_number(metric.get("latest", metric.get("lastvalue")), units)
-    parts = [f"- {label}: now={latest}"]
+    parts = [f"• {label}: now {latest}"]
     if metric.get("count", 0) > 0:
         if include_avg:
-            parts.append(f"avg24h={_fmt_number(metric.get('avg'), units)}")
-        parts.append(f"low24h={_fmt_number(metric.get('min'), units)}")
-        parts.append(f"high24h={_fmt_number(metric.get('max'), units)}")
-    return " ".join(parts)
+            parts.append(f"avg24h {_fmt_number(metric.get('avg'), units)}")
+        parts.append(f"low24h {_fmt_number(metric.get('min'), units)}")
+        parts.append(f"high24h {_fmt_number(metric.get('max'), units)}")
+    return " | ".join(parts)
+
 
 
 def _format_disk_space(host: str) -> list[str]:
@@ -95,34 +124,35 @@ def _format_disk_space(host: str) -> list[str]:
     lines = []
     if total.get("found") and used.get("found") and free.get("found"):
         lines.append(
-            "- Disk space C:: "
-            f"used={_fmt_number(used.get('lastvalue'), used.get('units', ''))} / "
-            f"total={_fmt_number(total.get('lastvalue'), total.get('units', ''))} "
-            f"free={_fmt_number(free.get('lastvalue'), free.get('units', ''))}"
+            "• Disk C:: "
+            f"used {_fmt_number(used.get('lastvalue'), used.get('units', ''))} / "
+            f"total {_fmt_number(total.get('lastvalue'), total.get('units', ''))} | "
+            f"free {_fmt_number(free.get('lastvalue'), free.get('units', ''))}"
         )
     if used_pct.get("found") or free_pct.get("found"):
         lines.append(
-            "- Disk percentages: "
-            f"used={_fmt_number(used_pct.get('lastvalue'), used_pct.get('units', '%'))} "
-            f"free={_fmt_number(free_pct.get('lastvalue'), free_pct.get('units', '%'))}"
+            "• Disk C: percentages: "
+            f"used {_fmt_number(used_pct.get('lastvalue'), used_pct.get('units', '%'))} | "
+            f"free {_fmt_number(free_pct.get('lastvalue'), free_pct.get('units', '%'))}"
         )
-    return lines or ["- Disk space C:: n/a"]
+    return lines or ["• Disk C:: n/a"]
+
 
 
 def _summarize_windows_traffic(host: str) -> str:
     items = get_item_last_value(host, "windows.traffic.out")
     if not items:
-        return "- Outbound connection summary: windows.traffic.out item not found"
+        return "• Outbound connections: windows.traffic.out item not found"
 
     raw = items[0].get("lastvalue", "")
     try:
         payload = json.loads(raw)
     except Exception as e:
-        return f"- Outbound connection summary: could not parse windows.traffic.out ({e})"
+        return f"• Outbound connections: could not parse windows.traffic.out ({e})"
 
     rows = payload.get("data", []) or []
     if not rows:
-        return "- Outbound connection summary: no recent connection rows"
+        return "• Outbound connections: no recent connection rows"
 
     proc_counter = Counter()
     ip_counter = Counter()
@@ -137,21 +167,46 @@ def _summarize_windows_traffic(host: str) -> str:
         port_counter[str(rport)] += 1
         proc_samples.setdefault(proc, []).append(f"{rip}:{rport}")
 
-    top_processes = ", ".join(f"{proc}({count})" for proc, count in proc_counter.most_common(5))
-    top_dests = ", ".join(f"{ip}({count})" for ip, count in ip_counter.most_common(5))
-    top_ports = ", ".join(f"{port}({count})" for port, count in port_counter.most_common(5))
+    top_processes = ", ".join(f"{proc}({count})" for proc, count in proc_counter.most_common(3))
+    top_dests = ", ".join(f"{ip}({count})" for ip, count in ip_counter.most_common(3))
+    top_ports = ", ".join(f"{port}({count})" for port, count in port_counter.most_common(3))
     samples = []
-    for proc, count in proc_counter.most_common(3):
-        examples = ", ".join(proc_samples.get(proc, [])[:3])
+    for proc, _count in proc_counter.most_common(2):
+        examples = ", ".join(proc_samples.get(proc, [])[:2])
         samples.append(f"{proc}: {examples}")
 
     return (
-        f"- Outbound connection summary: {len(rows)} rows. "
-        f"Top processes: {top_processes}. "
-        f"Top destinations: {top_dests}. "
-        f"Top remote ports: {top_ports}. "
-        f"Examples: {'; '.join(samples)}"
+        f"• Outbound connections: {len(rows)} rows | "
+        f"top processes {top_processes} | "
+        f"top destinations {top_dests} | "
+        f"top ports {top_ports} | "
+        f"examples {'; '.join(samples)}"
     )
+
+
+
+def _format_problem_summary(problems: list[dict]) -> str:
+    if not problems:
+        return "✅ No current problems detected."
+
+    active_problems = [p for p in problems if str(p.get("severity")) != "0"]
+    problem_counts = Counter(str(p.get("severity")) for p in active_problems)
+    summary_bits = []
+    for severity in sorted(problem_counts.keys(), key=lambda value: int(value), reverse=True):
+        summary_bits.append(
+            f"{SEVERITY_ICONS.get(severity, '•')} {SEVERITY_LABELS.get(severity, severity)}={problem_counts[severity]}"
+        )
+
+    lines = [" | ".join(summary_bits) if summary_bits else "✅ No actionable alerts."]
+    for problem in active_problems[:8]:
+        sev = str(problem.get("severity"))
+        lines.append(f"• {SEVERITY_ICONS.get(sev, '•')} sev={sev} {problem.get('name')}")
+
+    remaining = len(active_problems) - min(len(active_problems), 8)
+    if remaining > 0:
+        lines.append(f"• …and {remaining} more active alerts")
+    return "\n".join(lines)
+
 
 
 def _torakka_server_section(host: str) -> str:
@@ -161,17 +216,17 @@ def _torakka_server_section(host: str) -> str:
     host_info = data.get("host", {}) if isinstance(data, dict) else {}
     os_item = get_item_last_value(host, "system.sw.os")
     alerts = get_problems(50)
-    host_alerts = [p for p in alerts if host.lower() in json.dumps(p).lower()]
+    host_alerts = [p for p in alerts if host.lower() in json.dumps(p).lower() and str(p.get("severity")) != "0"]
 
     lines = [
-        f"Server summary: {host}",
-        f"- Overall status: {'enabled' if str(host_info.get('status')) == '0' else 'disabled'}",
-        f"- OS: {os_item[0].get('lastvalue') if os_item else 'n/a'}",
-        f"- Current alerts: {len(host_alerts)}",
+        _subtitle(f"Server health: {host}"),
+        f"• Status: {'enabled' if str(host_info.get('status')) == '0' else 'disabled'}",
+        f"• OS: {os_item[0].get('lastvalue') if os_item else 'n/a'}",
+        f"• Active alerts on host: {len(host_alerts)}",
         _format_metric_line("CPU utilization", _metric_stats(host, "system.cpu.util")),
         _format_metric_line("Memory utilization", _metric_stats(host, "vm.memory.util")),
         _format_metric_line("Page Faults/sec", _metric_stats(host, r'perf_counter_en["\\Memory\\Page Faults/sec"]')),
-        "  Page Faults/sec shows how many memory pages fault per second. Hard faults need disk access and can slow the host noticeably.",
+        "  Note: sustained high hard page faults can mean memory pressure and visible slowdown.",
         _format_metric_line("Processes", _metric_stats(host, "proc.num[]")),
         _format_metric_line("Disk reads/sec C:", _metric_stats(host, r'perf_counter_en["\\PhysicalDisk(0 C:)\\Disk Reads/sec",60]')),
     ]
@@ -180,13 +235,13 @@ def _torakka_server_section(host: str) -> str:
         _format_metric_line(f"Traffic in {TORAKKA_IFACE}", _metric_stats(host, f'net.if.in["{TORAKKA_IFACE}"]'), include_avg=False),
         _format_metric_line(f"Traffic out {TORAKKA_IFACE}", _metric_stats(host, f'net.if.out["{TORAKKA_IFACE}"]'), include_avg=False),
         _summarize_windows_traffic(host),
-        f"- AI host interpretation: {summarize_host_24h_with_ai(host)}",
-        f"- AI traffic interpretation: {summarize_traffic_with_ai(host)}",
+        f"• AI host interpretation: {summarize_host_24h_with_ai(host)}",
+        f"• AI traffic interpretation: {summarize_traffic_with_ai(host)}",
     ])
 
     gpu_items = {item.get("key_"): item for item in gpu.get("gpu_items", [])} if isinstance(gpu, dict) else {}
     if gpu_items:
-        lines.append("- Nvidia:")
+        lines.append("• Nvidia GPU:")
         for key, label in [
             ("gpu.name[0]", "Name"),
             ("gpu.utilization[0]", "Utilization"),
@@ -198,17 +253,18 @@ def _torakka_server_section(host: str) -> str:
         ]:
             item = gpu_items.get(key)
             if item:
-                lines.append(f"  - {label}: {item.get('lastvalue')} {item.get('units', '')}".rstrip())
-        lines.append("  - Services overall status: infer from active alerts/events until a dedicated service item is added.")
+                lines.append(f"  • {label}: {item.get('lastvalue')} {item.get('units', '')}".rstrip())
+        lines.append("  • Service status note: infer from active alerts/events until a dedicated service item is added.")
     else:
-        lines.append("- Nvidia: no GPU metrics found")
+        lines.append("• Nvidia GPU: no metrics found")
 
     return "\n".join(lines)
 
 
+
 def _zabbix_server_section(host: str) -> str:
     lines = [
-        f"Server summary: {host}",
+        _subtitle(f"Server health: {host}"),
         _format_metric_line("CPU count", _metric_stats(host, "system.cpu.num"), include_avg=False),
         _format_metric_line("Memory total", _metric_stats(host, "vm.memory.size[total]"), include_avg=False),
         _format_metric_line("Logged in users", _metric_stats(host, "system.users.num"), include_avg=False),
@@ -216,9 +272,9 @@ def _zabbix_server_section(host: str) -> str:
 
     log_summary = get_item_last_value(host, "log.summary.text")
     if log_summary:
-        lines.append(f"- Log summary: {log_summary[0].get('lastvalue', '')[:700]}")
+        lines.append(f"• Log summary: {log_summary[0].get('lastvalue', '')[:500]}")
     else:
-        lines.append("- Log summary: n/a")
+        lines.append("• Log summary: n/a")
 
     nginx_keys = [
         "nginx.connections.active",
@@ -230,12 +286,12 @@ def _zabbix_server_section(host: str) -> str:
         "nginx.requests.total.rate",
         "vhost.urls[zabbix.kivela.work]",
     ]
-    lines.append("- Nginx:")
+    lines.append("• Nginx:")
     for key in nginx_keys:
         item = get_item_last_value(host, key)
         if item:
             value = item[0].get("lastvalue")
-            lines.append(f"  - {key}: {value}")
+            lines.append(f"  • {key}: {value}")
     lines.append(_format_metric_line("New log lines today", _metric_stats(host, "log.summary.total_new_lines"), include_avg=False))
     for key in [
         "audit anomaly",
@@ -251,15 +307,16 @@ def _zabbix_server_section(host: str) -> str:
     ]:
         item = get_item_last_value(host, key)
         if item:
-            lines.append(f"- {key}: {item[0].get('lastvalue')}")
+            lines.append(f"• {key}: {item[0].get('lastvalue')}")
 
     return "\n".join(lines)
+
 
 
 def _firewall_network_section() -> str:
     host = FIREWALL_HOST
     lines = [
-        f"Network summary: {host}",
+        _subtitle(f"Firewall & network: {host}"),
         _format_metric_line("Internet traffic in", _metric_stats(host, "net.if.in[ifHCOutOctets.4]"), include_avg=False),
         _format_metric_line("Internet traffic out", _metric_stats(host, "net.if.out[ifHCOutOctets.4]"), include_avg=False),
         _format_metric_line("Active sessions", _metric_stats(host, "net.ipv4.sessions[fgSysSesCount.0]"), include_avg=False),
@@ -267,23 +324,21 @@ def _firewall_network_section() -> str:
         _format_metric_line("CPU usage", _metric_stats(host, "system.cpu.util[fgSysCpuUsage.0]")),
         _format_metric_line("Memory usage", _metric_stats(host, "vm.memory.util[memoryUsedPercentage.0]")),
         _format_metric_line("Critical IPS detections", _metric_stats(host, "ips.detected.crit[fgIpsCritSevDetections.0]"), include_avg=False),
-        f"- FortiGate config summary: {summarize_fortigate_snapshot()}",
-        f"- FortiGate traffic summary: {summarize_fortigate_traffic()}",
+        f"• FortiGate config summary: {summarize_fortigate_snapshot()}",
+        f"• FortiGate traffic summary: {summarize_fortigate_traffic()}",
     ]
     return "\n".join(lines)
 
 
+
 def build_daily_report(host: str = "TORAKKA") -> str:
+    timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+
     try:
         problems = get_problems(10)
-        if problems:
-            problems_text = "\n".join(
-                [f"- sev={p.get('severity')} {p.get('name')}" for p in problems[:10]]
-            )
-        else:
-            problems_text = "- No current problems"
+        problems_text = _format_problem_summary(problems)
     except Exception as e:
-        problems_text = f"Could not get current problems: {e}"
+        problems_text = f"⚠️ Could not get current problems: {e}"
 
     try:
         server_summary = "\n\n".join([
@@ -291,22 +346,25 @@ def build_daily_report(host: str = "TORAKKA") -> str:
             _zabbix_server_section(SERVER_HOST),
         ])
     except Exception as e:
-        server_summary = f"Could not build server summary: {e}"
+        server_summary = f"⚠️ Could not build server summary: {e}"
 
     try:
         network_summary = _firewall_network_section()
     except Exception as e:
-        network_summary = f"Could not build network summary: {e}"
+        network_summary = f"⚠️ Could not build network summary: {e}"
 
     return (
-        f"Daily infrastructure report ({datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')})\n\n"
-        "Current problems:\n"
+        f"🏁 Daily infrastructure report\n"
+        f"Generated: {timestamp}\n"
+        f"Primary host: {host}\n\n"
+        f"{_title('Current problems')}\n"
         f"{problems_text}\n\n"
-        "Servers summary:\n"
+        f"{_title('Servers')}\n"
         f"{server_summary}\n\n"
-        "Network summary:\n"
+        f"{_title('Network')}\n"
         f"{network_summary}"
     )
+
 
 
 def send_telegram_message(chat_id: int, text: str) -> None:
@@ -326,6 +384,7 @@ def send_telegram_message(chat_id: int, text: str) -> None:
         r = requests.post(url, data=payload, timeout=30)
         if not r.ok:
             raise RuntimeError(f"Telegram send failed for chat_id={chat_id}: {r.status_code} {r.text}")
+
 
 
 def send_daily_report_to_all(host: str = "TORAKKA") -> None:
@@ -348,6 +407,7 @@ def send_daily_report_to_all(host: str = "TORAKKA") -> None:
 
     if failed:
         raise RuntimeError("Some sends failed:\n" + "\n".join(failed))
+
 
 
 def main() -> None:
