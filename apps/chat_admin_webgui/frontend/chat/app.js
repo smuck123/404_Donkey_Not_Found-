@@ -8,6 +8,7 @@ let savedChats = [];
 let savedProjects = [];
 let savedRepoTemplates = [];
 let savedRepos = [];
+let savedLearningItems = [];
 let selectedChatId = "";
 let lastRetrieved = [];
 let lastPlannedChanges = null;
@@ -124,6 +125,29 @@ function renderRepoTemplates() {
       <div class="item-title">${escapeHtml(t.template_name)}</div>
       <div class="item-meta">${escapeHtml(t.repo_name)} • ${escapeHtml(String(t.file_count))} files</div>
     </button>
+  `).join("");
+}
+
+function getSelectedLearningIds() {
+  return [...document.querySelectorAll('input[name="learningItem"]:checked')].map(el => el.value);
+}
+
+function renderLearningItems() {
+  const box = document.getElementById("learningList");
+  if (!box) return;
+  if (savedLearningItems.length === 0) {
+    box.innerHTML = '<div class="item-meta">No learning items yet</div>';
+    return;
+  }
+  const selected = new Set(getSelectedLearningIds());
+  box.innerHTML = savedLearningItems.map(item => `
+    <label class="sidebar-item learning-item">
+      <input type="checkbox" name="learningItem" value="${escapeHtml(item.id)}" ${selected.has(item.id) ? "checked" : ""}>
+      <div>
+        <div class="item-title">${escapeHtml(item.title)}</div>
+        <div class="item-meta">${escapeHtml(item.category)} • ${escapeHtml((item.tags || []).join(", ") || "no tags")}</div>
+      </div>
+    </label>
   `).join("");
 }
 
@@ -263,6 +287,7 @@ async function loadState() {
   savedChats = data.chats || [];
   savedRepoTemplates = templateData.templates || [];
   savedRepos = repoData.repos || [];
+  savedLearningItems = data.learning_items || [];
 
   document.getElementById("mainBrand").textContent = data.brand || "404DonkeyNotFound";
   document.getElementById("mainSlogan").textContent = data.slogan || "if it works, make sure donkey can break IT!";
@@ -274,6 +299,7 @@ async function loadState() {
   renderProjects();
   renderChats();
   renderRepoTemplates();
+  renderLearningItems();
   renderProjectSelect();
   renderTemplateSelect();
   renderRepoSelect();
@@ -325,6 +351,49 @@ function buildSourceTypes() {
   return null;
 }
 
+function applyPromptPreset(text) {
+  const messageBox = document.getElementById("message");
+  messageBox.value = text;
+  messageBox.focus();
+}
+
+async function saveLearningItem() {
+  const title = document.getElementById("learningTitle").value.trim();
+  const category = document.getElementById("learningCategory").value.trim();
+  const tags = document.getElementById("learningTags").value.split(",").map(x => x.trim()).filter(Boolean);
+  const content = document.getElementById("learningContent").value.trim();
+  if (!title || !content) {
+    setStatus("Learning title and content are required.");
+    return;
+  }
+  try {
+    await api("/api/chat/learning/save", "POST", { title, category, tags, content });
+    document.getElementById("learningTitle").value = "";
+    document.getElementById("learningTags").value = "";
+    document.getElementById("learningContent").value = "";
+    await loadState();
+    setStatus(`Saved learning item "${title}".`);
+  } catch (err) {
+    setStatus("Failed to save learning item: " + err.message);
+  }
+}
+
+async function previewLearningItem() {
+  const ids = getSelectedLearningIds();
+  if (ids.length === 0) {
+    setStatus("Select a learning item to preview.");
+    return;
+  }
+  try {
+    const data = await api(`/api/chat/learning/read?item_id=${encodeURIComponent(ids[0])}`);
+    document.getElementById("sourceMeta").textContent = `learning: ${data.title}`;
+    document.getElementById("sourceViewer").textContent = data.content;
+    setStatus(`Previewed learning item "${data.title}".`);
+  } catch (err) {
+    setStatus("Failed to preview learning item: " + err.message);
+  }
+}
+
 async function sendMessage() {
   const messageBox = document.getElementById("message");
   const userText = messageBox.value.trim();
@@ -348,7 +417,7 @@ async function sendMessage() {
       stream: false,
       use_retrieval: true,
       selected_template: activeTemplate || null,
-      selected_repo: activeRepo || null,
+      selected_learning_ids: getSelectedLearningIds(),
       source_types: sourceTypes
     });
 
@@ -389,7 +458,8 @@ async function proposeChanges() {
       model: activeModel,
       instruction,
       selected_template: activeTemplate || null,
-      selected_repo: activeRepo || null
+      selected_repo: activeRepo || null,
+      selected_learning_ids: getSelectedLearningIds()
     });
     lastPlannedChanges = data;
     renderPlannedChanges();

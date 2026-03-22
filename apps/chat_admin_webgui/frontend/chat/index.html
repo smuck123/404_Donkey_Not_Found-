@@ -43,6 +43,12 @@
         <div class="section-title">Saved Templates</div>
         <div id="repoTemplatesList" class="list-stack"></div>
       </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Learning Library</div>
+        <div id="learningList" class="list-stack"></div>
+        <button onclick="previewLearningItem()">Preview selected</button>
+      </div>
     </aside>
 
     <main class="centerpanel">
@@ -97,6 +103,12 @@
       </section>
 
       <section class="composer-wrap">
+        <div class="prompt-toolbar">
+          <span>Quick prompts:</span>
+          <button onclick="applyPromptPreset('Use the selected learning items and template to explain how to build a Zabbix widget step by step, including file structure and common mistakes.')">Zabbix widget guide</button>
+          <button onclick="applyPromptPreset('Use the selected learning items and code examples to create a reusable Zabbix template plan with items, triggers, tags, and discovery notes.')">Template plan</button>
+          <button onclick="applyPromptPreset('Review the selected repo and learning items, then propose code changes that improve training quality, examples, and implementation clarity.')">Improve training repo</button>
+        </div>
         <div class="composer">
           <textarea id="message" rows="5" placeholder="Ask about Zabbix widgets, templates, modules, repos, or use the selected template/repo as context..."></textarea>
           <div class="composer-actions">
@@ -111,6 +123,17 @@
     </main>
 
     <aside class="rightbar">
+      <section class="inspector-card">
+        <h3>Learning Capture</h3>
+        <div class="stack-form">
+          <input id="learningTitle" type="text" placeholder="Learning item title">
+          <input id="learningCategory" type="text" value="zabbix-code" placeholder="Category">
+          <input id="learningTags" type="text" placeholder="Tags comma separated: zabbix, widget, template">
+          <textarea id="learningContent" rows="10" placeholder="Paste code, notes, widget snippets, template XML/JSON, troubleshooting patterns, or step-by-step implementation guidance here."></textarea>
+          <button onclick="saveLearningItem()">Save to learning library</button>
+        </div>
+      </section>
+
       <section class="inspector-card">
         <h3>Retrieved Sources</h3>
         <div id="sourcesList" class="list-stack compact"></div>

@@ -1,4 +1,5 @@
 let chatMessages = [];
+let learningItems = [];
 
 async function api(url, method = "GET", data = null, isForm = false) {
   const options = { method };
@@ -57,6 +58,28 @@ function clearChat() {
   document.getElementById("chatStatus").textContent = "Chat cleared.";
 }
 
+function getSelectedLearningIds() {
+  return [...document.querySelectorAll('input[name="learningAttach"]:checked')].map(el => el.value);
+}
+
+function renderLearningItems() {
+  const box = document.getElementById("learningList");
+  if (!box) return;
+  if (learningItems.length === 0) {
+    box.innerHTML = "<div>No learning items yet.</div>";
+    return;
+  }
+  box.innerHTML = learningItems.map(item => `
+    <label class="learning-item">
+      <input type="checkbox" name="learningAttach" value="${item.id}">
+      <div>
+        <strong>${item.title}</strong><br>
+        <small>${item.category} • ${(item.tags || []).join(", ") || "no tags"}</small>
+      </div>
+    </label>
+  `).join("");
+}
+
 async function loadModels() {
   const status = document.getElementById("modelStatus");
   const select = document.getElementById("modelSelect");
@@ -112,7 +135,8 @@ async function sendChatMessage() {
     const data = await api("/api/chat/messages", "POST", {
       model: model,
       messages: messages,
-      stream: false
+      stream: false,
+      learning_item_ids: getSelectedLearningIds()
     });
 
     const answer =
@@ -125,6 +149,50 @@ async function sendChatMessage() {
     status.textContent = "Reply received.";
   } catch (e) {
     status.textContent = "Chat failed: " + e.message;
+  }
+}
+
+async function loadLearningItems() {
+  const data = await api("/api/learning/list");
+  learningItems = data.items || [];
+  renderLearningItems();
+}
+
+async function saveLearningItem() {
+  const title = document.getElementById("learningTitle").value.trim();
+  const category = document.getElementById("learningCategory").value.trim();
+  const tags = document.getElementById("learningTags").value.split(",").map(x => x.trim()).filter(Boolean);
+  const content = document.getElementById("learningContent").value.trim();
+  const status = document.getElementById("learningStatus");
+  if (!title || !content) {
+    status.textContent = "Title and content are required.";
+    return;
+  }
+  try {
+    await api("/api/learning/save", "POST", { title, category, tags, content });
+    document.getElementById("learningTitle").value = "";
+    document.getElementById("learningTags").value = "";
+    document.getElementById("learningContent").value = "";
+    await loadLearningItems();
+    status.textContent = `Saved learning item "${title}".`;
+  } catch (e) {
+    status.textContent = "Save failed: " + e.message;
+  }
+}
+
+async function previewLearningItem() {
+  const status = document.getElementById("learningStatus");
+  const ids = getSelectedLearningIds();
+  if (!ids.length) {
+    status.textContent = "Select one learning item first.";
+    return;
+  }
+  try {
+    const data = await api(`/api/learning/read?item_id=${encodeURIComponent(ids[0])}`);
+    document.getElementById("learningPreview").textContent = data.content;
+    status.textContent = `Previewing ${data.title}`;
+  } catch (e) {
+    status.textContent = "Preview failed: " + e.message;
   }
 }
 
@@ -243,7 +311,8 @@ async function generateFromExample() {
       example_name: example,
       user_request: userRequest,
       output_folder: outputFolder,
-      write_files: true
+      write_files: true,
+      learning_item_ids: getSelectedLearningIds()
     });
 
     status.textContent = JSON.stringify(data, null, 2);
@@ -326,5 +395,6 @@ window.onload = async function () {
   await loadModels();
   await loadExamples();
   await loadGeneratedFolders();
+  await loadLearningItems();
   renderChat();
 };

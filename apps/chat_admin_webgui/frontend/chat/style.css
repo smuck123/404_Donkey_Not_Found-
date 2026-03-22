@@ -152,6 +152,13 @@ html, body {
   cursor: pointer;
 }
 
+.learning-item {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: start;
+  gap: 10px;
+}
+
 .sidebar-item.active {
   border-color: #3b82f6;
   background: #172033;
@@ -272,6 +279,27 @@ html, body {
 
 .composer-wrap {
   padding: 0 20px 20px 20px;
+}
+
+.prompt-toolbar,
+.stack-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prompt-toolbar {
+  margin-bottom: 12px;
+  background: #1b1f27;
+  border: 1px solid #2b3240;
+  border-radius: 18px;
+  padding: 12px;
+}
+
+.prompt-toolbar span {
+  color: #9fb0c7;
+  font-size: 12px;
+  text-transform: uppercase;
 }
 
 .composer {
