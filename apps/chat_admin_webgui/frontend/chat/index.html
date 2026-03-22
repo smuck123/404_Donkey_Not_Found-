@@ -29,18 +29,44 @@
         <button class="new-chat-btn" onclick="newChat()">+ New chat</button>
       </div>
 
+      <section class="sidebar-section quick-links">
+        <div class="section-title">Workspace</div>
+        <div class="list-stack">
+          <button class="sidebar-item" onclick="jumpToSection('workspaceContext')">Projects + models</button>
+          <button class="sidebar-item" onclick="jumpToSection('chatComposer')">Chat composer</button>
+          <button class="sidebar-item" onclick="jumpToSection('imageStudioCard')">Image studio</button>
+          <button class="sidebar-item" onclick="jumpToSection('learningCaptureCard')">Learning capture</button>
+          <button class="sidebar-item" onclick="jumpToSection('imageGalleryCard')">Saved images</button>
+        </div>
+      </section>
+
       <div class="sidebar-section">
         <div class="section-title">Projects</div>
+        <div class="inline-stack">
+          <input id="projectNameInput" type="text" placeholder="Create project">
+          <div class="button-row tight">
+            <button onclick="saveProject()">Save</button>
+            <button onclick="deleteCurrentProject()">Delete</button>
+          </div>
+        </div>
         <div id="projectsList" class="list-stack"></div>
       </div>
 
       <div class="sidebar-section">
         <div class="section-title">Chats</div>
+        <div class="button-row tight">
+          <button onclick="saveCurrentChat()">Save current</button>
+          <button onclick="deleteSelectedChat()">Delete selected</button>
+        </div>
         <div id="chatsList" class="list-stack"></div>
       </div>
 
       <div class="sidebar-section">
         <div class="section-title">Saved Templates</div>
+        <div class="button-row tight">
+          <button onclick="refreshTemplateSegments()">Refresh selected</button>
+          <button onclick="deleteActiveTemplate()">Delete selected</button>
+        </div>
         <div id="repoTemplatesList" class="list-stack"></div>
       </div>
 
@@ -66,7 +92,7 @@
         </div>
       </section>
 
-      <section class="context-bar">
+      <section class="context-bar" id="workspaceContext">
         <div class="context-grid">
           <div class="context-item">
             <label for="projectSelect">Project</label>
@@ -100,6 +126,20 @@
           <div class="context-item">
             <label for="modelSelect">Model</label>
             <select id="modelSelect" onchange="changeModelContext()"></select>
+          </div>
+        </div>
+        <div class="context-helper-row">
+          <div class="context-helper-card">
+            <strong>Model controls</strong>
+            <p id="modelDescription">Pick a model for chat, image prompt rewriting, and vision tasks.</p>
+            <div class="button-row tight">
+              <button onclick="refreshModels()">Refresh models</button>
+              <button onclick="copyImageHelp()">How to make a picture</button>
+            </div>
+          </div>
+          <div class="context-helper-card">
+            <strong>What works here</strong>
+            <p>Create projects, save chats, build templates from repos, upload learning notes, then generate and preview images in one page.</p>
           </div>
         </div>
       </section>
@@ -136,7 +176,7 @@
         <div id="chatBox" class="chat-box"></div>
       </section>
 
-      <section class="composer-wrap">
+      <section class="composer-wrap" id="chatComposer">
         <div class="prompt-toolbar">
           <span>Quick prompts:</span>
           <button onclick="applyPromptPreset('Use the selected learning items and template to explain how to build a Zabbix widget step by step, including file structure and common mistakes.')">Zabbix widget guide</button>
@@ -173,6 +213,13 @@
       </section>
 
       <section class="inspector-card">
+        <h3>Image quick help</h3>
+        <div class="helper-text">
+          1) Choose a model in the top bar. 2) Fill title or prompt. 3) Click <strong>Create SVG concept</strong> for fast results or <strong>Create real image</strong> for backend generation. 4) Preview appears immediately below. 5) Save it to the gallery to reopen later.
+        </div>
+      </section>
+
+      <section class="inspector-card" id="learningCaptureCard">
         <h3>Learning Capture</h3>
         <div class="stack-form">
           <div class="helper-text">Save a single note, bulk-import structured study items, or upload source files to teach your local Ollama workflows.</div>
@@ -202,7 +249,7 @@
         </div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card" id="imageStudioCard">
         <h3>Image Studio</h3>
         <div class="stack-form">
           <div class="helper-text">Create either a fast SVG concept card or a real backend-generated image, and optionally inspect uploaded pictures with a vision-capable Ollama model.</div>
@@ -246,6 +293,10 @@
           <div class="image-preview-wrap">
             <img id="imagePreview" class="image-preview" alt="Generated study image preview">
           </div>
+          <div id="imageResultSummary" class="meta-panel">
+            <div class="item-title">No image yet</div>
+            <div class="item-meta">Generate an SVG concept or a real image to see details and reuse it later.</div>
+          </div>
           <div class="button-row">
             <button onclick="saveGeneratedImage()">Save to gallery</button>
             <button onclick="downloadGeneratedImage()">Download current image</button>
@@ -268,7 +319,7 @@
         </div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card" id="imageGalleryCard">
         <h3>Image Gallery</h3>
         <div class="helper-text">Browse saved image history, reopen prior SVGs in the studio, or download/delete them.</div>
         <div id="imageGalleryList" class="list-stack compact"></div>

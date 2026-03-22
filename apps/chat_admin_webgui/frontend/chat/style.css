@@ -171,6 +171,12 @@ html, body {
   gap: 8px;
 }
 
+.inline-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .section-title {
   font-size: 12px;
   text-transform: uppercase;
@@ -182,6 +188,10 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.quick-links .sidebar-item {
+  font-size: 13px;
 }
 
 .list-stack.compact {
@@ -257,7 +267,7 @@ html, body {
 
 .context-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -270,6 +280,28 @@ html, body {
 .context-item label {
   font-size: 12px;
   color: #cbd5e1;
+}
+
+.context-helper-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.context-helper-card,
+.meta-panel {
+  background: #1b1f27;
+  border: 1px solid #2b3240;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.context-helper-card p,
+.meta-panel p {
+  margin: 8px 0 0 0;
+  color: #cbd5e1;
+  line-height: 1.5;
 }
 
 .main-topbar {
@@ -468,6 +500,10 @@ button.primary {
   flex-wrap: wrap;
 }
 
+.button-row.tight {
+  margin-top: 0;
+}
+
 .two-col-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -572,6 +608,11 @@ pre {
   .workspace-strip {
     grid-template-columns: 1fr;
   }
+
+  .context-grid,
+  .context-helper-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 1100px) {
@@ -585,6 +626,10 @@ pre {
   }
 
   .context-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .context-helper-row {
     grid-template-columns: 1fr;
   }
 
