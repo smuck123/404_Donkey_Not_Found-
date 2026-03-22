@@ -1,12 +1,13 @@
 import os
-import time
 from statistics import mean
+
 from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 
 from zabbix_client import ZabbixClient
 
-load_dotenv("/opt/openclaw_zabbix_mcp/.env")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 ZABBIX_URL = os.getenv("ZABBIX_URL")
 ZABBIX_API_TOKEN = os.getenv("ZABBIX_API_TOKEN")

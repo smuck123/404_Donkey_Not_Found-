@@ -22,7 +22,8 @@ from fortigate_api import (
 )
 import requests
 
-PENDING_ACTIONS_FILE = "/opt/openclaw_zabbix_mcp/pending_fortigate_actions.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PENDING_ACTIONS_FILE = os.path.join(BASE_DIR, "pending_fortigate_actions.json")
 
 
 def _load_pending() -> dict:
