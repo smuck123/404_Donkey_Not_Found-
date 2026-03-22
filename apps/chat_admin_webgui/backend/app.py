@@ -21,7 +21,7 @@ OLLAMA_CHAT_URL = "http://127.0.0.1:11434/api/chat"
 DEFAULT_MODEL = "qwen3:8b"
 SEARCH_API_URL = "http://127.0.0.1:8020/search"
 
-BASE_DIR = Path("/opt/chat_admin_webgui").resolve()
+BASE_DIR = Path(__file__).resolve().parent.parent
 CHAT_ROOT = (BASE_DIR / "frontend" / "chat").resolve()
 ADMIN_ROOT = (BASE_DIR / "frontend" / "admin").resolve()
 EDIT_ROOT = (BASE_DIR / "editable" / "chat_site").resolve()
@@ -381,10 +381,10 @@ def search_local_context(query: str, top_k: int = 6, source_types=None, path_con
 
 import os
 
-TEMPLATE_BASE = "/opt/chat_admin_webgui/data/repo_templates"
+TEMPLATE_BASE = str(BASE_DIR / "data" / "repo_templates")
 
 
-REPO_BASE = "/opt/chat_admin_webgui/repos"
+REPO_BASE = str(BASE_DIR / "repos")
 
 def load_repo_content(repo_name: str, max_chars=12000):
     import os
