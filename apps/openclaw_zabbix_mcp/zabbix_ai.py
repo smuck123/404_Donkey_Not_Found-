@@ -84,6 +84,10 @@ def get_summary():
     return zget("/chat_summary")
 
 
+def get_estate_summary(limit: int = 200):
+    return zget("/summarize_hosts", {"limit": limit})
+
+
 def search_hosts(search_text: str, limit: int = 5):
     return zget("/search_hosts", {"search_text": search_text, "limit": limit})
 
