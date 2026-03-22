@@ -529,30 +529,7 @@ function escapeXml(text) {
     .replace(/'/g, "&apos;");
 }
 
-function svgTextBlock(lines, x, startY, lineHeight, size, color, weight = 400) {
-  return lines.map((line, idx) => (
-    `<text x="${x}" y="${startY + (idx * lineHeight)}" fill="${color}" font-size="${size}" font-weight="${weight}" font-family="Arial, sans-serif">${escapeXml(line)}</text>`
-  )).join("");
-}
-
-function wrapSvgText(text, maxChars) {
-  const words = (text || "").split(/\s+/).filter(Boolean);
-  const lines = [];
-  let current = "";
-  for (const word of words) {
-    const next = current ? `${current} ${word}` : word;
-    if (next.length > maxChars) {
-      if (current) lines.push(current);
-      current = word;
-    } else {
-      current = next;
-    }
-  }
-  if (current) lines.push(current);
-  return lines.slice(0, 4);
-}
-
-function generateStudyImage() {
+async function generateStudyImage() {
   const title = document.getElementById("imageTitle").value.trim();
   if (!title) {
     setStatus("Image title is required.");
@@ -567,47 +544,38 @@ function generateStudyImage() {
     .slice(0, 5);
   const accent = document.getElementById("imageAccent").value.trim() || "#38bdf8";
   const layout = document.getElementById("imageLayout").value;
-  const sizes = {
-    landscape: { width: 1600, height: 900 },
-    square: { width: 1080, height: 1080 },
-    portrait: { width: 1080, height: 1350 }
+  const aspectMap = {
+    landscape: "16:9",
+    square: "1:1",
+    portrait: "4:5"
   };
-  const { width, height } = sizes[layout] || sizes.landscape;
+  const userInput = [
+    `Title: ${title}`,
+    subtitle ? `Subtitle: ${subtitle}` : "",
+    bullets.length ? `Key points:\n- ${bullets.join("\n- ")}` : ""
+  ].filter(Boolean).join("\n");
 
-  const titleLines = wrapSvgText(title, layout === "landscape" ? 28 : 22);
-  const subtitleLines = wrapSvgText(subtitle, layout === "landscape" ? 48 : 30);
-  const bulletLines = bullets.flatMap(item => wrapSvgText(`• ${item}`, layout === "landscape" ? 42 : 28));
-  const bulletStartY = layout === "portrait" ? 710 : 590;
+  setStatus(`Building structured image prompt with ${activeModel}...`);
 
-  const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#111827"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="${escapeXml(accent)}"/>
-      <stop offset="100%" stop-color="#ffffff"/>
-    </linearGradient>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#bg)"/>
-  <circle cx="${width - 120}" cy="120" r="180" fill="${escapeXml(accent)}" opacity="0.15"/>
-  <circle cx="140" cy="${height - 120}" r="220" fill="${escapeXml(accent)}" opacity="0.08"/>
-  <rect x="60" y="60" width="${width - 120}" height="${height - 120}" rx="36" fill="#0f172a" fill-opacity="0.35" stroke="#ffffff" stroke-opacity="0.10"/>
-  <text x="110" y="140" fill="${escapeXml(accent)}" font-size="36" font-weight="700" font-family="Arial, sans-serif">404DonkeyNotFound</text>
-  ${svgTextBlock(titleLines, 110, layout === "portrait" ? 270 : 250, 74, layout === "portrait" ? 54 : 64, "#ffffff", 700)}
-  ${svgTextBlock(subtitleLines, 110, layout === "portrait" ? 470 : 430, 42, 28, "#cbd5e1", 400)}
-  ${svgTextBlock(bulletLines, 130, bulletStartY, 40, 26, "#f8fafc", 400)}
-  <rect x="110" y="${height - 150}" width="${Math.min(width - 220, 520)}" height="10" rx="5" fill="url(#accent)"/>
-  <text x="110" y="${height - 90}" fill="#93c5fd" font-size="28" font-weight="600" font-family="Arial, sans-serif">Study card • Ready to share</text>
-</svg>`.trim();
+  try {
+    const data = await api("/api/chat/image-studio/generate", "POST", {
+      model: activeModel,
+      user_input: userInput,
+      aspect_ratio: aspectMap[layout] || "16:9",
+      accent_color: accent
+    });
 
-  lastGeneratedImage = svg;
-  const encoded = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-  document.getElementById("imagePreview").src = encoded;
-  document.getElementById("imageStudioMeta").textContent = `${layout} • ${width}x${height} • accent ${accent}`;
-  setStatus("Study image created. You can preview or download it.");
+    lastGeneratedImage = data.image?.svg || "";
+    document.getElementById("imagePreview").src = data.image?.data_url || "";
+
+    const structured = data.structured_prompt || {};
+    const notes = (structured.safety_notes || []).join(" | ") || "No extra safety flags";
+    document.getElementById("imageStudioMeta").textContent =
+      `${structured.aspect_ratio || "16:9"} • ${(data.image?.width || 0)}x${(data.image?.height || 0)} • ${notes}`;
+    setStatus("Study image created through the backend image pipeline.");
+  } catch (err) {
+    setStatus("Image generation failed: " + err.message);
+  }
 }
 
 function downloadGeneratedImage() {
