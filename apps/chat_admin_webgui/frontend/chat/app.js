@@ -15,11 +15,27 @@ let lastRetrieved = [];
 let lastPlannedChanges = null;
 let lastGeneratedImage = "";
 let lastGeneratedImageMeta = null;
+let activeTemplateFiles = [];
 
 async function api(url, method = "GET", data = null) {
   const opts = { method, headers: { "Content-Type": "application/json" } };
   if (data !== null) opts.body = JSON.stringify(data);
   const res = await fetch(url, opts);
+  const text = await res.text();
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch {
+    payload = { raw: text };
+  }
+  if (!res.ok) {
+    throw new Error(payload.detail || payload.raw || `HTTP ${res.status}`);
+  }
+  return payload;
+}
+
+async function apiForm(url, formData) {
+  const res = await fetch(url, { method: "POST", body: formData });
   const text = await res.text();
   let payload;
   try {
@@ -131,6 +147,52 @@ function renderRepoTemplates() {
   `).join("");
 }
 
+function buildTemplateSegments(files) {
+  const groups = new Map();
+  for (const path of files || []) {
+    const normalized = String(path || "").trim();
+    if (!normalized) continue;
+    const [head] = normalized.split("/");
+    const key = normalized.includes("/") ? head : "root files";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(normalized);
+  }
+  return [...groups.entries()]
+    .map(([name, items]) => ({ name, items: items.sort() }))
+    .sort((a, b) => b.items.length - a.items.length || a.name.localeCompare(b.name));
+}
+
+function renderTemplateSegments() {
+  const meta = document.getElementById("templateStudioMeta");
+  const box = document.getElementById("templateSegmentsList");
+  if (!box || !meta) return;
+
+  if (!activeTemplate) {
+    meta.textContent = "Select or save a template pack to inspect its segments";
+    box.innerHTML = '<div class="item-meta">No template selected</div>';
+    return;
+  }
+
+  if (!activeTemplateFiles.length) {
+    meta.textContent = `${activeTemplate} • no files loaded yet`;
+    box.innerHTML = '<div class="item-meta">No segmented files available</div>';
+    return;
+  }
+
+  const segments = buildTemplateSegments(activeTemplateFiles);
+  meta.textContent = `${activeTemplate} • ${activeTemplateFiles.length} files • ${segments.length} segments`;
+  box.innerHTML = segments.map(segment => `
+    <div class="segment-group">
+      <div class="item-title">${escapeHtml(segment.name)}</div>
+      <div class="item-meta">${segment.items.length} file(s)</div>
+      <ul class="segment-list">
+        ${segment.items.slice(0, 6).map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+        ${segment.items.length > 6 ? `<li>+ ${segment.items.length - 6} more</li>` : ""}
+      </ul>
+    </div>
+  `).join("");
+}
+
 function getSelectedLearningIds() {
   return [...document.querySelectorAll('input[name="learningItem"]:checked')].map(el => el.value);
 }
@@ -186,8 +248,8 @@ function renderChat() {
   if (chatHistory.length === 0) {
     box.innerHTML = `
       <div class="empty-state">
-        <h2>How can donkey help today?</h2>
-        <p>Select a template and repo for smarter Zabbix widget/module work.</p>
+        <h2>Build, teach, and create from one workspace.</h2>
+        <p>Select a template or repo, chat with contextual retrieval, upload training material for your Ollama stack, and turn notes into ready-to-share images.</p>
       </div>
     `;
     return;
@@ -281,12 +343,14 @@ async function selectTemplate(name) {
   activeTemplate = name;
   renderRepoTemplates();
   renderTemplateSelect();
+  await refreshTemplateSegments();
 }
 
 async function changeTemplateContext() {
   activeTemplate = document.getElementById("templateSelect").value;
   renderRepoTemplates();
   renderTemplateSelect();
+  await refreshTemplateSegments();
 }
 
 function changeRepoContext() {
@@ -338,6 +402,7 @@ async function loadState() {
   renderSources();
   renderPlannedChanges();
   renderImageGallery();
+  await refreshTemplateSegments();
 }
 
 async function saveCurrentChat() {
@@ -459,6 +524,29 @@ async function saveLearningItem() {
     setStatus(`Saved learning item "${title}".`);
   } catch (err) {
     setStatus("Failed to save learning item: " + err.message);
+  }
+}
+
+async function uploadLearningFiles() {
+  const input = document.getElementById("learningUploadFiles");
+  const files = [...(input.files || [])];
+  if (files.length === 0) {
+    setStatus("Choose one or more files first.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("category", document.getElementById("learningCategory").value.trim() || "uploaded-reference");
+  formData.append("tags", document.getElementById("learningTags").value.trim());
+  for (const file of files) formData.append("files", file);
+
+  try {
+    const data = await apiForm("/api/chat/learning/upload", formData);
+    input.value = "";
+    await loadState();
+    setStatus(`Uploaded ${data.count || files.length} file(s) into the learning library.`);
+  } catch (err) {
+    setStatus("File upload failed: " + err.message);
   }
 }
 
@@ -728,6 +816,64 @@ async function previewLearningItem() {
     setStatus(`Previewed learning item "${data.title}".`);
   } catch (err) {
     setStatus("Failed to preview learning item: " + err.message);
+  }
+}
+
+async function refreshTemplateSegments() {
+  if (!activeTemplate) {
+    activeTemplateFiles = [];
+    renderTemplateSegments();
+    return;
+  }
+
+  try {
+    const data = await api(`/api/chat/repo-template/files?template_name=${encodeURIComponent(activeTemplate)}`);
+    activeTemplateFiles = data.files || [];
+    renderTemplateSegments();
+  } catch (err) {
+    activeTemplateFiles = [];
+    renderTemplateSegments();
+    setStatus("Failed to load template segments: " + err.message);
+  }
+}
+
+async function saveTemplateSnapshot() {
+  if (!activeRepo) {
+    setStatus("Select a repo first so a template pack can be created from it.");
+    return;
+  }
+
+  const templateName = document.getElementById("templateNameInput").value.trim() || `${activeRepo}-template`;
+  try {
+    await api("/api/repo/template/save", "POST", {
+      repo_name: activeRepo,
+      template_name: templateName,
+      selected_files: []
+    });
+    activeTemplate = templateName;
+    document.getElementById("templateNameInput").value = templateName;
+    await loadState();
+    setStatus(`Saved template pack "${templateName}" from repo "${activeRepo}".`);
+  } catch (err) {
+    setStatus("Failed to save template pack: " + err.message);
+  }
+}
+
+async function deleteActiveTemplate() {
+  if (!activeTemplate) {
+    setStatus("Select a template pack first.");
+    return;
+  }
+
+  try {
+    await api("/api/repo/template/delete", "POST", { template_name: activeTemplate });
+    const deleted = activeTemplate;
+    activeTemplate = "";
+    activeTemplateFiles = [];
+    await loadState();
+    setStatus(`Deleted template pack "${deleted}".`);
+  } catch (err) {
+    setStatus("Failed to delete template pack: " + err.message);
   }
 }
 

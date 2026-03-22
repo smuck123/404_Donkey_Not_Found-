@@ -52,6 +52,20 @@
     </aside>
 
     <main class="centerpanel">
+      <section class="hero-panel">
+        <div>
+          <div class="eyebrow">AI workspace</div>
+          <h1>Build templates, chat with context, generate visuals, and train your local Ollama stack.</h1>
+          <p>Keep template creation segmented, reuse project context, turn notes into shareable images, and upload your own source material so the assistant learns from your stack.</p>
+        </div>
+        <div class="hero-chips">
+          <span>Segmented templates</span>
+          <span>Context-aware chat</span>
+          <span>Image studio</span>
+          <span>Upload training data</span>
+        </div>
+      </section>
+
       <section class="context-bar">
         <div class="context-grid">
           <div class="context-item">
@@ -98,6 +112,21 @@
         </div>
       </section>
 
+      <section class="workspace-strip">
+        <article class="workspace-card">
+          <div class="workspace-title">1. Template Studio</div>
+          <p>Save the active repo as a reusable template pack, then review file segments by folder before chatting or proposing changes.</p>
+        </article>
+        <article class="workspace-card">
+          <div class="workspace-title">2. Chat + Retrieval</div>
+          <p>Use projects, templates, repos, and selected learning items together so Ollama answers with the right local context.</p>
+        </article>
+        <article class="workspace-card">
+          <div class="workspace-title">3. Teach + Create</div>
+          <p>Upload notes, code, configs, or documents into the learning library and turn them into explainer images for your team.</p>
+        </article>
+      </section>
+
       <section class="chat-stage">
         <div id="chatBox" class="chat-box"></div>
       </section>
@@ -124,9 +153,24 @@
 
     <aside class="rightbar">
       <section class="inspector-card">
+        <h3>Template Studio</h3>
+        <div class="stack-form">
+          <div class="helper-text">Create a reusable template from the selected repo and review segmented file groups for faster reuse.</div>
+          <input id="templateNameInput" type="text" placeholder="Template pack name">
+          <div class="button-row">
+            <button onclick="saveTemplateSnapshot()" class="primary">Save template pack</button>
+            <button onclick="refreshTemplateSegments()">Refresh segments</button>
+            <button onclick="deleteActiveTemplate()">Delete selected</button>
+          </div>
+          <div id="templateStudioMeta" class="meta-line">No template segment loaded</div>
+          <div id="templateSegmentsList" class="list-stack compact"></div>
+        </div>
+      </section>
+
+      <section class="inspector-card">
         <h3>Learning Capture</h3>
         <div class="stack-form">
-          <div class="helper-text">Save a single note or bulk-import several study items at once.</div>
+          <div class="helper-text">Save a single note, bulk-import structured study items, or upload source files to teach your local Ollama workflows.</div>
           <input id="learningTitle" type="text" placeholder="Learning item title">
           <input id="learningCategory" type="text" value="zabbix-code" placeholder="Category">
           <input id="learningTags" type="text" placeholder="Tags comma separated: zabbix, widget, template">
@@ -139,6 +183,11 @@
           <div class="button-row">
             <button onclick="importLearningBatch()">Bulk import study material</button>
             <button onclick="appendSelectionToComposer()">Add selected study items to composer</button>
+          </div>
+          <div class="upload-dropzone">
+            <div class="helper-text">Upload `.txt`, `.md`, `.json`, `.yaml`, `.xml`, `.csv`, `.py`, `.js`, `.html`, `.css`, `.ini`, `.conf`, or similar text/code files.</div>
+            <input id="learningUploadFiles" type="file" multiple>
+            <button onclick="uploadLearningFiles()">Upload files into learning library</button>
           </div>
         </div>
       </section>

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import FastAPI, HTTPException, Query, Response, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, field_validator
@@ -48,10 +48,17 @@ IMAGE_BACKEND_TIMEOUT = int(os.getenv("IMAGE_BACKEND_TIMEOUT", "300"))
 IMAGE_REWRITE_TIMEOUT = int(os.getenv("IMAGE_REWRITE_TIMEOUT", "120"))
 MAX_IMAGE_DIMENSION = int(os.getenv("MAX_IMAGE_DIMENSION", "2048"))
 MAX_IMAGE_STEPS = int(os.getenv("MAX_IMAGE_STEPS", "150"))
+MAX_LEARNING_UPLOAD_BYTES = int(os.getenv("MAX_LEARNING_UPLOAD_BYTES", str(2 * 1024 * 1024)))
 
 ALLOWED_EDIT_SUFFIXES = {
     ".html", ".css", ".js", ".txt", ".json", ".md", ".yaml", ".yml",
     ".py", ".sh", ".php", ".xml", ".conf", ".ini", ".svg"
+}
+
+ALLOWED_LEARNING_UPLOAD_SUFFIXES = {
+    ".txt", ".md", ".markdown", ".json", ".yaml", ".yml", ".xml", ".csv",
+    ".log", ".py", ".js", ".ts", ".html", ".css", ".ini", ".conf", ".cfg",
+    ".sh", ".sql"
 }
 
 MODEL_INFO = {
@@ -979,6 +986,52 @@ def chat_learning_save_batch(req: LearningBatchSaveRequest):
 
     if not saved_items:
         raise HTTPException(status_code=400, detail="No valid learning items were provided")
+
+    return {"status": "saved", "count": len(saved_items), "items": saved_items}
+
+@app.post("/chat/learning/upload")
+async def chat_learning_upload(
+    files: list[UploadFile] = File(...),
+    category: str = Form("uploaded-reference"),
+    tags: str = Form("")
+):
+    ensure_data_files()
+    saved_items = []
+    cleaned_tags = [safe_slug(tag, "") for tag in tags.split(",") if safe_slug(tag.strip(), "")]
+
+    for upload in files:
+        filename = upload.filename or "upload.txt"
+        suffix = Path(filename).suffix.lower()
+        if suffix not in ALLOWED_LEARNING_UPLOAD_SUFFIXES:
+            raise HTTPException(status_code=400, detail=f"Unsupported upload type: {suffix or 'no extension'}")
+
+        content_bytes = await upload.read()
+        if not content_bytes:
+            continue
+        if len(content_bytes) > MAX_LEARNING_UPLOAD_BYTES:
+            raise HTTPException(status_code=400, detail=f"File too large: {filename}")
+
+        content = content_bytes.decode("utf-8", errors="replace").strip()
+        if not content:
+            continue
+
+        title = Path(filename).stem.replace("_", " ").replace("-", " ").strip() or "Uploaded reference"
+        item_id = f"{safe_slug(title, 'learning')}_{uuid.uuid4().hex[:8]}"
+        now = datetime.utcnow().isoformat() + "Z"
+        payload = {
+            "id": item_id,
+            "title": title,
+            "category": category.strip() or "uploaded-reference",
+            "tags": cleaned_tags,
+            "content": content,
+            "source_filename": filename,
+            "updated_at": now
+        }
+        get_learning_item_file(item_id).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        saved_items.append(payload)
+
+    if not saved_items:
+        raise HTTPException(status_code=400, detail="No readable text files were uploaded")
 
     return {"status": "saved", "count": len(saved_items), "items": saved_items}
 
