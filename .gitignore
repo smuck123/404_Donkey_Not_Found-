@@ -30,3 +30,6 @@ telegram_chats.json
 
 # external nested repo
 apps/openclaw_zabbix_mcp/openclaw/
+
+# external openclaw symlink/repo
+apps/openclaw_zabbix_mcp/openclaw
