@@ -2,6 +2,8 @@
 **/.env
 venv/
 **/venv/
+node_modules/
+**/node_modules/
 __pycache__/
 **/__pycache__/
 *.pyc
@@ -27,9 +29,4 @@ repos/
 **/repos/
 pending_*.json
 telegram_chats.json
-
-# external nested repo
 apps/openclaw_zabbix_mcp/openclaw/
-
-# external openclaw symlink/repo
-apps/openclaw_zabbix_mcp/openclaw
