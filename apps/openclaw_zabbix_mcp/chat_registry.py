@@ -3,7 +3,8 @@ import json
 import os
 from typing import Dict, List
 
-REGISTRY_PATH = "/opt/openclaw_zabbix_mcp/telegram_chats.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+REGISTRY_PATH = os.path.join(BASE_DIR, "telegram_chats.json")
 
 
 def _load_registry() -> Dict[str, dict]:
