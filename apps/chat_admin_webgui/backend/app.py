@@ -35,6 +35,7 @@ DOWNLOADS_ROOT = (BASE_DIR / "downloads").resolve()
 EXPORTS_ROOT = (BASE_DIR / "exports").resolve()
 REPO_TEMPLATES_ROOT = (DATA_ROOT / "repo_templates").resolve()
 REPO_TEMPLATES_META_ROOT = (DATA_ROOT / "repo_templates_meta").resolve()
+LEARNING_ROOT = (DATA_ROOT / "learning_library").resolve()
 
 ALLOWED_EDIT_SUFFIXES = {
     ".html", ".css", ".js", ".txt", ".json", ".md", ".yaml", ".yml",
@@ -73,6 +74,7 @@ class RetrievalChatRequest(BaseModel):
     path_contains: str | None = None
     use_retrieval: bool = True
     selected_template: str | None = None
+    selected_learning_ids: list[str] | None = None
 
 
 class SourceViewRequest(BaseModel):
@@ -88,6 +90,7 @@ class ChatEditPlanRequest(BaseModel):
     selected_template: str | None = None
     selected_repo: str | None = None
     target_paths: list[str] | None = None
+    selected_learning_ids: list[str] | None = None
 
 class ApplyEditRequest(BaseModel):
     repo_name: str
@@ -188,6 +191,12 @@ class ExportTextRequest(BaseModel):
     filename: str
     content: str
 
+class LearningItemSaveRequest(BaseModel):
+    title: str
+    category: str = "reference"
+    tags: list[str] = []
+    content: str
+
 def ensure_data_files():
     CHATS_ROOT.mkdir(parents=True, exist_ok=True)
     PROJECTS_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -196,8 +205,64 @@ def ensure_data_files():
     EXPORTS_ROOT.mkdir(parents=True, exist_ok=True)
     REPO_TEMPLATES_ROOT.mkdir(parents=True, exist_ok=True)
     REPO_TEMPLATES_META_ROOT.mkdir(parents=True, exist_ok=True)
+    LEARNING_ROOT.mkdir(parents=True, exist_ok=True)
     if not PROJECTS_FILE.exists():
         PROJECTS_FILE.write_text("[]", encoding="utf-8")
+
+def safe_slug(value: str, fallback: str = "item") -> str:
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "_", (value or "").strip()).strip("._-")
+    return slug or fallback
+
+def get_learning_item_file(item_id: str) -> Path:
+    safe_id = safe_slug(item_id, "item")
+    target = (LEARNING_ROOT / f"{safe_id}.json").resolve()
+    if not str(target).startswith(str(LEARNING_ROOT)):
+        raise HTTPException(status_code=403, detail="Learning item path not allowed")
+    return target
+
+def list_learning_items():
+    ensure_data_files()
+    items = []
+    for f in sorted(LEARNING_ROOT.glob("*.json"), reverse=True):
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            items.append({
+                "id": data.get("id", f.stem),
+                "title": data.get("title", f.stem),
+                "category": data.get("category", "reference"),
+                "tags": data.get("tags", []),
+                "updated_at": data.get("updated_at", ""),
+                "content_preview": data.get("content", "")[:220]
+            })
+        except Exception:
+            continue
+    items.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
+    return items
+
+def load_learning_context(item_ids: list[str] | None, max_chars: int = 24000):
+    if not item_ids:
+        return ""
+    chunks = []
+    total = 0
+    for item_id in item_ids:
+        target = get_learning_item_file(item_id)
+        if not target.exists():
+            continue
+        try:
+            data = json.loads(target.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        block = (
+            f"--- LEARNING ITEM: {data.get('title', item_id)} ---\n"
+            f"CATEGORY: {data.get('category', 'reference')}\n"
+            f"TAGS: {', '.join(data.get('tags', []))}\n"
+            f"{data.get('content', '')}\n"
+        )
+        if total + len(block) > max_chars:
+            break
+        chunks.append(block)
+        total += len(block)
+    return "\n".join(chunks)
 
 def read_projects():
     ensure_data_files()
@@ -522,8 +587,43 @@ def chat_state():
         "brand": "404DonkeyNotFound",
         "slogan": "if it works, make sure donkey can break IT!",
         "projects": read_projects(),
-        "chats": list_chat_meta()
+        "chats": list_chat_meta(),
+        "learning_items": list_learning_items()
     }
+
+@app.get("/chat/learning")
+def chat_learning_list():
+    return {"items": list_learning_items()}
+
+@app.get("/chat/learning/read")
+def chat_learning_read(item_id: str = Query(...)):
+    target = get_learning_item_file(item_id)
+    if not target.exists():
+        raise HTTPException(status_code=404, detail="Learning item not found")
+    return json.loads(target.read_text(encoding="utf-8"))
+
+@app.post("/chat/learning/save")
+def chat_learning_save(req: LearningItemSaveRequest):
+    ensure_data_files()
+    title = req.title.strip()
+    content = req.content.strip()
+    if not title:
+        raise HTTPException(status_code=400, detail="Title is required")
+    if not content:
+        raise HTTPException(status_code=400, detail="Content is required")
+    item_id = f"{safe_slug(title, 'learning')}_{uuid.uuid4().hex[:8]}"
+    tags = [safe_slug(tag, "") for tag in req.tags if safe_slug(tag, "")]
+    now = datetime.utcnow().isoformat() + "Z"
+    payload = {
+        "id": item_id,
+        "title": title,
+        "category": req.category.strip() or "reference",
+        "tags": tags,
+        "content": content,
+        "updated_at": now
+    }
+    get_learning_item_file(item_id).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return {"status": "saved", "item": payload}
 
 @app.post("/chat/project/save")
 def chat_project_save(req: SaveProjectRequest):
@@ -1151,64 +1251,16 @@ def chat_messages_retrieval(req: RetrievalChatRequest):
             except Exception as e:
                 retrieval_context = f"Retrieval failed: {e}"
 
-        
-        template_context = ""
-        if req.selected_template:
-            template_context = load_template_content(req.selected_template)
-
-        
-        template_context = ""
-        if req.selected_template:
-            template_context = load_template_content(req.selected_template)
-
-        
-        template_context = ""
-        if req.selected_template:
-            template_context = load_template_content(req.selected_template)
-
-        
-        template_context = ""
-        repo_context = ""
-
-        if getattr(req, "selected_template", None):
-            template_context = load_template_content(req.selected_template)
-
-        if getattr(req, "selected_repo", None):
-            repo_context = load_repo_content(req.selected_repo)
-
-        
-        template_context = ""
-        repo_context = ""
-
-        if getattr(req, "selected_template", None):
-            template_context = load_template_content(req.selected_template)
-
-        if getattr(req, "selected_repo", None):
-            repo_context = load_repo_content(req.selected_repo)
-
-        
-        template_context = ""
-        repo_context = ""
-
-        if getattr(req, "selected_template", None):
-            template_context = load_template_content(req.selected_template)
-
-        if getattr(req, "selected_repo", None):
-            repo_context = load_repo_content(req.selected_repo)
+        template_context = load_template_content(req.selected_template) if req.selected_template else ""
+        learning_context = load_learning_context(req.selected_learning_ids)
 
         system_message = {
-
-
-
-
-
-
             "role": "system",
             "content": f"""You are a coding assistant focused on LOCAL DATA.
 
 RULES:
 - ALWAYS use TEMPLATE CONTENT if present.
-- ALWAYS use REPO CONTENT if present.
+- ALWAYS use LEARNING LIBRARY CONTENT if present.
 - ALWAYS use RETRIEVED CONTEXT if present.
 - If information exists in provided context, DO NOT use generic knowledge.
 - Reference file names when explaining.
@@ -1221,29 +1273,8 @@ Prefer concrete answers based on the retrieved data when available.
 TEMPLATE CONTENT:
 {template_context}
 
-TEMPLATE CONTENT:
-{template_context}
-
-TEMPLATE CONTENT:
-{template_context}
-
-TEMPLATE CONTENT:
-{template_context}
-
-REPO CONTENT:
-{repo_context}
-
-TEMPLATE CONTENT:
-{template_context}
-
-REPO CONTENT:
-{repo_context}
-
-TEMPLATE CONTENT:
-{template_context}
-
-REPO CONTENT:
-{repo_context}
+LEARNING LIBRARY CONTENT:
+{learning_context}
 
 RETRIEVED CONTEXT:
 {retrieval_context}
@@ -1270,6 +1301,7 @@ RETRIEVED CONTEXT:
                 "role": "assistant",
                 "content": answer
             },
+            "learning_items_used": req.selected_learning_ids or [],
             "retrieved": [
                 {
                     "source_type": x.get("source_type"),
@@ -1334,6 +1366,7 @@ def chat_edit_plan(req: ChatEditPlanRequest):
 
     template_context = load_template_content(req.selected_template) if req.selected_template else ""
     repo_context = load_repo_content(req.selected_repo, max_chars=8000)
+    learning_context = load_learning_context(req.selected_learning_ids, max_chars=16000)
 
     prompt = f"""
 You are editing files inside a repository.
@@ -1349,6 +1382,9 @@ USER INSTRUCTION:
 
 TEMPLATE CONTEXT:
 {template_context}
+
+LEARNING LIBRARY CONTEXT:
+{learning_context}
 
 REPO CONTEXT:
 {repo_context}

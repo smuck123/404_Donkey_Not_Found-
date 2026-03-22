@@ -55,7 +55,35 @@
     </section>
 
     <section class="card">
-      <h2>4. Browse example folders</h2>
+      <h2>4. Learning library for code + templates</h2>
+      <div class="row">
+        <label for="learningTitle">Learning item title</label>
+        <input id="learningTitle" type="text" placeholder="Example: Zabbix widget patterns for API tables">
+      </div>
+      <div class="row">
+        <label for="learningCategory">Category</label>
+        <input id="learningCategory" type="text" value="zabbix-code">
+      </div>
+      <div class="row">
+        <label for="learningTags">Tags</label>
+        <input id="learningTags" type="text" placeholder="zabbix, widget, template, php, json">
+      </div>
+      <div class="row">
+        <label for="learningContent">Code or learning content</label>
+        <textarea id="learningContent" rows="10">Paste widget code, template exports, JSON schemas, troubleshooting notes, or prompt-ready implementation examples here.</textarea>
+      </div>
+      <div class="row buttons">
+        <button onclick="saveLearningItem()">Save learning item</button>
+        <button onclick="loadLearningItems()">Refresh learning items</button>
+        <button onclick="previewLearningItem()">Preview selected item</button>
+      </div>
+      <div id="learningList" class="learning-list"></div>
+      <pre id="learningStatus"></pre>
+      <pre id="learningPreview"></pre>
+    </section>
+
+    <section class="card">
+      <h2>5. Browse example folders</h2>
       <div class="row">
         <button onclick="loadExamples()">Refresh examples</button>
       </div>
@@ -78,7 +106,7 @@
     </section>
 
     <section class="card">
-      <h2>5. Generate widget from example</h2>
+      <h2>6. Generate widget from example</h2>
       <div class="row">
         <label for="outputFolder">Output folder name</label>
         <input id="outputFolder" type="text" value="generated_widget_01">
@@ -94,7 +122,7 @@
     </section>
 
     <section class="card">
-      <h2>6. Browse generated output</h2>
+      <h2>7. Browse generated output</h2>
       <div class="row">
         <button onclick="loadGeneratedFolders()">Refresh generated folders</button>
       </div>

@@ -8,6 +8,7 @@ import io
 import json
 import shutil
 import subprocess
+import uuid
 
 app = FastAPI(title="Ollama Web GUI + Zabbix Example Builder")
 
@@ -20,6 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SAFE_EDIT_ROOT = (BASE_DIR / "editable").resolve()
 EXAMPLES_ROOT = (BASE_DIR / "examples" / "zabbix").resolve()
 GENERATED_ROOT = (BASE_DIR / "generated_widgets").resolve()
+LEARNING_ROOT = (BASE_DIR / "learning_library").resolve()
 
 ALLOWED_CONTEXT_SUFFIXES = {".php", ".json", ".md", ".txt", ".yaml", ".yml", ".js", ".css", ".html"}
 MAX_CONTEXT_FILES = 50
@@ -43,6 +45,7 @@ class ChatMessageRequest(BaseModel):
     model: str = DEFAULT_MODEL
     messages: list
     stream: bool = False
+    learning_item_ids: list[str] = []
 
 class SaveFileRequest(BaseModel):
     relative_path: str
@@ -57,6 +60,13 @@ class GenerateFromExampleRequest(BaseModel):
     user_request: str
     output_folder: str = "generated_widget"
     write_files: bool = True
+    learning_item_ids: list[str] = []
+
+class LearningItemRequest(BaseModel):
+    title: str
+    category: str = "reference"
+    tags: list[str] = []
+    content: str
 
 def safe_join(root: Path, relative_path: str) -> Path:
     p = (root / relative_path).resolve()
@@ -84,6 +94,58 @@ def collect_example_context(folder: Path):
             count += 1
 
     return "".join(chunks), count, total_chars
+
+def safe_slug(value: str, fallback: str = "item") -> str:
+    slug = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in (value or "").strip()).strip("._-")
+    return slug or fallback
+
+def get_learning_file(item_id: str) -> Path:
+    target = (LEARNING_ROOT / f"{safe_slug(item_id)}.json").resolve()
+    if not str(target).startswith(str(LEARNING_ROOT)):
+        raise HTTPException(status_code=403, detail="Learning path not allowed")
+    return target
+
+def list_learning_items():
+    LEARNING_ROOT.mkdir(parents=True, exist_ok=True)
+    items = []
+    for p in sorted(LEARNING_ROOT.glob("*.json"), reverse=True):
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        items.append({
+            "id": data.get("id", p.stem),
+            "title": data.get("title", p.stem),
+            "category": data.get("category", "reference"),
+            "tags": data.get("tags", []),
+            "content_preview": data.get("content", "")[:220]
+        })
+    return items
+
+def load_learning_context(item_ids: list[str], max_chars: int = 24000):
+    if not item_ids:
+        return ""
+    chunks = []
+    total = 0
+    for item_id in item_ids:
+        target = get_learning_file(item_id)
+        if not target.exists():
+            continue
+        try:
+            data = json.loads(target.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        block = (
+            f"\n--- LEARNING ITEM: {data.get('title', item_id)} ---\n"
+            f"CATEGORY: {data.get('category', 'reference')}\n"
+            f"TAGS: {', '.join(data.get('tags', []))}\n"
+            f"{data.get('content', '')}\n"
+        )
+        if total + len(block) > max_chars:
+            break
+        chunks.append(block)
+        total += len(block)
+    return "".join(chunks)
 
 def extract_json_block(text: str):
     start = text.find("{")
@@ -124,9 +186,16 @@ def chat(req: ChatRequest):
 
 @app.post("/api/chat/messages")
 def chat_messages(req: ChatMessageRequest):
+    learning_context = load_learning_context(req.learning_item_ids)
     payload = {
         "model": req.model,
-        "messages": req.messages,
+        "messages": (
+            ([{
+                "role": "system",
+                "content": f"Use the learning library context when relevant for Zabbix widgets, templates, and code generation.\n\n{learning_context}"
+            }] if learning_context else [])
+            + req.messages
+        ),
         "stream": req.stream
     }
 
@@ -136,6 +205,35 @@ def chat_messages(req: ChatMessageRequest):
         return r.json()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ollama chat request failed: {e}")
+
+@app.get("/api/learning/list")
+def api_learning_list():
+    return {"items": list_learning_items()}
+
+@app.get("/api/learning/read")
+def api_learning_read(item_id: str):
+    target = get_learning_file(item_id)
+    if not target.exists():
+        raise HTTPException(status_code=404, detail="Learning item not found")
+    return json.loads(target.read_text(encoding="utf-8"))
+
+@app.post("/api/learning/save")
+def api_learning_save(req: LearningItemRequest):
+    LEARNING_ROOT.mkdir(parents=True, exist_ok=True)
+    title = req.title.strip()
+    content = req.content.strip()
+    if not title or not content:
+        raise HTTPException(status_code=400, detail="Title and content are required")
+    item_id = f"{safe_slug(title, 'learning')}_{uuid.uuid4().hex[:8]}"
+    payload = {
+        "id": item_id,
+        "title": title,
+        "category": req.category.strip() or "reference",
+        "tags": [safe_slug(tag, "") for tag in req.tags if safe_slug(tag, "")],
+        "content": content
+    }
+    get_learning_file(item_id).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return {"status": "saved", "item": payload}
 
 @app.post("/api/files/save")
 def save_file(req: SaveFileRequest):
@@ -242,6 +340,7 @@ def generate_from_example(req: GenerateFromExampleRequest):
         raise HTTPException(status_code=404, detail="Example not found")
 
     context, file_count, total_chars = collect_example_context(example_folder)
+    learning_context = load_learning_context(req.learning_item_ids, max_chars=16000)
     if not context.strip():
         raise HTTPException(status_code=400, detail="No supported files found in example folder")
 
@@ -255,6 +354,9 @@ EXAMPLE_NAME:
 
 EXAMPLE_FILES:
 {context}
+
+LEARNING_LIBRARY:
+{learning_context}
 
 TASK:
 {req.user_request}
