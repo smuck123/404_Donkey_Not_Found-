@@ -561,30 +561,7 @@ function escapeXml(text) {
     .replace(/'/g, "&apos;");
 }
 
-function svgTextBlock(lines, x, startY, lineHeight, size, color, weight = 400) {
-  return lines.map((line, idx) => (
-    `<text x="${x}" y="${startY + (idx * lineHeight)}" fill="${color}" font-size="${size}" font-weight="${weight}" font-family="Arial, sans-serif">${escapeXml(line)}</text>`
-  )).join("");
-}
-
-function wrapSvgText(text, maxChars) {
-  const words = (text || "").split(/\s+/).filter(Boolean);
-  const lines = [];
-  let current = "";
-  for (const word of words) {
-    const next = current ? `${current} ${word}` : word;
-    if (next.length > maxChars) {
-      if (current) lines.push(current);
-      current = word;
-    } else {
-      current = next;
-    }
-  }
-  if (current) lines.push(current);
-  return lines.slice(0, 4);
-}
-
-function generateStudyImage() {
+async function generateStudyImage() {
   const title = document.getElementById("imageTitle").value.trim();
   if (!title) {
     setStatus("Image title is required.");

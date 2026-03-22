@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from pathlib import Path
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -13,6 +13,10 @@ import uuid
 import subprocess
 import re
 import difflib
+import base64
+import mimetypes
+import os
+
 
 app = FastAPI(title="404DonkeyNotFound")
 
@@ -37,6 +41,13 @@ IMAGES_ROOT = (DATA_ROOT / "images").resolve()
 REPO_TEMPLATES_ROOT = (DATA_ROOT / "repo_templates").resolve()
 REPO_TEMPLATES_META_ROOT = (DATA_ROOT / "repo_templates_meta").resolve()
 LEARNING_ROOT = (DATA_ROOT / "learning_library").resolve()
+GENERATED_IMAGES_ROOT = (DATA_ROOT / "generated_images").resolve()
+
+IMAGE_BACKEND_URL = os.getenv("IMAGE_BACKEND_URL", "http://127.0.0.1:7860/sdapi/v1/txt2img")
+IMAGE_BACKEND_TIMEOUT = int(os.getenv("IMAGE_BACKEND_TIMEOUT", "300"))
+IMAGE_REWRITE_TIMEOUT = int(os.getenv("IMAGE_REWRITE_TIMEOUT", "120"))
+MAX_IMAGE_DIMENSION = int(os.getenv("MAX_IMAGE_DIMENSION", "2048"))
+MAX_IMAGE_STEPS = int(os.getenv("MAX_IMAGE_STEPS", "150"))
 
 ALLOWED_EDIT_SUFFIXES = {
     ".html", ".css", ".js", ".txt", ".json", ".md", ".yaml", ".yml",
@@ -179,6 +190,12 @@ class WebSummarizeRequest(BaseModel):
     url: str
     task: str = "Summarize this clearly."
 
+class ImagePromptRequest(BaseModel):
+    model: str = DEFAULT_MODEL
+    user_input: str
+    aspect_ratio: str = "16:9"
+    accent_color: str | None = None
+
 
 class RepoTemplateSaveRequest(BaseModel):
     repo_name: str
@@ -220,8 +237,122 @@ def ensure_data_files():
     REPO_TEMPLATES_ROOT.mkdir(parents=True, exist_ok=True)
     REPO_TEMPLATES_META_ROOT.mkdir(parents=True, exist_ok=True)
     LEARNING_ROOT.mkdir(parents=True, exist_ok=True)
+    GENERATED_IMAGES_ROOT.mkdir(parents=True, exist_ok=True)
     if not PROJECTS_FILE.exists():
         PROJECTS_FILE.write_text("[]", encoding="utf-8")
+
+def build_image_urls(filename: str) -> dict:
+    return {
+        "download_url": f"/api/images/download?filename={filename}",
+        "preview_url": f"/api/images/preview?filename={filename}"
+    }
+
+
+def get_generated_image_file(filename: str) -> Path:
+    safe_name = safe_slug(filename, "image")
+    target = (GENERATED_IMAGES_ROOT / safe_name).resolve()
+    if not str(target).startswith(str(GENERATED_IMAGES_ROOT)):
+        raise HTTPException(status_code=403, detail="Generated image path not allowed")
+    return target
+
+
+def maybe_rewrite_image_prompt(req: ImageGenerateRequest) -> str:
+    if not req.rewrite_prompt:
+        return req.prompt
+    system_text = (
+        "You rewrite image-generation prompts for a diffusion model. "
+        "Return only the improved prompt text with no JSON, markdown, or commentary. "
+        "Preserve the user intent and keep it concise but vivid."
+    )
+    user_text = (
+        f"Original prompt:\n{req.prompt}\n\n"
+        f"Negative prompt:\n{req.negative_prompt or '(none)'}\n\n"
+        f"Target size: {req.width}x{req.height}.\n"
+        "Improve this for text-to-image generation."
+    )
+    try:
+        rewritten = ask_ollama_text(req.model, system_text, user_text, timeout=IMAGE_REWRITE_TIMEOUT).strip()
+        return rewritten or req.prompt
+    except requests.Timeout:
+        raise HTTPException(status_code=504, detail="Timed out while rewriting the image prompt with Ollama")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"Failed to rewrite image prompt with Ollama: {e}")
+
+
+def call_image_backend(req: ImageGenerateRequest, final_prompt: str) -> tuple[bytes, str]:
+    payload = {
+        "prompt": final_prompt,
+        "negative_prompt": req.negative_prompt,
+        "width": req.width,
+        "height": req.height,
+        "steps": req.steps,
+        "cfg_scale": req.guidance,
+        "sampler_name": "Euler a",
+        "send_images": True,
+        "save_images": False
+    }
+    if req.model:
+        payload["override_settings"] = {"sd_model_checkpoint": req.model}
+
+    try:
+        r = requests.post(IMAGE_BACKEND_URL, json=payload, timeout=IMAGE_BACKEND_TIMEOUT)
+        r.raise_for_status()
+    except requests.Timeout:
+        raise HTTPException(status_code=504, detail="Timed out while generating the image")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"Image backend request failed: {e}")
+
+    try:
+        data = r.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image backend returned invalid JSON: {e}")
+
+    images = data.get("images") or []
+    if not images:
+        raise HTTPException(status_code=500, detail="Image backend returned no images")
+
+    image_b64 = images[0]
+    if "," in image_b64:
+        image_b64 = image_b64.split(",", 1)[1]
+    try:
+        image_bytes = base64.b64decode(image_b64)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to decode generated image: {e}")
+
+    output_format = req.format
+    info = data.get("info")
+    if isinstance(info, str):
+        try:
+            info = json.loads(info)
+        except Exception:
+            info = None
+    if isinstance(info, dict):
+        backend_format = (info.get("format") or "").lower()
+        if backend_format in {"png", "jpg", "jpeg", "webp"}:
+            output_format = "jpg" if backend_format == "jpeg" else backend_format
+
+    return image_bytes, output_format
+
+
+def detect_image_extension(image_bytes: bytes, fallback: str) -> str:
+    if image_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "png"
+    if image_bytes.startswith(b"\xff\xd8\xff"):
+        return "jpg"
+    if image_bytes.startswith(b"RIFF") and image_bytes[8:12] == b"WEBP":
+        return "webp"
+    return fallback
+
+
+def save_generated_image(image_bytes: bytes, output_format: str) -> str:
+    ensure_data_files()
+    actual_format = detect_image_extension(image_bytes, output_format)
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    filename = f"image_{timestamp}_{uuid.uuid4().hex[:8]}.{actual_format}"
+    target = get_generated_image_file(filename)
+    target.write_bytes(image_bytes)
+    return filename
+
 
 def safe_slug(value: str, fallback: str = "item") -> str:
     slug = re.sub(r"[^A-Za-z0-9._-]+", "_", (value or "").strip()).strip("._-")
@@ -475,6 +606,153 @@ def ask_ollama_text(model: str, system_text: str, user_text: str, timeout: int =
     data = r.json()
     return data.get("message", {}).get("content", "")
 
+def wrap_text(text: str, max_chars: int, max_lines: int = 4):
+    words = (text or "").split()
+    if not words:
+        return []
+    lines = []
+    current = ""
+    for word in words:
+        proposed = f"{current} {word}".strip()
+        if len(proposed) > max_chars and current:
+            lines.append(current)
+            current = word
+        else:
+            current = proposed
+    if current:
+        lines.append(current)
+    return lines[:max_lines]
+
+def escape_xml(text: str) -> str:
+    return (
+        (text or "")
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&apos;")
+    )
+
+def svg_text_block(lines: list[str], x: int, start_y: int, line_height: int, size: int, color: str, weight: int = 400):
+    out = []
+    for idx, line in enumerate(lines):
+        out.append(
+            f'<text x="{x}" y="{start_y + (idx * line_height)}" fill="{color}" font-size="{size}" '
+            f'font-weight="{weight}" font-family="Arial, sans-serif">{escape_xml(line)}</text>'
+        )
+    return "".join(out)
+
+def normalize_aspect_ratio(value: str | None) -> str:
+    mapping = {
+        "landscape": "16:9",
+        "square": "1:1",
+        "portrait": "4:5",
+        "16:9": "16:9",
+        "1:1": "1:1",
+        "4:5": "4:5",
+    }
+    return mapping.get((value or "").strip().lower(), "16:9")
+
+def build_structured_image_prompt(model: str, user_input: str, aspect_ratio: str = "16:9"):
+    normalized_ratio = normalize_aspect_ratio(aspect_ratio)
+    prompt = f"""
+Convert the user's image request into safe, production-ready JSON for an image backend.
+
+Return ONLY valid JSON with this exact shape:
+{{
+  "final_prompt": "detailed prompt for the image model",
+  "negative_prompt": "things the image model should avoid",
+  "style_tags": ["tag1", "tag2"],
+  "aspect_ratio": "{normalized_ratio}",
+  "safety_notes": ["note 1", "note 2"]
+}}
+
+Requirements:
+- final_prompt must be concise but specific, written as a direct image-generation prompt.
+- negative_prompt should remove low-quality artifacts, unreadable text, clutter, distortion, and unsafe elements.
+- style_tags must be short lowercase tags.
+- aspect_ratio must be one of: 16:9, 1:1, 4:5.
+- safety_notes must mention policy-sensitive concerns or say that no additional issues were found.
+- Preserve the user's core intent while making the result visually coherent.
+- Do not include markdown or commentary.
+
+USER INPUT:
+{user_input}
+"""
+    structured = ask_ollama_json(
+        model,
+        "You convert user image requests into valid JSON prompts for an image backend. Return JSON only.",
+        prompt
+    )
+    return {
+        "final_prompt": (structured.get("final_prompt") or "").strip(),
+        "negative_prompt": (structured.get("negative_prompt") or "").strip(),
+        "style_tags": [str(tag).strip().lower() for tag in structured.get("style_tags", []) if str(tag).strip()][:8],
+        "aspect_ratio": normalize_aspect_ratio(structured.get("aspect_ratio") or normalized_ratio),
+        "safety_notes": [str(note).strip() for note in structured.get("safety_notes", []) if str(note).strip()][:6],
+    }
+
+def render_image_backend_svg(structured_prompt: dict, accent_color: str | None = None):
+    ratio = normalize_aspect_ratio(structured_prompt.get("aspect_ratio"))
+    sizes = {
+        "16:9": {"width": 1600, "height": 900, "title_chars": 28, "body_chars": 42},
+        "1:1": {"width": 1080, "height": 1080, "title_chars": 22, "body_chars": 30},
+        "4:5": {"width": 1080, "height": 1350, "title_chars": 22, "body_chars": 30},
+    }
+    layout = sizes[ratio]
+    width = layout["width"]
+    height = layout["height"]
+    accent = accent_color.strip() if accent_color and accent_color.strip() else "#38bdf8"
+
+    prompt_lines = wrap_text(structured_prompt.get("final_prompt", ""), layout["title_chars"], 4)
+    style_tags = structured_prompt.get("style_tags", [])
+    negative_prompt = structured_prompt.get("negative_prompt", "")
+    safety_notes = structured_prompt.get("safety_notes", [])
+
+    subtitle = ", ".join(style_tags[:4]) or "Structured prompt generated by Ollama"
+    subtitle_lines = wrap_text(subtitle, layout["body_chars"], 3)
+    notes = [f"Negative: {negative_prompt}"] if negative_prompt else []
+    notes.extend([f"Safety: {note}" for note in safety_notes[:3]])
+    bullet_lines = []
+    for item in notes:
+        bullet_lines.extend(wrap_text(f"• {item}", layout["body_chars"], 2))
+
+    bullet_start_y = 710 if ratio == "4:5" else 590
+    title_y = 270 if ratio == "4:5" else 250
+    subtitle_y = 470 if ratio == "4:5" else 430
+    title_size = 54 if ratio == "4:5" else 64
+
+    svg = f"""
+<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="{escape_xml(accent)}"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg)"/>
+  <circle cx="{width - 120}" cy="120" r="180" fill="{escape_xml(accent)}" opacity="0.15"/>
+  <circle cx="140" cy="{height - 120}" r="220" fill="{escape_xml(accent)}" opacity="0.08"/>
+  <rect x="60" y="60" width="{width - 120}" height="{height - 120}" rx="36" fill="#0f172a" fill-opacity="0.35" stroke="#ffffff" stroke-opacity="0.10"/>
+  <text x="110" y="140" fill="{escape_xml(accent)}" font-size="36" font-weight="700" font-family="Arial, sans-serif">404DonkeyNotFound image backend</text>
+  {svg_text_block(prompt_lines, 110, title_y, 74, title_size, "#ffffff", 700)}
+  {svg_text_block(subtitle_lines, 110, subtitle_y, 42, 28, "#cbd5e1", 400)}
+  {svg_text_block(bullet_lines, 130, bullet_start_y, 40, 26, "#f8fafc", 400)}
+  <rect x="110" y="{height - 150}" width="{min(width - 220, 520)}" height="10" rx="5" fill="url(#accent)"/>
+  <text x="110" y="{height - 90}" fill="#93c5fd" font-size="28" font-weight="600" font-family="Arial, sans-serif">Prompt packaged for image generation</text>
+</svg>""".strip()
+    return {
+        "svg": svg,
+        "mime_type": "image/svg+xml",
+        "width": width,
+        "height": height,
+        "aspect_ratio": ratio
+    }
+
 
 
 def search_local_context(query: str, top_k: int = 6, source_types=None, path_contains=None):
@@ -492,8 +770,6 @@ def search_local_context(query: str, top_k: int = 6, source_types=None, path_con
     return r.json().get("results", [])
 
 
-
-import os
 
 TEMPLATE_BASE = str(BASE_DIR / "data" / "repo_templates")
 
@@ -1025,6 +1301,28 @@ CONTENT:
 """
     summary = ask_ollama_text(req.model, "You summarize web pages clearly and concisely.", prompt)
     return {"url": page["url"], "title": page["title"], "summary": summary, "content_preview": page["content"][:4000]}
+
+@app.post("/api/chat/image-studio/generate")
+def generate_image_studio_asset(req: ImagePromptRequest):
+    if not (req.user_input or "").strip():
+        raise HTTPException(status_code=400, detail="user_input is required")
+
+    structured_prompt = build_structured_image_prompt(req.model, req.user_input.strip(), req.aspect_ratio)
+    rendered = render_image_backend_svg(structured_prompt, req.accent_color)
+    encoded_svg = requests.utils.quote(rendered["svg"])
+
+    return {
+        "structured_prompt": structured_prompt,
+        "image": {
+            "backend": "svg",
+            "mime_type": rendered["mime_type"],
+            "width": rendered["width"],
+            "height": rendered["height"],
+            "aspect_ratio": rendered["aspect_ratio"],
+            "svg": rendered["svg"],
+            "data_url": f"data:{rendered['mime_type']};charset=utf-8,{encoded_svg}"
+        }
+    }
 
 @app.post("/text/summarize")
 def text_summarize(req: SummarizeTextRequest):
