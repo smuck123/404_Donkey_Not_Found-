@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from pathlib import Path
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -13,6 +13,10 @@ import uuid
 import subprocess
 import re
 import difflib
+import base64
+import mimetypes
+import os
+
 
 app = FastAPI(title="404DonkeyNotFound")
 
@@ -36,6 +40,13 @@ EXPORTS_ROOT = (BASE_DIR / "exports").resolve()
 REPO_TEMPLATES_ROOT = (DATA_ROOT / "repo_templates").resolve()
 REPO_TEMPLATES_META_ROOT = (DATA_ROOT / "repo_templates_meta").resolve()
 LEARNING_ROOT = (DATA_ROOT / "learning_library").resolve()
+GENERATED_IMAGES_ROOT = (DATA_ROOT / "generated_images").resolve()
+
+IMAGE_BACKEND_URL = os.getenv("IMAGE_BACKEND_URL", "http://127.0.0.1:7860/sdapi/v1/txt2img")
+IMAGE_BACKEND_TIMEOUT = int(os.getenv("IMAGE_BACKEND_TIMEOUT", "300"))
+IMAGE_REWRITE_TIMEOUT = int(os.getenv("IMAGE_REWRITE_TIMEOUT", "120"))
+MAX_IMAGE_DIMENSION = int(os.getenv("MAX_IMAGE_DIMENSION", "2048"))
+MAX_IMAGE_STEPS = int(os.getenv("MAX_IMAGE_STEPS", "150"))
 
 ALLOWED_EDIT_SUFFIXES = {
     ".html", ".css", ".js", ".txt", ".json", ".md", ".yaml", ".yml",
@@ -200,6 +211,46 @@ class LearningItemSaveRequest(BaseModel):
 class LearningBatchSaveRequest(BaseModel):
     items: list[LearningItemSaveRequest]
 
+
+class ImageGenerateRequest(BaseModel):
+    prompt: str
+    negative_prompt: str = ""
+    width: int = Field(default=1024, ge=64, le=MAX_IMAGE_DIMENSION)
+    height: int = Field(default=1024, ge=64, le=MAX_IMAGE_DIMENSION)
+    steps: int = Field(default=28, ge=1, le=MAX_IMAGE_STEPS)
+    guidance: float = Field(default=7.0, ge=0.0, le=50.0)
+    model: str = DEFAULT_MODEL
+    format: str = "png"
+    rewrite_prompt: bool = True
+
+    @field_validator("prompt")
+    @classmethod
+    def validate_prompt(cls, value: str):
+        value = value.strip()
+        if not value:
+            raise ValueError("Prompt is required")
+        if len(value) > 4000:
+            raise ValueError("Prompt is too long")
+        return value
+
+    @field_validator("negative_prompt")
+    @classmethod
+    def validate_negative_prompt(cls, value: str):
+        value = value.strip()
+        if len(value) > 4000:
+            raise ValueError("Negative prompt is too long")
+        return value
+
+    @field_validator("format")
+    @classmethod
+    def validate_format(cls, value: str):
+        value = (value or "png").strip().lower()
+        if value not in {"png", "jpg", "jpeg", "webp"}:
+            raise ValueError("Format must be png, jpg, jpeg, or webp")
+        return "jpg" if value == "jpeg" else value
+
+
+
 def ensure_data_files():
     CHATS_ROOT.mkdir(parents=True, exist_ok=True)
     PROJECTS_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -209,8 +260,122 @@ def ensure_data_files():
     REPO_TEMPLATES_ROOT.mkdir(parents=True, exist_ok=True)
     REPO_TEMPLATES_META_ROOT.mkdir(parents=True, exist_ok=True)
     LEARNING_ROOT.mkdir(parents=True, exist_ok=True)
+    GENERATED_IMAGES_ROOT.mkdir(parents=True, exist_ok=True)
     if not PROJECTS_FILE.exists():
         PROJECTS_FILE.write_text("[]", encoding="utf-8")
+
+def build_image_urls(filename: str) -> dict:
+    return {
+        "download_url": f"/api/images/download?filename={filename}",
+        "preview_url": f"/api/images/preview?filename={filename}"
+    }
+
+
+def get_generated_image_file(filename: str) -> Path:
+    safe_name = safe_slug(filename, "image")
+    target = (GENERATED_IMAGES_ROOT / safe_name).resolve()
+    if not str(target).startswith(str(GENERATED_IMAGES_ROOT)):
+        raise HTTPException(status_code=403, detail="Generated image path not allowed")
+    return target
+
+
+def maybe_rewrite_image_prompt(req: ImageGenerateRequest) -> str:
+    if not req.rewrite_prompt:
+        return req.prompt
+    system_text = (
+        "You rewrite image-generation prompts for a diffusion model. "
+        "Return only the improved prompt text with no JSON, markdown, or commentary. "
+        "Preserve the user intent and keep it concise but vivid."
+    )
+    user_text = (
+        f"Original prompt:\n{req.prompt}\n\n"
+        f"Negative prompt:\n{req.negative_prompt or '(none)'}\n\n"
+        f"Target size: {req.width}x{req.height}.\n"
+        "Improve this for text-to-image generation."
+    )
+    try:
+        rewritten = ask_ollama_text(req.model, system_text, user_text, timeout=IMAGE_REWRITE_TIMEOUT).strip()
+        return rewritten or req.prompt
+    except requests.Timeout:
+        raise HTTPException(status_code=504, detail="Timed out while rewriting the image prompt with Ollama")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"Failed to rewrite image prompt with Ollama: {e}")
+
+
+def call_image_backend(req: ImageGenerateRequest, final_prompt: str) -> tuple[bytes, str]:
+    payload = {
+        "prompt": final_prompt,
+        "negative_prompt": req.negative_prompt,
+        "width": req.width,
+        "height": req.height,
+        "steps": req.steps,
+        "cfg_scale": req.guidance,
+        "sampler_name": "Euler a",
+        "send_images": True,
+        "save_images": False
+    }
+    if req.model:
+        payload["override_settings"] = {"sd_model_checkpoint": req.model}
+
+    try:
+        r = requests.post(IMAGE_BACKEND_URL, json=payload, timeout=IMAGE_BACKEND_TIMEOUT)
+        r.raise_for_status()
+    except requests.Timeout:
+        raise HTTPException(status_code=504, detail="Timed out while generating the image")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"Image backend request failed: {e}")
+
+    try:
+        data = r.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image backend returned invalid JSON: {e}")
+
+    images = data.get("images") or []
+    if not images:
+        raise HTTPException(status_code=500, detail="Image backend returned no images")
+
+    image_b64 = images[0]
+    if "," in image_b64:
+        image_b64 = image_b64.split(",", 1)[1]
+    try:
+        image_bytes = base64.b64decode(image_b64)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to decode generated image: {e}")
+
+    output_format = req.format
+    info = data.get("info")
+    if isinstance(info, str):
+        try:
+            info = json.loads(info)
+        except Exception:
+            info = None
+    if isinstance(info, dict):
+        backend_format = (info.get("format") or "").lower()
+        if backend_format in {"png", "jpg", "jpeg", "webp"}:
+            output_format = "jpg" if backend_format == "jpeg" else backend_format
+
+    return image_bytes, output_format
+
+
+def detect_image_extension(image_bytes: bytes, fallback: str) -> str:
+    if image_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "png"
+    if image_bytes.startswith(b"\xff\xd8\xff"):
+        return "jpg"
+    if image_bytes.startswith(b"RIFF") and image_bytes[8:12] == b"WEBP":
+        return "webp"
+    return fallback
+
+
+def save_generated_image(image_bytes: bytes, output_format: str) -> str:
+    ensure_data_files()
+    actual_format = detect_image_extension(image_bytes, output_format)
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    filename = f"image_{timestamp}_{uuid.uuid4().hex[:8]}.{actual_format}"
+    target = get_generated_image_file(filename)
+    target.write_bytes(image_bytes)
+    return filename
+
 
 def safe_slug(value: str, fallback: str = "item") -> str:
     slug = re.sub(r"[^A-Za-z0-9._-]+", "_", (value or "").strip()).strip("._-")
@@ -446,8 +611,6 @@ def search_local_context(query: str, top_k: int = 6, source_types=None, path_con
     return r.json().get("results", [])
 
 
-
-import os
 
 TEMPLATE_BASE = str(BASE_DIR / "data" / "repo_templates")
 
@@ -993,6 +1156,44 @@ TEXT:
 """
     summary = ask_ollama_text(req.model, "You summarize text clearly and concisely.", prompt)
     return {"summary": summary}
+
+@app.post("/images/generate")
+def image_generate(req: ImageGenerateRequest):
+    final_prompt = maybe_rewrite_image_prompt(req)
+    image_bytes, output_format = call_image_backend(req, final_prompt)
+    filename = save_generated_image(image_bytes, output_format)
+    urls = build_image_urls(filename)
+    return {
+        "filename": filename,
+        "prompt": final_prompt,
+        "original_prompt": req.prompt,
+        "negative_prompt": req.negative_prompt,
+        "width": req.width,
+        "height": req.height,
+        "steps": req.steps,
+        "guidance": req.guidance,
+        "format": output_format,
+        **urls
+    }
+
+
+@app.get("/images/download")
+def image_download(filename: str = Query(...)):
+    target = get_generated_image_file(filename)
+    if not target.exists():
+        raise HTTPException(status_code=404, detail="Generated image not found")
+    media_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+    return FileResponse(str(target), filename=target.name, media_type=media_type)
+
+
+@app.get("/images/preview")
+def image_preview(filename: str = Query(...)):
+    target = get_generated_image_file(filename)
+    if not target.exists():
+        raise HTTPException(status_code=404, detail="Generated image not found")
+    media_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+    return FileResponse(str(target), media_type=media_type)
+
 
 @app.post("/export/text")
 def export_text(req: ExportTextRequest):
