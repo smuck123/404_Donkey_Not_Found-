@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, field_validator
@@ -37,6 +37,7 @@ PROJECTS_FILE = (DATA_ROOT / "projects" / "projects.json").resolve()
 REPOS_ROOT = (BASE_DIR / "repos").resolve()
 DOWNLOADS_ROOT = (BASE_DIR / "downloads").resolve()
 EXPORTS_ROOT = (BASE_DIR / "exports").resolve()
+IMAGES_ROOT = (DATA_ROOT / "images").resolve()
 REPO_TEMPLATES_ROOT = (DATA_ROOT / "repo_templates").resolve()
 REPO_TEMPLATES_META_ROOT = (DATA_ROOT / "repo_templates_meta").resolve()
 LEARNING_ROOT = (DATA_ROOT / "learning_library").resolve()
@@ -218,44 +219,13 @@ class LearningBatchSaveRequest(BaseModel):
     items: list[LearningItemSaveRequest]
 
 
-class ImageGenerateRequest(BaseModel):
-    prompt: str
-    negative_prompt: str = ""
-    width: int = Field(default=1024, ge=64, le=MAX_IMAGE_DIMENSION)
-    height: int = Field(default=1024, ge=64, le=MAX_IMAGE_DIMENSION)
-    steps: int = Field(default=28, ge=1, le=MAX_IMAGE_STEPS)
-    guidance: float = Field(default=7.0, ge=0.0, le=50.0)
-    model: str = DEFAULT_MODEL
-    format: str = "png"
-    rewrite_prompt: bool = True
-
-    @field_validator("prompt")
-    @classmethod
-    def validate_prompt(cls, value: str):
-        value = value.strip()
-        if not value:
-            raise ValueError("Prompt is required")
-        if len(value) > 4000:
-            raise ValueError("Prompt is too long")
-        return value
-
-    @field_validator("negative_prompt")
-    @classmethod
-    def validate_negative_prompt(cls, value: str):
-        value = value.strip()
-        if len(value) > 4000:
-            raise ValueError("Negative prompt is too long")
-        return value
-
-    @field_validator("format")
-    @classmethod
-    def validate_format(cls, value: str):
-        value = (value or "png").strip().lower()
-        if value not in {"png", "jpg", "jpeg", "webp"}:
-            raise ValueError("Format must be png, jpg, jpeg, or webp")
-        return "jpg" if value == "jpeg" else value
-
-
+class SaveImageRequest(BaseModel):
+    svg: str
+    prompt: str = ""
+    model_workflow: str = "study-image-studio"
+    width: int
+    height: int
+    title: str = "Study card"
 
 def ensure_data_files():
     CHATS_ROOT.mkdir(parents=True, exist_ok=True)
@@ -263,6 +233,7 @@ def ensure_data_files():
     REPOS_ROOT.mkdir(parents=True, exist_ok=True)
     DOWNLOADS_ROOT.mkdir(parents=True, exist_ok=True)
     EXPORTS_ROOT.mkdir(parents=True, exist_ok=True)
+    IMAGES_ROOT.mkdir(parents=True, exist_ok=True)
     REPO_TEMPLATES_ROOT.mkdir(parents=True, exist_ok=True)
     REPO_TEMPLATES_META_ROOT.mkdir(parents=True, exist_ok=True)
     LEARNING_ROOT.mkdir(parents=True, exist_ok=True)
@@ -386,6 +357,41 @@ def save_generated_image(image_bytes: bytes, output_format: str) -> str:
 def safe_slug(value: str, fallback: str = "item") -> str:
     slug = re.sub(r"[^A-Za-z0-9._-]+", "_", (value or "").strip()).strip("._-")
     return slug or fallback
+
+def get_image_file(image_id: str, suffix: str) -> Path:
+    safe_id = safe_slug(image_id, "image")
+    target = (IMAGES_ROOT / f"{safe_id}{suffix}").resolve()
+    if not str(target).startswith(str(IMAGES_ROOT)):
+        raise HTTPException(status_code=403, detail="Image path not allowed")
+    return target
+
+def serialize_image_metadata(meta: dict) -> dict:
+    dimensions = meta.get("dimensions") or {}
+    return {
+        "image_id": meta.get("image_id", ""),
+        "title": meta.get("title", ""),
+        "prompt": meta.get("prompt", ""),
+        "model_workflow": meta.get("model/workflow", ""),
+        "created_timestamp": meta.get("created_timestamp", ""),
+        "dimensions": {
+            "width": int(dimensions.get("width", 0) or 0),
+            "height": int(dimensions.get("height", 0) or 0),
+        },
+        "file_path": meta.get("file_path", ""),
+        "filename": meta.get("filename", ""),
+        "download_url": f"/api/images/read/{meta.get('image_id', '')}",
+    }
+
+def load_image_metadata(image_id: str) -> tuple[Path, Path, dict]:
+    svg_path = get_image_file(image_id, ".svg")
+    meta_path = get_image_file(image_id, ".json")
+    if not svg_path.exists() or not meta_path.exists():
+        raise HTTPException(status_code=404, detail="Image not found")
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Image metadata unreadable: {exc}")
+    return svg_path, meta_path, meta
 
 def get_learning_item_file(item_id: str) -> Path:
     safe_id = safe_slug(item_id, "item")
@@ -1332,43 +1338,64 @@ TEXT:
     summary = ask_ollama_text(req.model, "You summarize text clearly and concisely.", prompt)
     return {"summary": summary}
 
-@app.post("/images/generate")
-def image_generate(req: ImageGenerateRequest):
-    final_prompt = maybe_rewrite_image_prompt(req)
-    image_bytes, output_format = call_image_backend(req, final_prompt)
-    filename = save_generated_image(image_bytes, output_format)
-    urls = build_image_urls(filename)
+@app.post("/images")
+def save_image(req: SaveImageRequest):
+    ensure_data_files()
+    image_id = f"{datetime.utcnow().strftime('%Y%m%dT%H%M%S')}_{uuid.uuid4().hex[:8]}"
+    svg_path = get_image_file(image_id, ".svg")
+    meta_path = get_image_file(image_id, ".json")
+
+    svg_path.write_text(req.svg, encoding="utf-8")
+    meta = {
+        "image_id": image_id,
+        "title": req.title.strip() or "Study card",
+        "prompt": req.prompt.strip(),
+        "model/workflow": req.model_workflow.strip() or "study-image-studio",
+        "created_timestamp": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "dimensions": {
+            "width": req.width,
+            "height": req.height,
+        },
+        "file_path": str(svg_path.relative_to(BASE_DIR)),
+        "filename": svg_path.name,
+    }
+    meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
     return {
-        "filename": filename,
-        "prompt": final_prompt,
-        "original_prompt": req.prompt,
-        "negative_prompt": req.negative_prompt,
-        "width": req.width,
-        "height": req.height,
-        "steps": req.steps,
-        "guidance": req.guidance,
-        "format": output_format,
-        **urls
+        "status": "saved",
+        **serialize_image_metadata(meta),
     }
 
+@app.get("/images/list")
+def image_list():
+    ensure_data_files()
+    items = []
+    for meta_path in sorted(IMAGES_ROOT.glob("*.json"), reverse=True):
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            svg_path = get_image_file(meta.get("image_id", meta_path.stem), ".svg")
+            if not svg_path.exists():
+                continue
+            items.append(serialize_image_metadata(meta))
+        except Exception:
+            continue
+    items.sort(key=lambda item: item.get("created_timestamp", ""), reverse=True)
+    return {"images": items}
 
-@app.get("/images/download")
-def image_download(filename: str = Query(...)):
-    target = get_generated_image_file(filename)
-    if not target.exists():
-        raise HTTPException(status_code=404, detail="Generated image not found")
-    media_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
-    return FileResponse(str(target), filename=target.name, media_type=media_type)
+@app.get("/images/read/{image_id}")
+def image_read(image_id: str, format: str = Query("file")):
+    svg_path, _, meta = load_image_metadata(image_id)
+    if format == "meta":
+        return serialize_image_metadata(meta)
+    if format == "raw":
+        return Response(content=svg_path.read_text(encoding="utf-8"), media_type="image/svg+xml")
+    return FileResponse(str(svg_path), media_type="image/svg+xml", filename=meta.get("filename", svg_path.name))
 
-
-@app.get("/images/preview")
-def image_preview(filename: str = Query(...)):
-    target = get_generated_image_file(filename)
-    if not target.exists():
-        raise HTTPException(status_code=404, detail="Generated image not found")
-    media_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
-    return FileResponse(str(target), media_type=media_type)
-
+@app.delete("/images/{image_id}")
+def image_delete(image_id: str):
+    svg_path, meta_path, meta = load_image_metadata(image_id)
+    svg_path.unlink(missing_ok=True)
+    meta_path.unlink(missing_ok=True)
+    return {"status": "deleted", "image_id": meta.get("image_id", image_id)}
 
 @app.post("/export/text")
 def export_text(req: ExportTextRequest):

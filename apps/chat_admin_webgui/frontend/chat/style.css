@@ -164,6 +164,14 @@ html, body {
   background: #172033;
 }
 
+.gallery-item {
+  cursor: default;
+}
+
+.gallery-item .button-row {
+  margin-top: 8px;
+}
+
 .item-title {
   font-weight: bold;
   margin-bottom: 4px;

@@ -168,9 +168,16 @@
             <img id="imagePreview" class="image-preview" alt="Generated study image preview">
           </div>
           <div class="button-row">
-            <button onclick="downloadGeneratedImage()">Download backend SVG</button>
+            <button onclick="saveGeneratedImage()">Save to gallery</button>
+            <button onclick="downloadGeneratedImage()">Download SVG</button>
           </div>
         </div>
+      </section>
+
+      <section class="inspector-card">
+        <h3>Image Gallery</h3>
+        <div class="helper-text">Browse saved image history, reopen prior SVGs in the studio, or download/delete them.</div>
+        <div id="imageGalleryList" class="list-stack compact"></div>
       </section>
 
       <section class="inspector-card">

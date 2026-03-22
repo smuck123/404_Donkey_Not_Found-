@@ -9,10 +9,12 @@ let savedProjects = [];
 let savedRepoTemplates = [];
 let savedRepos = [];
 let savedLearningItems = [];
+let savedImages = [];
 let selectedChatId = "";
 let lastRetrieved = [];
 let lastPlannedChanges = null;
 let lastGeneratedImage = "";
+let lastGeneratedImageMeta = null;
 
 async function api(url, method = "GET", data = null) {
   const opts = { method, headers: { "Content-Type": "application/json" } };
@@ -152,6 +154,33 @@ function renderLearningItems() {
   `).join("");
 }
 
+function renderImageGallery() {
+  const box = document.getElementById("imageGalleryList");
+  if (!box) return;
+  if (savedImages.length === 0) {
+    box.innerHTML = '<div class="item-meta">No saved images yet</div>';
+    return;
+  }
+
+  box.innerHTML = savedImages.map(image => {
+    const dims = image.dimensions || {};
+    const promptPreview = (image.prompt || "").trim();
+    return `
+      <div class="sidebar-item gallery-item">
+        <div class="item-title">${escapeHtml(image.title || image.image_id)}</div>
+        <div class="item-meta">${escapeHtml(image.created_timestamp || "unknown")} • ${escapeHtml(`${dims.width || 0}x${dims.height || 0}`)}</div>
+        <div class="item-meta">${escapeHtml(image.model_workflow || "study-image-studio")}</div>
+        <div class="item-meta">${escapeHtml(promptPreview ? promptPreview.slice(0, 120) : "No prompt saved")}</div>
+        <div class="button-row">
+          <button onclick="reopenSavedImage(${JSON.stringify(image.image_id)})">Reopen</button>
+          <button onclick="downloadSavedImage(${JSON.stringify(image.image_id)})">Download</button>
+          <button onclick="deleteSavedImage(${JSON.stringify(image.image_id)})">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
 function renderChat() {
   const box = document.getElementById("chatBox");
   if (chatHistory.length === 0) {
@@ -283,12 +312,14 @@ async function loadState() {
   const data = await api("/api/chat/state");
   const templateData = await api("/api/chat/repo-templates");
   const repoData = await api("/api/repo/list");
+  const imageData = await api("/api/images/list");
 
   savedProjects = data.projects || [];
   savedChats = data.chats || [];
   savedRepoTemplates = templateData.templates || [];
   savedRepos = repoData.repos || [];
   savedLearningItems = data.learning_items || [];
+  savedImages = imageData.images || [];
 
   document.getElementById("mainBrand").textContent = data.brand || "404DonkeyNotFound";
   document.getElementById("mainSlogan").textContent = data.slogan || "if it works, make sure donkey can break IT!";
@@ -306,6 +337,7 @@ async function loadState() {
   renderRepoSelect();
   renderSources();
   renderPlannedChanges();
+  renderImageGallery();
 }
 
 async function saveCurrentChat() {
@@ -544,53 +576,143 @@ async function generateStudyImage() {
     .slice(0, 5);
   const accent = document.getElementById("imageAccent").value.trim() || "#38bdf8";
   const layout = document.getElementById("imageLayout").value;
-  const aspectMap = {
-    landscape: "16:9",
-    square: "1:1",
-    portrait: "4:5"
+  const modelWorkflow = "study-image-studio/svg";
+  const sizes = {
+    landscape: { width: 1600, height: 900 },
+    square: { width: 1080, height: 1080 },
+    portrait: { width: 1080, height: 1350 }
   };
-  const userInput = [
-    `Title: ${title}`,
-    subtitle ? `Subtitle: ${subtitle}` : "",
-    bullets.length ? `Key points:\n- ${bullets.join("\n- ")}` : ""
+  const { width, height } = sizes[layout] || sizes.landscape;
+
+  const titleLines = wrapSvgText(title, layout === "landscape" ? 28 : 22);
+  const subtitleLines = wrapSvgText(subtitle, layout === "landscape" ? 48 : 30);
+  const bulletLines = bullets.flatMap(item => wrapSvgText(`• ${item}`, layout === "landscape" ? 42 : 28));
+  const bulletStartY = layout === "portrait" ? 710 : 590;
+
+  const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="${escapeXml(accent)}"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg)"/>
+  <circle cx="${width - 120}" cy="120" r="180" fill="${escapeXml(accent)}" opacity="0.15"/>
+  <circle cx="140" cy="${height - 120}" r="220" fill="${escapeXml(accent)}" opacity="0.08"/>
+  <rect x="60" y="60" width="${width - 120}" height="${height - 120}" rx="36" fill="#0f172a" fill-opacity="0.35" stroke="#ffffff" stroke-opacity="0.10"/>
+  <text x="110" y="140" fill="${escapeXml(accent)}" font-size="36" font-weight="700" font-family="Arial, sans-serif">404DonkeyNotFound</text>
+  ${svgTextBlock(titleLines, 110, layout === "portrait" ? 270 : 250, 74, layout === "portrait" ? 54 : 64, "#ffffff", 700)}
+  ${svgTextBlock(subtitleLines, 110, layout === "portrait" ? 470 : 430, 42, 28, "#cbd5e1", 400)}
+  ${svgTextBlock(bulletLines, 130, bulletStartY, 40, 26, "#f8fafc", 400)}
+  <rect x="110" y="${height - 150}" width="${Math.min(width - 220, 520)}" height="10" rx="5" fill="url(#accent)"/>
+  <text x="110" y="${height - 90}" fill="#93c5fd" font-size="28" font-weight="600" font-family="Arial, sans-serif">Study card • Ready to share</text>
+</svg>`.trim();
+
+  lastGeneratedImage = svg;
+  lastGeneratedImageMeta = {
+    title,
+    subtitle,
+    bullets,
+    accent,
+    layout,
+    width,
+    height,
+    modelWorkflow
+  };
+  const encoded = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  document.getElementById("imagePreview").src = encoded;
+  document.getElementById("imageStudioMeta").textContent = `${layout} • ${width}x${height} • accent ${accent}`;
+  setStatus("Study image created. You can preview or download it.");
+}
+
+async function saveGeneratedImage() {
+  if (!lastGeneratedImage || !lastGeneratedImageMeta) {
+    setStatus("Generate an image first.");
+    return null;
+  }
+
+  const prompt = [
+    lastGeneratedImageMeta.title,
+    lastGeneratedImageMeta.subtitle,
+    ...(lastGeneratedImageMeta.bullets || [])
   ].filter(Boolean).join("\n");
 
-  setStatus(`Building structured image prompt with ${activeModel}...`);
+  const saved = await api("/api/images", "POST", {
+    svg: lastGeneratedImage,
+    prompt,
+    model_workflow: lastGeneratedImageMeta.modelWorkflow,
+    width: lastGeneratedImageMeta.width,
+    height: lastGeneratedImageMeta.height,
+    title: lastGeneratedImageMeta.title
+  });
+  await loadState();
+  setStatus(`Saved image "${saved.title || lastGeneratedImageMeta.title}" to the gallery.`);
+  return saved;
+}
 
+async function downloadGeneratedImage() {
   try {
-    const data = await api("/api/chat/image-studio/generate", "POST", {
-      model: activeModel,
-      user_input: userInput,
-      aspect_ratio: aspectMap[layout] || "16:9",
-      accent_color: accent
-    });
-
-    lastGeneratedImage = data.image?.svg || "";
-    document.getElementById("imagePreview").src = data.image?.data_url || "";
-
-    const structured = data.structured_prompt || {};
-    const notes = (structured.safety_notes || []).join(" | ") || "No extra safety flags";
-    document.getElementById("imageStudioMeta").textContent =
-      `${structured.aspect_ratio || "16:9"} • ${(data.image?.width || 0)}x${(data.image?.height || 0)} • ${notes}`;
-    setStatus("Study image created through the backend image pipeline.");
+    const saved = await saveGeneratedImage();
+    if (!saved) return;
+    window.open(saved.download_url, "_blank");
+    setStatus("Saved image metadata and opened the download.");
   } catch (err) {
-    setStatus("Image generation failed: " + err.message);
+    setStatus("Failed to save/download image: " + err.message);
   }
 }
 
-function downloadGeneratedImage() {
-  if (!lastGeneratedImage) {
-    setStatus("Generate an image first.");
-    return;
+async function reopenSavedImage(imageId) {
+  try {
+    const [meta, svgText] = await Promise.all([
+      api(`/api/images/read/${encodeURIComponent(imageId)}?format=meta`),
+      fetch(`/api/images/read/${encodeURIComponent(imageId)}?format=raw`).then(async res => {
+        const text = await res.text();
+        if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+        return text;
+      })
+    ]);
+
+    const promptLines = (meta.prompt || "").split("\n").map(line => line.trim()).filter(Boolean);
+    lastGeneratedImage = svgText;
+    lastGeneratedImageMeta = {
+      title: meta.title || promptLines[0] || "",
+      subtitle: promptLines[1] || "",
+      bullets: promptLines.slice(2),
+      accent: document.getElementById("imageAccent").value.trim() || "#38bdf8",
+      layout: "saved",
+      width: meta.dimensions?.width || 0,
+      height: meta.dimensions?.height || 0,
+      modelWorkflow: meta.model_workflow || "study-image-studio/svg"
+    };
+    document.getElementById("imageTitle").value = lastGeneratedImageMeta.title;
+    document.getElementById("imageSubtitle").value = lastGeneratedImageMeta.subtitle;
+    document.getElementById("imageBullets").value = lastGeneratedImageMeta.bullets.join("\n");
+    document.getElementById("imagePreview").src = `/api/images/read/${encodeURIComponent(imageId)}`;
+    document.getElementById("imageStudioMeta").textContent = `${meta.created_timestamp || "saved image"} • ${meta.dimensions?.width || 0}x${meta.dimensions?.height || 0}`;
+    setStatus(`Reopened saved image ${meta.title || imageId}.`);
+  } catch (err) {
+    setStatus("Failed to reopen saved image: " + err.message);
   }
-  const blob = new Blob([lastGeneratedImage], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `study-card-${new Date().toISOString().slice(0, 10)}.svg`;
-  link.click();
-  URL.revokeObjectURL(url);
-  setStatus("Downloaded generated SVG image.");
+}
+
+function downloadSavedImage(imageId) {
+  window.open(`/api/images/read/${encodeURIComponent(imageId)}`, "_blank");
+  setStatus(`Opened download for image ${imageId}.`);
+}
+
+async function deleteSavedImage(imageId) {
+  try {
+    await api(`/api/images/${encodeURIComponent(imageId)}`, "DELETE");
+    await loadState();
+    setStatus(`Deleted image ${imageId}.`);
+  } catch (err) {
+    setStatus("Failed to delete image: " + err.message);
+  }
 }
 
 async function previewLearningItem() {
