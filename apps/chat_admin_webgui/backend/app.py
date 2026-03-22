@@ -13,15 +13,32 @@ import uuid
 import subprocess
 import re
 import difflib
+import os
+
+
+def env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value in (None, ""):
+        return default
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise RuntimeError(f"Environment variable {name} must be an integer") from exc
 
 app = FastAPI(title="404DonkeyNotFound")
 
-OLLAMA_TAGS_URL = "http://127.0.0.1:11434/api/tags"
-OLLAMA_CHAT_URL = "http://127.0.0.1:11434/api/chat"
-DEFAULT_MODEL = "qwen3:8b"
-SEARCH_API_URL = "http://127.0.0.1:8020/search"
-
+OLLAMA_TAGS_URL = os.getenv("OLLAMA_TAGS_URL", "http://127.0.0.1:11434/api/tags")
+OLLAMA_CHAT_URL = os.getenv("OLLAMA_CHAT_URL", "http://127.0.0.1:11434/api/chat")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "qwen3:8b")
+SEARCH_API_URL = os.getenv("SEARCH_API_URL", "http://127.0.0.1:8020/search")
+IMAGE_API_BASE_URL = os.getenv("IMAGE_API_BASE_URL", "http://127.0.0.1:8188")
+DEFAULT_IMAGE_WORKFLOW = os.getenv("DEFAULT_IMAGE_WORKFLOW", "default")
 BASE_DIR = Path(__file__).resolve().parent.parent
+IMAGE_OUTPUT_DIR = Path(os.getenv("IMAGE_OUTPUT_DIR", str((BASE_DIR / "generated_images").resolve()))).resolve()
+MAX_IMAGE_SIZE = env_int("MAX_IMAGE_SIZE", 4096)
+MAX_BATCH_COUNT = env_int("MAX_BATCH_COUNT", 8)
+REQUEST_TIMEOUT = env_int("REQUEST_TIMEOUT", 120)
+
 CHAT_ROOT = (BASE_DIR / "frontend" / "chat").resolve()
 ADMIN_ROOT = (BASE_DIR / "frontend" / "admin").resolve()
 EDIT_ROOT = (BASE_DIR / "editable" / "chat_site").resolve()
