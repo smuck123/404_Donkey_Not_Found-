@@ -2,7 +2,15 @@
 set -euo pipefail
 
 PROJECT="/opt/git/404_Donkey_Not_Found"
-BRANCH="${1:-main}"
+DEFAULT_FILE="$PROJECT/.default_branch"
+
+if [ -f "$DEFAULT_FILE" ]; then
+    DEFAULT_BRANCH=$(cat "$DEFAULT_FILE")
+else
+    DEFAULT_BRANCH="main"
+fi
+
+BRANCH="${1:-$DEFAULT_BRANCH}"
 MSG="${2:-Auto update $(date '+%Y-%m-%d %H:%M:%S')}"
 
 cd "$PROJECT"
@@ -18,8 +26,9 @@ if [ ! -d ".git" ]; then
     exit 1
 fi
 
-git remote remove origin 2>/dev/null || true
-git remote add origin git@github.com:smuck123/404_Donkey_Not_Found-.git
+if ! git remote get-url origin >/dev/null 2>&1; then
+    git remote add origin git@github.com:smuck123/404_Donkey_Not_Found-.git
+fi
 
 if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
     git checkout "$BRANCH"
@@ -35,7 +44,12 @@ else
     git commit -m "$MSG"
 fi
 
-git pull origin "$BRANCH" --rebase || true
+git fetch origin
+
+if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+    git pull --rebase origin "$BRANCH"
+fi
+
 git push -u origin "$BRANCH"
 
 echo "[+] Done"
