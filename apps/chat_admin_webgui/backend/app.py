@@ -207,6 +207,49 @@ class ImagePromptRequest(BaseModel):
     accent_color: str | None = None
 
 
+class ImageGenerateRequest(BaseModel):
+    model: str = Field(default="stabilityai/stable-diffusion-xl-base-1.0")
+    prompt: str
+    negative_prompt: str = ""
+    width: int = 832
+    height: int = 1216
+    steps: int = 30
+    guidance: float = 6.5
+    format: str = "png"
+    rewrite_prompt: bool = True
+
+    @field_validator("width", "height")
+    @classmethod
+    def validate_dimensions(cls, value: int):
+        if value < 256 or value > MAX_IMAGE_DIMENSION:
+            raise ValueError(f"Image dimensions must be between 256 and {MAX_IMAGE_DIMENSION}")
+        if value % 8 != 0:
+            raise ValueError("Image dimensions must be divisible by 8")
+        return value
+
+    @field_validator("steps")
+    @classmethod
+    def validate_steps(cls, value: int):
+        if value < 1 or value > MAX_IMAGE_STEPS:
+            raise ValueError(f"Steps must be between 1 and {MAX_IMAGE_STEPS}")
+        return value
+
+    @field_validator("guidance")
+    @classmethod
+    def validate_guidance(cls, value: float):
+        if value < 1 or value > 20:
+            raise ValueError("Guidance must be between 1 and 20")
+        return value
+
+    @field_validator("format")
+    @classmethod
+    def validate_format(cls, value: str):
+        normalized = (value or "png").strip().lower()
+        if normalized not in {"png", "jpg", "jpeg", "webp"}:
+            raise ValueError("Format must be png, jpg, jpeg, or webp")
+        return "jpg" if normalized == "jpeg" else normalized
+
+
 class RepoTemplateSaveRequest(BaseModel):
     repo_name: str
     template_name: str
@@ -614,6 +657,23 @@ def ask_ollama_text(model: str, system_text: str, user_text: str, timeout: int =
             "messages": [
                 {"role": "system", "content": system_text},
                 {"role": "user", "content": user_text}
+            ],
+            "stream": False
+        },
+        timeout=timeout
+    )
+    r.raise_for_status()
+    data = r.json()
+    return data.get("message", {}).get("content", "")
+
+def ask_ollama_with_images(model: str, system_text: str, user_text: str, images: list[str], timeout: int = 600):
+    r = requests.post(
+        OLLAMA_CHAT_URL,
+        json={
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_text},
+                {"role": "user", "content": user_text, "images": images}
             ],
             "stream": False
         },
@@ -1417,6 +1477,73 @@ def generate_image_studio_asset(req: ImagePromptRequest):
         }
     }
 
+@app.post("/api/images/generate")
+def generate_real_image(req: ImageGenerateRequest):
+    if not (req.prompt or "").strip():
+        raise HTTPException(status_code=400, detail="prompt is required")
+
+    final_prompt = maybe_rewrite_image_prompt(req).strip()
+    image_bytes, output_format = call_image_backend(req, final_prompt)
+    filename = save_generated_image(image_bytes, output_format)
+    encoded = base64.b64encode(image_bytes).decode("utf-8")
+
+    return {
+        "prompt": req.prompt,
+        "final_prompt": final_prompt,
+        "negative_prompt": req.negative_prompt,
+        "model": req.model,
+        "width": req.width,
+        "height": req.height,
+        "steps": req.steps,
+        "guidance": req.guidance,
+        "format": output_format,
+        "filename": filename,
+        "data_url": f"data:image/{output_format};base64,{encoded}",
+        **build_image_urls(filename),
+    }
+
+@app.post("/api/images/analyze")
+async def analyze_uploaded_image(
+    model: str = Form(DEFAULT_MODEL),
+    prompt: str = Form("Describe this image in detail and call out important objects, style, and text."),
+    image: UploadFile = File(...),
+):
+    content_type = (image.content_type or "").lower()
+    if content_type and not content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Uploaded file must be an image")
+
+    image_bytes = await image.read()
+    if not image_bytes:
+        raise HTTPException(status_code=400, detail="Uploaded image is empty")
+
+    system_text = (
+        "You analyze user-provided images. Be specific, grounded in visible details, "
+        "and clearly mention any uncertainty instead of guessing."
+    )
+    encoded = base64.b64encode(image_bytes).decode("utf-8")
+
+    try:
+        analysis = ask_ollama_with_images(model, system_text, prompt.strip() or "Describe this image.", [encoded], timeout=180)
+    except requests.Timeout:
+        raise HTTPException(status_code=504, detail="Timed out while analyzing the image")
+    except requests.RequestException as exc:
+        raise HTTPException(status_code=502, detail=f"Failed to analyze image with Ollama: {exc}")
+
+    preview_b64 = encoded
+    if content_type:
+        mime_type = content_type
+    else:
+        mime_type = mimetypes.guess_type(image.filename or "")[0] or "image/png"
+
+    return {
+        "model": model,
+        "prompt": prompt,
+        "filename": image.filename or "upload",
+        "content_type": mime_type,
+        "analysis": analysis.strip(),
+        "preview_data_url": f"data:{mime_type};base64,{preview_b64}",
+    }
+
 @app.post("/text/summarize")
 def text_summarize(req: SummarizeTextRequest):
     if not req.text.strip():
@@ -1457,6 +1584,22 @@ def save_image(req: SaveImageRequest):
         "status": "saved",
         **serialize_image_metadata(meta),
     }
+
+@app.get("/api/images/download")
+def download_generated_image(filename: str = Query(...)):
+    target = get_generated_image_file(filename)
+    if not target.exists():
+        raise HTTPException(status_code=404, detail="Generated image not found")
+    mime_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+    return FileResponse(str(target), media_type=mime_type, filename=target.name)
+
+@app.get("/api/images/preview")
+def preview_generated_image(filename: str = Query(...)):
+    target = get_generated_image_file(filename)
+    if not target.exists():
+        raise HTTPException(status_code=404, detail="Generated image not found")
+    mime_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+    return FileResponse(str(target), media_type=mime_type)
 
 @app.get("/images/list")
 def image_list():

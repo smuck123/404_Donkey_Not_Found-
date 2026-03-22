@@ -17,6 +17,7 @@ let lastPlannedChanges = null;
 let lastGeneratedImage = "";
 let lastGeneratedImageMeta = null;
 let activeTemplateFiles = [];
+let lastGeneratedImageDownloadUrl = "";
 
 async function api(url, method = "GET", data = null) {
   const opts = { method, headers: { "Content-Type": "application/json" } };
@@ -686,6 +687,7 @@ function buildImageFromComposer() {
   document.getElementById("imageTitle").value = payload.title;
   document.getElementById("imageSubtitle").value = payload.subtitle;
   document.getElementById("imageBullets").value = payload.bullets.join("\n");
+  document.getElementById("imagePrompt").value = [payload.title, payload.subtitle, ...payload.bullets].filter(Boolean).join(", ");
   setStatus("Prepared image content from the composer.");
 }
 
@@ -701,6 +703,7 @@ async function buildImageFromLearning() {
     document.getElementById("imageTitle").value = payload.title;
     document.getElementById("imageSubtitle").value = payload.subtitle;
     document.getElementById("imageBullets").value = payload.bullets.join("\n");
+    document.getElementById("imagePrompt").value = [payload.title, payload.subtitle, ...payload.bullets].filter(Boolean).join(", ");
     setStatus(`Prepared image content from "${item.title}".`);
   } catch (err) {
     setStatus("Failed to build image from learning item: " + err.message);
@@ -749,8 +752,10 @@ async function generateStudyImage() {
       layout,
       width: image.width || 0,
       height: image.height || 0,
-      modelWorkflow: image.backend || "study-image-studio/svg"
+      modelWorkflow: image.backend || "study-image-studio/svg",
+      mimeType: image.mime_type || "image/svg+xml"
     };
+    lastGeneratedImageDownloadUrl = "";
     document.getElementById("imagePreview").src = image.data_url || "";
     document.getElementById("imageStudioMeta").textContent = `${layout} • ${image.width || 0}x${image.height || 0} • ${activeModel}`;
     setStatus("Image prompt sent through the backend pipeline.");
@@ -759,10 +764,78 @@ async function generateStudyImage() {
   }
 }
 
+async function generateRealImage() {
+  const title = document.getElementById("imageTitle").value.trim();
+  const subtitle = document.getElementById("imageSubtitle").value.trim();
+  const bullets = document.getElementById("imageBullets").value
+    .split("\n")
+    .map(line => line.replace(/^[•*-]\s*/, "").trim())
+    .filter(Boolean)
+    .slice(0, 5);
+  const prompt = document.getElementById("imagePrompt").value.trim() || [title, subtitle, ...bullets].filter(Boolean).join(", ");
+  if (!prompt) {
+    setStatus("Add a prompt or fill in the image fields first.");
+    return;
+  }
+
+  const width = Number(document.getElementById("imageWidth").value || 832);
+  const height = Number(document.getElementById("imageHeight").value || 1216);
+  const steps = Number(document.getElementById("imageSteps").value || 30);
+  const guidance = Number(document.getElementById("imageGuidance").value || 6.5);
+  const negativePrompt = document.getElementById("imageNegativePrompt").value.trim();
+  const imageModel = document.getElementById("imageModelName").value.trim() || "stabilityai/stable-diffusion-xl-base-1.0";
+  const format = document.getElementById("imageOutputFormat").value;
+  const rewritePrompt = document.getElementById("imageRewritePrompt").checked;
+
+  try {
+    const data = await api("/api/images/generate", "POST", {
+      model: imageModel,
+      prompt,
+      negative_prompt: negativePrompt,
+      width,
+      height,
+      steps,
+      guidance,
+      format,
+      rewrite_prompt: rewritePrompt
+    });
+    lastGeneratedImage = data.data_url || "";
+    lastGeneratedImageDownloadUrl = data.download_url || "";
+    lastGeneratedImageMeta = {
+      title: title || "Generated image",
+      subtitle,
+      bullets,
+      width: data.width || width,
+      height: data.height || height,
+      modelWorkflow: data.model || imageModel,
+      mimeType: `image/${data.format || format}`,
+      prompt: data.final_prompt || prompt,
+      filename: data.filename || ""
+    };
+    document.getElementById("imagePreview").src = data.data_url || "";
+    document.getElementById("imageStudioMeta").textContent = `${data.width || width}x${data.height || height} • ${data.model || imageModel} • ${data.format || format}`;
+    setStatus(`Generated real image ${data.filename || ""}`.trim());
+  } catch (err) {
+    setStatus("Real image generation failed: " + err.message);
+  }
+}
+
 async function saveGeneratedImage() {
   if (!lastGeneratedImage || !lastGeneratedImageMeta) {
     setStatus("Generate an image first.");
     return null;
+  }
+
+  if ((lastGeneratedImageMeta.mimeType || "").startsWith("image/") && !String(lastGeneratedImageMeta.mimeType).includes("svg")) {
+    if (lastGeneratedImageDownloadUrl) {
+      window.open(lastGeneratedImageDownloadUrl, "_blank");
+      setStatus("Real image was already saved by the backend and opened for download.");
+      return {
+        download_url: lastGeneratedImageDownloadUrl,
+        title: lastGeneratedImageMeta.title || "Generated image"
+      };
+    }
+    throw new Error("Real image download URL is missing.");
   }
 
   const prompt = [
@@ -816,8 +889,10 @@ async function reopenSavedImage(imageId) {
       layout: "saved",
       width: meta.dimensions?.width || 0,
       height: meta.dimensions?.height || 0,
-      modelWorkflow: meta.model_workflow || "study-image-studio/svg"
+      modelWorkflow: meta.model_workflow || "study-image-studio/svg",
+      mimeType: "image/svg+xml"
     };
+    lastGeneratedImageDownloadUrl = `/api/images/read/${encodeURIComponent(imageId)}`;
     document.getElementById("imageTitle").value = lastGeneratedImageMeta.title;
     document.getElementById("imageSubtitle").value = lastGeneratedImageMeta.subtitle;
     document.getElementById("imageBullets").value = lastGeneratedImageMeta.bullets.join("\n");
@@ -832,6 +907,31 @@ async function reopenSavedImage(imageId) {
 function downloadSavedImage(imageId) {
   window.open(`/api/images/read/${encodeURIComponent(imageId)}`, "_blank");
   setStatus(`Opened download for image ${imageId}.`);
+}
+
+async function analyzeUploadedImage() {
+  const input = document.getElementById("imageAnalysisFile");
+  const prompt = document.getElementById("imageAnalysisPrompt").value.trim() || "Describe this image in detail and extract visible text.";
+  if (!input.files || input.files.length === 0) {
+    setStatus("Choose an image to analyze first.");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("model", activeModel);
+    formData.append("prompt", prompt);
+    formData.append("image", input.files[0]);
+    const data = await apiForm("/api/images/analyze", formData);
+    document.getElementById("imageAnalysisMeta").textContent = `${data.filename || "image"} • ${data.model}`;
+    document.getElementById("imageAnalysisResult").textContent = data.analysis || "";
+    if (data.preview_data_url) {
+      document.getElementById("imagePreview").src = data.preview_data_url;
+    }
+    setStatus("Image analysis completed.");
+  } catch (err) {
+    setStatus("Image analysis failed: " + err.message);
+  }
 }
 
 async function deleteSavedImage(imageId) {
