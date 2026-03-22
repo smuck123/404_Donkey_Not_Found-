@@ -10,6 +10,7 @@ let savedRepoTemplates = [];
 let savedRepos = [];
 let savedLearningItems = [];
 let savedImages = [];
+let availableModels = [];
 let selectedChatId = "";
 let lastRetrieved = [];
 let lastPlannedChanges = null;
@@ -64,6 +65,22 @@ function loadLocalSettings() {
   const prompt = localStorage.getItem("chat_system_prompt");
   if (model) activeModel = model;
   if (prompt) systemPrompt = prompt;
+  document.getElementById("activeModelLabel").textContent = `Model: ${activeModel}`;
+}
+
+function renderModelSelect() {
+  const select = document.getElementById("modelSelect");
+  if (!select) return;
+  const models = availableModels.length ? availableModels : [{ name: activeModel, description: "Saved model" }];
+  select.innerHTML = "";
+  for (const model of models) {
+    const opt = document.createElement("option");
+    opt.value = model.name;
+    opt.textContent = model.name;
+    opt.title = model.description || model.name;
+    if (model.name === activeModel) opt.selected = true;
+    select.appendChild(opt);
+  }
   document.getElementById("activeModelLabel").textContent = `Model: ${activeModel}`;
 }
 
@@ -309,13 +326,24 @@ async function openSourceByIndex(index) {
   const item = lastRetrieved[index];
   if (!item) return;
 
+  const normalizedPath = String(item.path || "").replace(/\\/g, "/");
   let params = new URLSearchParams({
     source_type: item.source_type || "",
-    path: item.path || ""
+    path: normalizedPath
   });
 
-  if (item.source_type === "repo" && activeRepo) params.set("repo_name", activeRepo);
-  if (item.source_type === "template" && activeTemplate) params.set("template_name", activeTemplate);
+  if (item.source_type === "repo") {
+    const repoName = activeRepo || normalizedPath.split("/repos/")[1]?.split("/")[0] || "";
+    const repoPath = normalizedPath.includes("/repos/") ? normalizedPath.split("/repos/")[1]?.split("/").slice(1).join("/") : normalizedPath;
+    if (repoName) params.set("repo_name", repoName);
+    params.set("path", repoPath || normalizedPath);
+  }
+  if (item.source_type === "template") {
+    const templateName = activeTemplate || normalizedPath.split("/repo_templates/")[1]?.split("/")[0] || "";
+    const templatePath = normalizedPath.includes("/repo_templates/") ? normalizedPath.split("/repo_templates/")[1]?.split("/").slice(1).join("/") : normalizedPath;
+    if (templateName) params.set("template_name", templateName);
+    params.set("path", templatePath || normalizedPath);
+  }
   if (item.source_type === "website") params.set("section", "chat");
 
   try {
@@ -358,6 +386,13 @@ function changeRepoContext() {
   renderRepoSelect();
 }
 
+function changeModelContext() {
+  activeModel = document.getElementById("modelSelect").value || activeModel;
+  localStorage.setItem("chat_model", activeModel);
+  renderModelSelect();
+  setStatus(`Active model changed to ${activeModel}.`);
+}
+
 function clearChat() {
   chatHistory = [];
   selectedChatId = "";
@@ -373,10 +408,13 @@ function newChat() {
 }
 
 async function loadState() {
-  const data = await api("/api/chat/state");
-  const templateData = await api("/api/chat/repo-templates");
-  const repoData = await api("/api/repo/list");
-  const imageData = await api("/api/images/list");
+  const [data, templateData, repoData, imageData, modelData] = await Promise.all([
+    api("/api/chat/state"),
+    api("/api/chat/repo-templates"),
+    api("/api/repo/list"),
+    api("/api/images/list"),
+    api("/api/models").catch(() => ({ models: [] }))
+  ]);
 
   savedProjects = data.projects || [];
   savedChats = data.chats || [];
@@ -384,6 +422,7 @@ async function loadState() {
   savedRepos = repoData.repos || [];
   savedLearningItems = data.learning_items || [];
   savedImages = imageData.images || [];
+  availableModels = modelData.models || [];
 
   document.getElementById("mainBrand").textContent = data.brand || "404DonkeyNotFound";
   document.getElementById("mainSlogan").textContent = data.slogan || "if it works, make sure donkey can break IT!";
@@ -399,6 +438,7 @@ async function loadState() {
   renderProjectSelect();
   renderTemplateSelect();
   renderRepoSelect();
+  renderModelSelect();
   renderSources();
   renderPlannedChanges();
   renderImageGallery();
@@ -416,7 +456,10 @@ async function saveCurrentChat() {
       title,
       project: activeProject || "General",
       messages: chatHistory,
-      model: activeModel
+      model: activeModel,
+      template: activeTemplate || "",
+      repo: activeRepo || "",
+      learning_ids: getSelectedLearningIds()
     });
     await loadState();
     setStatus(`Chat saved as "${title}"`);
@@ -430,10 +473,16 @@ async function loadSavedChat(chatId) {
     const data = await api(`/api/chat/session/read?chat_id=${encodeURIComponent(chatId)}`);
     chatHistory = data.messages || [];
     activeProject = data.project || "General";
+    activeModel = data.model || activeModel;
+    activeTemplate = data.template || "";
+    activeRepo = data.repo || "";
     selectedChatId = chatId;
     renderProjects();
     renderChats();
     renderProjectSelect();
+    renderTemplateSelect();
+    renderRepoSelect();
+    renderModelSelect();
     renderChat();
     setStatus(`Loaded saved chat: ${data.title}`);
   } catch (err) {
@@ -550,6 +599,24 @@ async function uploadLearningFiles() {
   }
 }
 
+async function importLearningUrl() {
+  const url = document.getElementById("learningUrlInput").value.trim();
+  if (!url) {
+    setStatus("Enter a URL first.");
+    return;
+  }
+  const category = document.getElementById("learningCategory").value.trim() || "web-reference";
+  const tags = document.getElementById("learningTags").value.split(",").map(x => x.trim()).filter(Boolean);
+  try {
+    await api("/api/chat/learning/import-url", "POST", { url, category, tags });
+    document.getElementById("learningUrlInput").value = "";
+    await loadState();
+    setStatus("Imported URL into the learning library.");
+  } catch (err) {
+    setStatus("URL import failed: " + err.message);
+  }
+}
+
 async function importLearningBatch() {
   const rawText = document.getElementById("learningBulkInput").value.trim();
   if (!rawText) {
@@ -651,71 +718,45 @@ function escapeXml(text) {
 
 async function generateStudyImage() {
   const title = document.getElementById("imageTitle").value.trim();
-  if (!title) {
-    setStatus("Image title is required.");
-    return;
-  }
-
   const subtitle = document.getElementById("imageSubtitle").value.trim();
   const bullets = document.getElementById("imageBullets").value
     .split("\n")
     .map(line => line.replace(/^[•*-]\s*/, "").trim())
     .filter(Boolean)
     .slice(0, 5);
+  const promptInput = [title, subtitle, ...bullets].filter(Boolean).join("\n");
+  if (!promptInput) {
+    setStatus("Add at least a title, subtitle, or bullets first.");
+    return;
+  }
   const accent = document.getElementById("imageAccent").value.trim() || "#38bdf8";
+  const aspectMap = { landscape: "16:9", square: "1:1", portrait: "4:5" };
   const layout = document.getElementById("imageLayout").value;
-  const modelWorkflow = "study-image-studio/svg";
-  const sizes = {
-    landscape: { width: 1600, height: 900 },
-    square: { width: 1080, height: 1080 },
-    portrait: { width: 1080, height: 1350 }
-  };
-  const { width, height } = sizes[layout] || sizes.landscape;
-
-  const titleLines = wrapSvgText(title, layout === "landscape" ? 28 : 22);
-  const subtitleLines = wrapSvgText(subtitle, layout === "landscape" ? 48 : 30);
-  const bulletLines = bullets.flatMap(item => wrapSvgText(`• ${item}`, layout === "landscape" ? 42 : 28));
-  const bulletStartY = layout === "portrait" ? 710 : 590;
-
-  const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#111827"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="${escapeXml(accent)}"/>
-      <stop offset="100%" stop-color="#ffffff"/>
-    </linearGradient>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#bg)"/>
-  <circle cx="${width - 120}" cy="120" r="180" fill="${escapeXml(accent)}" opacity="0.15"/>
-  <circle cx="140" cy="${height - 120}" r="220" fill="${escapeXml(accent)}" opacity="0.08"/>
-  <rect x="60" y="60" width="${width - 120}" height="${height - 120}" rx="36" fill="#0f172a" fill-opacity="0.35" stroke="#ffffff" stroke-opacity="0.10"/>
-  <text x="110" y="140" fill="${escapeXml(accent)}" font-size="36" font-weight="700" font-family="Arial, sans-serif">404DonkeyNotFound</text>
-  ${svgTextBlock(titleLines, 110, layout === "portrait" ? 270 : 250, 74, layout === "portrait" ? 54 : 64, "#ffffff", 700)}
-  ${svgTextBlock(subtitleLines, 110, layout === "portrait" ? 470 : 430, 42, 28, "#cbd5e1", 400)}
-  ${svgTextBlock(bulletLines, 130, bulletStartY, 40, 26, "#f8fafc", 400)}
-  <rect x="110" y="${height - 150}" width="${Math.min(width - 220, 520)}" height="10" rx="5" fill="url(#accent)"/>
-  <text x="110" y="${height - 90}" fill="#93c5fd" font-size="28" font-weight="600" font-family="Arial, sans-serif">Study card • Ready to share</text>
-</svg>`.trim();
-
-  lastGeneratedImage = svg;
-  lastGeneratedImageMeta = {
-    title,
-    subtitle,
-    bullets,
-    accent,
-    layout,
-    width,
-    height,
-    modelWorkflow
-  };
-  const encoded = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-  document.getElementById("imagePreview").src = encoded;
-  document.getElementById("imageStudioMeta").textContent = `${layout} • ${width}x${height} • accent ${accent}`;
-  setStatus("Study image created. You can preview or download it.");
+  try {
+    const data = await api("/api/chat/image-studio/generate", "POST", {
+      model: activeModel,
+      user_input: promptInput,
+      aspect_ratio: aspectMap[layout] || "16:9",
+      accent_color: accent
+    });
+    const image = data.image || {};
+    lastGeneratedImage = image.svg || "";
+    lastGeneratedImageMeta = {
+      title: title || "Generated image",
+      subtitle,
+      bullets,
+      accent,
+      layout,
+      width: image.width || 0,
+      height: image.height || 0,
+      modelWorkflow: image.backend || "study-image-studio/svg"
+    };
+    document.getElementById("imagePreview").src = image.data_url || "";
+    document.getElementById("imageStudioMeta").textContent = `${layout} • ${image.width || 0}x${image.height || 0} • ${activeModel}`;
+    setStatus("Image prompt sent through the backend pipeline.");
+  } catch (err) {
+    setStatus("Image generation failed: " + err.message);
+  }
 }
 
 async function saveGeneratedImage() {

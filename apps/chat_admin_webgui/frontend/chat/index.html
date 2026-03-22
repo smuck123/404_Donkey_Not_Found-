@@ -96,6 +96,11 @@
               <option value="website">Website only</option>
             </select>
           </div>
+
+          <div class="context-item">
+            <label for="modelSelect">Model</label>
+            <select id="modelSelect" onchange="changeModelContext()"></select>
+          </div>
         </div>
       </section>
 
@@ -189,6 +194,11 @@
             <input id="learningUploadFiles" type="file" multiple>
             <button onclick="uploadLearningFiles()">Upload files into learning library</button>
           </div>
+          <div class="upload-dropzone">
+            <div class="helper-text">Add more sources from a live URL. The backend fetches the page text and stores it as a learning item for retrieval.</div>
+            <input id="learningUrlInput" type="url" placeholder="https://example.com/runbook-or-doc">
+            <button onclick="importLearningUrl()">Import URL as source</button>
+          </div>
         </div>
       </section>
 
@@ -227,6 +237,16 @@
         <h3>Image Gallery</h3>
         <div class="helper-text">Browse saved image history, reopen prior SVGs in the studio, or download/delete them.</div>
         <div id="imageGalleryList" class="list-stack compact"></div>
+      </section>
+
+      <section class="inspector-card">
+        <h3>Server-side setup</h3>
+        <div class="helper-text">
+          To make chats, templates, model switching, retrieval, and real image generation work reliably, the server must expose Ollama, the local search API, writable data folders, and optionally an image backend such as AUTOMATIC1111/SD WebUI at <code>IMAGE_BACKEND_URL</code>.
+        </div>
+        <div class="helper-text">
+          User flows: add repos under Admin, save templates from a repo, upload/import learning sources here, choose a model in the top bar, then chat or create images.
+        </div>
       </section>
 
       <section class="inspector-card">
