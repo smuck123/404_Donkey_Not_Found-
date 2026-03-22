@@ -55,6 +55,12 @@ function setStatus(text) {
   document.getElementById("status").textContent = text;
 }
 
+function jumpToSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text ?? "";
@@ -67,6 +73,14 @@ function loadLocalSettings() {
   if (model) activeModel = model;
   if (prompt) systemPrompt = prompt;
   document.getElementById("activeModelLabel").textContent = `Model: ${activeModel}`;
+}
+
+function updateModelDescription() {
+  const select = document.getElementById("modelSelect");
+  const info = availableModels.find(model => model.name === activeModel) || availableModels[select?.selectedIndex || 0];
+  const box = document.getElementById("modelDescription");
+  if (!box) return;
+  box.textContent = info?.description || "Pick a model for chat, image prompt rewriting, and vision tasks.";
 }
 
 function renderModelSelect() {
@@ -83,6 +97,7 @@ function renderModelSelect() {
     select.appendChild(opt);
   }
   document.getElementById("activeModelLabel").textContent = `Model: ${activeModel}`;
+  updateModelDescription();
 }
 
 function renderProjectSelect() {
@@ -261,6 +276,25 @@ function renderImageGallery() {
   }).join("");
 }
 
+function renderImageSummary() {
+  const box = document.getElementById("imageResultSummary");
+  if (!box) return;
+  if (!lastGeneratedImageMeta) {
+    box.innerHTML = `
+      <div class="item-title">No image yet</div>
+      <div class="item-meta">Generate an SVG concept or a real image to see details and reuse it later.</div>
+    `;
+    return;
+  }
+  const bullets = (lastGeneratedImageMeta.bullets || []).slice(0, 4);
+  box.innerHTML = `
+    <div class="item-title">${escapeHtml(lastGeneratedImageMeta.title || "Generated image")}</div>
+    <div class="item-meta">${escapeHtml(lastGeneratedImageMeta.modelWorkflow || activeModel)} • ${escapeHtml(`${lastGeneratedImageMeta.width || 0}x${lastGeneratedImageMeta.height || 0}`)}</div>
+    <div class="item-meta">${escapeHtml(lastGeneratedImageMeta.subtitle || "Preview ready below. Save it to gallery if you want to reopen it later.")}</div>
+    ${bullets.length ? `<ul class="segment-list">${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+  `;
+}
+
 function renderChat() {
   const box = document.getElementById("chatBox");
   if (chatHistory.length === 0) {
@@ -358,12 +392,14 @@ async function openSourceByIndex(index) {
 
 function selectProject(name) {
   activeProject = name;
+  document.getElementById("projectNameInput").value = name;
   renderProjects();
   renderProjectSelect();
 }
 
 function changeProjectFromSelect() {
   activeProject = document.getElementById("projectSelect").value;
+  document.getElementById("projectNameInput").value = activeProject;
   renderProjects();
   renderProjectSelect();
 }
@@ -392,6 +428,20 @@ function changeModelContext() {
   localStorage.setItem("chat_model", activeModel);
   renderModelSelect();
   setStatus(`Active model changed to ${activeModel}.`);
+}
+
+async function refreshModels() {
+  try {
+    const data = await api("/api/models");
+    availableModels = data.models || [];
+    if (!availableModels.some(model => model.name === activeModel) && availableModels[0]) {
+      activeModel = availableModels[0].name;
+    }
+    renderModelSelect();
+    setStatus(`Loaded ${availableModels.length} model(s).`);
+  } catch (err) {
+    setStatus("Failed to load models: " + err.message);
+  }
 }
 
 function clearChat() {
@@ -443,7 +493,46 @@ async function loadState() {
   renderSources();
   renderPlannedChanges();
   renderImageGallery();
+  renderImageSummary();
   await refreshTemplateSegments();
+}
+
+async function saveProject() {
+  const input = document.getElementById("projectNameInput");
+  const name = input.value.trim();
+  if (!name) {
+    setStatus("Enter a project name first.");
+    return;
+  }
+  try {
+    await api("/api/chat/project/save", "POST", { name });
+    activeProject = name;
+    await loadState();
+    setStatus(`Saved project "${name}".`);
+  } catch (err) {
+    setStatus("Failed to save project: " + err.message);
+  }
+}
+
+async function deleteCurrentProject() {
+  const name = activeProject || document.getElementById("projectNameInput").value.trim();
+  if (!name) {
+    setStatus("Choose a project first.");
+    return;
+  }
+  if (name === "General") {
+    setStatus('Keep "General" as a default project.');
+    return;
+  }
+  try {
+    await api("/api/chat/project/delete", "POST", { name });
+    activeProject = "General";
+    document.getElementById("projectNameInput").value = "";
+    await loadState();
+    setStatus(`Deleted project "${name}".`);
+  } catch (err) {
+    setStatus("Failed to delete project: " + err.message);
+  }
 }
 
 async function saveCurrentChat() {
@@ -485,9 +574,27 @@ async function loadSavedChat(chatId) {
     renderRepoSelect();
     renderModelSelect();
     renderChat();
+    document.getElementById("projectNameInput").value = activeProject;
     setStatus(`Loaded saved chat: ${data.title}`);
   } catch (err) {
     setStatus("Failed to load saved chat: " + err.message);
+  }
+}
+
+async function deleteSelectedChat() {
+  if (!selectedChatId) {
+    setStatus("Select a saved chat first.");
+    return;
+  }
+  try {
+    await api(`/api/chat/session/delete?chat_id=${encodeURIComponent(selectedChatId)}`, "POST");
+    selectedChatId = "";
+    chatHistory = [];
+    renderChat();
+    await loadState();
+    setStatus("Deleted selected chat.");
+  } catch (err) {
+    setStatus("Failed to delete chat: " + err.message);
   }
 }
 
@@ -758,6 +865,7 @@ async function generateStudyImage() {
     lastGeneratedImageDownloadUrl = "";
     document.getElementById("imagePreview").src = image.data_url || "";
     document.getElementById("imageStudioMeta").textContent = `${layout} • ${image.width || 0}x${image.height || 0} • ${activeModel}`;
+    renderImageSummary();
     setStatus("Image prompt sent through the backend pipeline.");
   } catch (err) {
     setStatus("Image generation failed: " + err.message);
@@ -814,6 +922,7 @@ async function generateRealImage() {
     };
     document.getElementById("imagePreview").src = data.data_url || "";
     document.getElementById("imageStudioMeta").textContent = `${data.width || width}x${data.height || height} • ${data.model || imageModel} • ${data.format || format}`;
+    renderImageSummary();
     setStatus(`Generated real image ${data.filename || ""}`.trim());
   } catch (err) {
     setStatus("Real image generation failed: " + err.message);
@@ -898,10 +1007,26 @@ async function reopenSavedImage(imageId) {
     document.getElementById("imageBullets").value = lastGeneratedImageMeta.bullets.join("\n");
     document.getElementById("imagePreview").src = `/api/images/read/${encodeURIComponent(imageId)}`;
     document.getElementById("imageStudioMeta").textContent = `${meta.created_timestamp || "saved image"} • ${meta.dimensions?.width || 0}x${meta.dimensions?.height || 0}`;
+    renderImageSummary();
     setStatus(`Reopened saved image ${meta.title || imageId}.`);
   } catch (err) {
     setStatus("Failed to reopen saved image: " + err.message);
   }
+}
+
+function copyImageHelp() {
+  const help = [
+    "How to create a picture:",
+    "1. Choose a model in the top bar.",
+    "2. Open Image Studio on the right.",
+    "3. Add a title, subtitle, bullets, or a direct prompt.",
+    "4. Click Create SVG concept for a fast draft or Create real image for the backend.",
+    "5. The preview appears immediately under Image Studio.",
+    "6. Save to gallery if you want to reopen or download it later."
+  ].join("\n");
+  document.getElementById("message").value = help;
+  jumpToSection("imageStudioCard");
+  setStatus("Added image creation help to the composer.");
 }
 
 function downloadSavedImage(imageId) {
@@ -1166,5 +1291,7 @@ window.onload = async function () {
   loadLocalSettings();
   renderChat();
   await loadState();
+  document.getElementById("projectNameInput").value = activeProject;
+  renderImageSummary();
   setStatus(`Ready. Active model: ${activeModel}`);
 };
