@@ -205,10 +205,12 @@
       <section class="inspector-card">
         <h3>Image Studio</h3>
         <div class="stack-form">
-          <div class="helper-text">Send your study-card details through the backend image pipeline to build a structured prompt and downloadable SVG preview.</div>
+          <div class="helper-text">Create either a fast SVG concept card or a real backend-generated image, and optionally inspect uploaded pictures with a vision-capable Ollama model.</div>
           <input id="imageTitle" type="text" placeholder="Image title">
           <input id="imageSubtitle" type="text" placeholder="Subtitle or short supporting line">
           <textarea id="imageBullets" rows="5" placeholder="Bullets, one per line:&#10;• Widget layout&#10;• Data flow&#10;• Common mistakes"></textarea>
+          <textarea id="imagePrompt" rows="4" placeholder="Optional direct prompt for real image generation. If blank, title/subtitle/bullets are combined."></textarea>
+          <textarea id="imageNegativePrompt" rows="3" placeholder="Negative prompt for real image generation (optional)."></textarea>
           <div class="two-col-grid">
             <input id="imageAccent" type="text" value="#38bdf8" placeholder="Accent color">
             <select id="imageLayout">
@@ -217,10 +219,28 @@
               <option value="portrait">Portrait 1080x1350</option>
             </select>
           </div>
+          <div class="two-col-grid">
+            <input id="imageModelName" type="text" value="stabilityai/stable-diffusion-xl-base-1.0" placeholder="Image model/checkpoint">
+            <label class="checkbox-line"><input id="imageRewritePrompt" type="checkbox" checked> Rewrite prompt with Ollama before generation</label>
+          </div>
+          <div class="three-col-grid">
+            <input id="imageWidth" type="number" value="832" min="256" step="8" placeholder="Width">
+            <input id="imageHeight" type="number" value="1216" min="256" step="8" placeholder="Height">
+            <input id="imageSteps" type="number" value="30" min="1" max="150" placeholder="Steps">
+          </div>
+          <div class="two-col-grid">
+            <input id="imageGuidance" type="number" value="6.5" min="1" max="20" step="0.1" placeholder="Guidance">
+            <select id="imageOutputFormat">
+              <option value="png">PNG</option>
+              <option value="jpg">JPG</option>
+              <option value="webp">WEBP</option>
+            </select>
+          </div>
           <div class="button-row">
             <button onclick="buildImageFromLearning()">Fill from selected learning</button>
             <button onclick="buildImageFromComposer()">Fill from composer</button>
-            <button onclick="generateStudyImage()" class="primary">Create image</button>
+            <button onclick="generateStudyImage()" class="primary">Create SVG concept</button>
+            <button onclick="generateRealImage()">Create real image</button>
           </div>
           <div id="imageStudioMeta" class="meta-line">No image generated yet</div>
           <div class="image-preview-wrap">
@@ -228,8 +248,23 @@
           </div>
           <div class="button-row">
             <button onclick="saveGeneratedImage()">Save to gallery</button>
-            <button onclick="downloadGeneratedImage()">Download SVG</button>
+            <button onclick="downloadGeneratedImage()">Download current image</button>
           </div>
+          <div class="helper-text">CLI equivalent for real generation: <code>python scripts/make_image_sdxl.py "prompt" --model stabilityai/stable-diffusion-xl-base-1.0 --width 832 --height 1216 --steps 30 --guidance 6.5</code></div>
+        </div>
+      </section>
+
+      <section class="inspector-card">
+        <h3>Image Vision</h3>
+        <div class="stack-form">
+          <div class="helper-text">Upload a picture and ask the active Ollama vision model to describe it, extract visible text, or explain what is happening.</div>
+          <input id="imageAnalysisFile" type="file" accept="image/*">
+          <textarea id="imageAnalysisPrompt" rows="3" placeholder="What should the model look for? Example: Describe this image, list important objects, and extract any visible text."></textarea>
+          <div class="button-row">
+            <button onclick="analyzeUploadedImage()">Look at picture</button>
+          </div>
+          <div id="imageAnalysisMeta" class="meta-line">No image analyzed yet</div>
+          <pre id="imageAnalysisResult" class="code-viewer"></pre>
         </div>
       </section>
 
