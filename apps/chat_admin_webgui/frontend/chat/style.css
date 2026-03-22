@@ -238,6 +238,24 @@ html, body {
   gap: 10px;
 }
 
+
+.static-note {
+  cursor: default;
+  color: #cbd5e1;
+}
+
+.compact-picker-card select {
+  margin-top: 10px;
+}
+
+.right-panel-card.is-active {
+  display: block;
+}
+
+.right-panel-card.hidden-by-mode {
+  display: none;
+}
+
 .sidebar-item.active {
   border-color: #3b82f6;
   background: #172033;
