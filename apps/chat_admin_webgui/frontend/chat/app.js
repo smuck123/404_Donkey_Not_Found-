@@ -59,6 +59,18 @@ function jumpToSection(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.scrollIntoView({ behavior: "smooth", block: "start" });
+  el.classList.remove("flash-focus");
+  void el.offsetWidth;
+  el.classList.add("flash-focus");
+}
+
+function focusResultCard(id) {
+  jumpToSection(id);
+}
+
+function currentModelLooksVisionCapable() {
+  const name = String(activeModel || "").toLowerCase();
+  return ["llava", "vision", "minicpm-v", "bakllava", "moondream", "qwen2.5vl", "qwen-vl", "multimodal"].some(token => name.includes(token));
 }
 
 function escapeHtml(text) {
@@ -355,6 +367,7 @@ function showDiff(index) {
   const path = files[index];
   document.getElementById("diffMeta").textContent = path;
   document.getElementById("diffViewer").textContent = lastPlannedChanges.diffs?.[path] || lastPlannedChanges.files[path] || "";
+  focusResultCard("diffPreviewCard");
 }
 
 async function openSourceByIndex(index) {
@@ -385,6 +398,7 @@ async function openSourceByIndex(index) {
     const data = await api(`/api/chat/source/view?${params.toString()}`);
     document.getElementById("sourceMeta").textContent = `${data.source_type}: ${data.path}`;
     document.getElementById("sourceViewer").textContent = data.content;
+    focusResultCard("sourceViewerCard");
   } catch (err) {
     setStatus("Failed to open source: " + err.message);
   }
@@ -427,7 +441,8 @@ function changeModelContext() {
   activeModel = document.getElementById("modelSelect").value || activeModel;
   localStorage.setItem("chat_model", activeModel);
   renderModelSelect();
-  setStatus(`Active model changed to ${activeModel}.`);
+  const visionHint = currentModelLooksVisionCapable() ? " Vision should work with uploaded pictures." : " For Image Vision, switch to a vision-capable model if needed.";
+  setStatus(`Active model changed to ${activeModel}.` + visionHint);
 }
 
 async function refreshModels() {
@@ -495,6 +510,22 @@ async function loadState() {
   renderImageGallery();
   renderImageSummary();
   await refreshTemplateSegments();
+}
+
+function showWorkspaceGuide() {
+  const guide = [
+    "Workspace guide:",
+    "1. Create or select a project in the left sidebar.",
+    "2. Add repos from Admin, then come back and select the repo here.",
+    "3. Save a template pack from the selected repo if you want reusable context.",
+    "4. Choose Mode: Auto uses all sources, Templates only limits retrieval to templates, Repos only limits retrieval to repos, Website only limits retrieval to website files.",
+    "5. To make pictures, use Image Studio on the right and watch the preview panel below the buttons.",
+    "6. For Image Vision, choose a vision-capable model first, upload a picture, then click Look at picture.",
+    "7. When you click a source or diff, the page now jumps directly to the output viewer."
+  ].join("\n");
+  document.getElementById("message").value = guide;
+  setStatus("Added the workspace guide to the composer.");
+  jumpToSection("workspaceContext");
 }
 
 async function saveProject() {
@@ -866,6 +897,7 @@ async function generateStudyImage() {
     document.getElementById("imagePreview").src = image.data_url || "";
     document.getElementById("imageStudioMeta").textContent = `${layout} • ${image.width || 0}x${image.height || 0} • ${activeModel}`;
     renderImageSummary();
+    focusResultCard("imageStudioCard");
     setStatus("Image prompt sent through the backend pipeline.");
   } catch (err) {
     setStatus("Image generation failed: " + err.message);
@@ -923,6 +955,7 @@ async function generateRealImage() {
     document.getElementById("imagePreview").src = data.data_url || "";
     document.getElementById("imageStudioMeta").textContent = `${data.width || width}x${data.height || height} • ${data.model || imageModel} • ${data.format || format}`;
     renderImageSummary();
+    focusResultCard("imageStudioCard");
     setStatus(`Generated real image ${data.filename || ""}`.trim());
   } catch (err) {
     setStatus("Real image generation failed: " + err.message);
@@ -1053,9 +1086,11 @@ async function analyzeUploadedImage() {
     if (data.preview_data_url) {
       document.getElementById("imagePreview").src = data.preview_data_url;
     }
+    focusResultCard("imageStudioCard");
     setStatus("Image analysis completed.");
   } catch (err) {
-    setStatus("Image analysis failed: " + err.message);
+    const hint = currentModelLooksVisionCapable() ? "" : " Try switching to a vision-capable model first.";
+    setStatus("Image analysis failed: " + err.message + hint);
   }
 }
 
@@ -1079,6 +1114,7 @@ async function previewLearningItem() {
     const data = await api(`/api/chat/learning/read?item_id=${encodeURIComponent(ids[0])}`);
     document.getElementById("sourceMeta").textContent = `learning: ${data.title}`;
     document.getElementById("sourceViewer").textContent = data.content;
+    focusResultCard("sourceViewerCard");
     setStatus(`Previewed learning item "${data.title}".`);
   } catch (err) {
     setStatus("Failed to preview learning item: " + err.message);
@@ -1253,6 +1289,7 @@ async function showGitStatus() {
     const data = await api(`/api/repo/git/status?repo_name=${encodeURIComponent(activeRepo)}`);
     document.getElementById("sourceMeta").textContent = `git status: ${activeRepo}`;
     document.getElementById("sourceViewer").textContent = data.status || "(clean)";
+    focusResultCard("sourceViewerCard");
     setStatus("Git status loaded.");
   } catch (err) {
     setStatus("Git status failed: " + err.message);

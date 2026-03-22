@@ -93,6 +93,9 @@
       </section>
 
       <section class="context-bar" id="workspaceContext">
+        <div class="workspace-alert">
+          <strong>Quick start:</strong> Projects are created from the left sidebar. Templates require a selected repo. Repos are added in <a href="/admin/" target="_blank" rel="noopener">Admin</a>. Image Vision works best with a vision-capable model such as LLaVA or another multimodal Ollama model.
+        </div>
         <div class="context-grid">
           <div class="context-item">
             <label for="projectSelect">Project</label>
@@ -135,11 +138,12 @@
             <div class="button-row tight">
               <button onclick="refreshModels()">Refresh models</button>
               <button onclick="copyImageHelp()">How to make a picture</button>
+              <button onclick="showWorkspaceGuide()">Show workspace guide</button>
             </div>
           </div>
           <div class="context-helper-card">
             <strong>What works here</strong>
-            <p>Create projects, save chats, build templates from repos, upload learning notes, then generate and preview images in one page.</p>
+            <p>Create projects in the left sidebar, add repos in Admin, save templates from the selected repo, upload learning notes, then generate and preview images in one page.</p>
           </div>
         </div>
       </section>
@@ -290,6 +294,7 @@
             <button onclick="generateRealImage()">Create real image</button>
           </div>
           <div id="imageStudioMeta" class="meta-line">No image generated yet</div>
+          <div class="helper-text result-hint">When an image is created, this panel auto-scrolls into view and the latest result is shown below.</div>
           <div class="image-preview-wrap">
             <img id="imagePreview" class="image-preview" alt="Generated study image preview">
           </div>
@@ -315,6 +320,7 @@
             <button onclick="analyzeUploadedImage()">Look at picture</button>
           </div>
           <div id="imageAnalysisMeta" class="meta-line">No image analyzed yet</div>
+          <div class="helper-text result-hint">If analysis fails, switch to a vision-capable model first, then try again.</div>
           <pre id="imageAnalysisResult" class="code-viewer"></pre>
         </div>
       </section>
@@ -335,18 +341,18 @@
         </div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card" id="retrievedSourcesCard">
         <h3>Retrieved Sources</h3>
         <div id="sourcesList" class="list-stack compact"></div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card" id="sourceViewerCard">
         <h3>Source Viewer</h3>
         <div id="sourceMeta" class="meta-line">No source selected</div>
         <pre id="sourceViewer" class="code-viewer"></pre>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card" id="proposedChangesCard">
         <h3>Proposed Changes</h3>
         <div id="changeFilesList" class="list-stack compact"></div>
         <div class="button-row">
@@ -356,7 +362,7 @@
         </div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card" id="diffPreviewCard">
         <h3>Diff Preview</h3>
         <div id="diffMeta" class="meta-line">No diff selected</div>
         <pre id="diffViewer" class="code-viewer"></pre>
