@@ -265,6 +265,34 @@ html, body {
   padding: 16px 20px 0 20px;
 }
 
+
+.workspace-alert {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid #1d4ed8;
+  background: rgba(37, 99, 235, 0.16);
+  color: #dbeafe;
+  line-height: 1.6;
+}
+
+.workspace-alert a {
+  color: #bfdbfe;
+}
+
+.result-hint {
+  margin-top: -2px;
+}
+
+.flash-focus {
+  animation: flashFocus 1.8s ease;
+}
+
+@keyframes flashFocus {
+  0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.75); }
+  100% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+}
+
 .context-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
