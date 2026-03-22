@@ -286,6 +286,16 @@ def list_host_groups():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+
+@app.get("/summarize_hosts")
+def summarize_hosts(limit: int = 200):
+    try:
+        return client().summarize_hosts(limit)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/chat_summary")
 def chat_summary():
     try:

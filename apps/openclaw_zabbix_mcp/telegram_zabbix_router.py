@@ -86,7 +86,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _reply(update, "\n".join(lines))
             return
 
-        if text in ["summarize daily report", "daily report", "show daily report"]:
+        if text in ["summarize daily report", "daily report", "daily_report", "show daily report"]:
             report = build_daily_report("TORAKKA")
             await _reply(update, report)
             return
@@ -131,13 +131,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _reply(update, data.get("summary", str(data)))
             return
 
-        if text.startswith("search host "):
-            host = normalize_host(text_raw[len("search host "):].strip())
-            data = search_hosts(host, 5)
+        if text.startswith(("search host ", "search hosts ", "/search host ", "find host ")):
+            prefixes = ["search host ", "search hosts ", "/search host ", "find host "]
+            query = text_raw
+            for prefix in prefixes:
+                if text.startswith(prefix):
+                    query = text_raw[len(prefix):].strip()
+                    break
+            host = normalize_host(query)
+            data = search_hosts(host, 10)
             if not data:
-                await _reply(update, "No hosts found.")
+                await _reply(update, f"No hosts found for: {host}")
                 return
-            msg = "\n".join([f"- {h.get('host')} ({h.get('name')})" for h in data])
+            msg = "\n".join([f"- {h.get('host')} ({h.get('name')}) status={h.get('status')}" for h in data])
             await _reply(update, msg)
             return
 

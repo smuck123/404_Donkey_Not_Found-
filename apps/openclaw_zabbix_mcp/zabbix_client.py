@@ -66,7 +66,9 @@ class ZabbixClient:
     def search_hosts(self, search_text: str, limit: int = 10):
         return self._rpc("host.get", {
             "output": ["hostid", "host", "name", "status"],
-            "search": {"host": search_text},
+            "search": {"host": search_text, "name": search_text},
+            "searchByAny": True,
+            "sortfield": ["name", "host"],
             "limit": limit
         })
 
