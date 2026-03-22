@@ -1,14 +1,15 @@
 [Unit]
 Description=Telegram Zabbix Router
-After=network.target
+After=network.target openclaw-zabbix-mcp.service
+Wants=openclaw-zabbix-mcp.service
 
 [Service]
 Type=simple
-User=root
-WorkingDirectory=/opt/openclaw_zabbix_mcp
-ExecStart=/opt/openclaw_zabbix_mcp/venv/bin/python3 /opt/openclaw_zabbix_mcp/telegram_zabbix_router.py
+WorkingDirectory=/opt/404_donkey_not_found/apps/openclaw_zabbix_mcp
+ExecStart=/opt/404_donkey_not_found/apps/openclaw_zabbix_mcp/venv/bin/python3 /opt/404_donkey_not_found/apps/openclaw_zabbix_mcp/telegram_zabbix_router.py
 Restart=always
-RestartSec=5
+RestartSec=3
+User=root
 Environment=PYTHONUNBUFFERED=1
 
 [Install]
