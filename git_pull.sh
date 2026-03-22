@@ -7,7 +7,7 @@ DEFAULT_FILE="$PROJECT/.default_branch"
 if [ -f "$DEFAULT_FILE" ]; then
     DEFAULT_BRANCH=$(cat "$DEFAULT_FILE")
 else
-    DEFAULT_BRANCH="main"
+    DEFAULT_BRANCH="test"
 fi
 
 BRANCH="${1:-$DEFAULT_BRANCH}"
