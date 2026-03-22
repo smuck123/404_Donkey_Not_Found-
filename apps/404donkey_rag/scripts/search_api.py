@@ -11,10 +11,11 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 
-RAG = Path("/opt/404donkey_rag")
+BASE_DIR = Path(__file__).resolve().parent.parent
+RAG = BASE_DIR
 CHUNKS_JSONL = RAG / "data" / "chunks" / "chunks.jsonl"
 FAISS_FILE = RAG / "indexes" / "chunks.faiss"
-EMBED_MODEL = "/opt/404donkey_rag/models/bge-large-en-v1.5"
+EMBED_MODEL = str(RAG / "models" / "bge-large-en-v1.5")
 
 app = FastAPI(title="404Donkey Search API")
 model = SentenceTransformer(EMBED_MODEL)

@@ -7,7 +7,8 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
-CACHE = Path("/opt/404donkey_rag/data/web_cache")
+BASE_DIR = Path(__file__).resolve().parent.parent
+CACHE = BASE_DIR / "data" / "web_cache"
 CACHE.mkdir(parents=True, exist_ok=True)
 
 def safe_name(url: str) -> str:

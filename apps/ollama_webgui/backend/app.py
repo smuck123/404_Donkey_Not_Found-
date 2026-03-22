@@ -16,7 +16,7 @@ OLLAMA_GENERATE_URL = "http://127.0.0.1:11434/api/generate"
 OLLAMA_CHAT_URL = "http://127.0.0.1:11434/api/chat"
 DEFAULT_MODEL = "qwen3:8b"
 
-BASE_DIR = Path("/opt/ollama_webgui").resolve()
+BASE_DIR = Path(__file__).resolve().parent.parent
 SAFE_EDIT_ROOT = (BASE_DIR / "editable").resolve()
 EXAMPLES_ROOT = (BASE_DIR / "examples" / "zabbix").resolve()
 GENERATED_ROOT = (BASE_DIR / "generated_widgets").resolve()
