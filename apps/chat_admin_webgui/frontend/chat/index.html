@@ -126,11 +126,50 @@
       <section class="inspector-card">
         <h3>Learning Capture</h3>
         <div class="stack-form">
+          <div class="helper-text">Save a single note or bulk-import several study items at once.</div>
           <input id="learningTitle" type="text" placeholder="Learning item title">
           <input id="learningCategory" type="text" value="zabbix-code" placeholder="Category">
           <input id="learningTags" type="text" placeholder="Tags comma separated: zabbix, widget, template">
           <textarea id="learningContent" rows="10" placeholder="Paste code, notes, widget snippets, template XML/JSON, troubleshooting patterns, or step-by-step implementation guidance here."></textarea>
-          <button onclick="saveLearningItem()">Save to learning library</button>
+          <div class="button-row">
+            <button onclick="saveLearningItem()">Save to learning library</button>
+            <button onclick="fillLearningFromComposer()">Use composer text</button>
+          </div>
+          <textarea id="learningBulkInput" rows="8" placeholder="Bulk import format:&#10;### Title&#10;Category: zabbix-widget&#10;Tags: chart, api&#10;Content here...&#10;&#10;---&#10;### Another Title&#10;Tags: discovery, dashboard&#10;More study material..."></textarea>
+          <div class="button-row">
+            <button onclick="importLearningBatch()">Bulk import study material</button>
+            <button onclick="appendSelectionToComposer()">Add selected study items to composer</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="inspector-card">
+        <h3>Image Studio</h3>
+        <div class="stack-form">
+          <div class="helper-text">Generate a downloadable SVG cover/flashcard image for lessons, posts, or study packs.</div>
+          <input id="imageTitle" type="text" placeholder="Image title">
+          <input id="imageSubtitle" type="text" placeholder="Subtitle or short supporting line">
+          <textarea id="imageBullets" rows="5" placeholder="Bullets, one per line:&#10;• Widget layout&#10;• Data flow&#10;• Common mistakes"></textarea>
+          <div class="two-col-grid">
+            <input id="imageAccent" type="text" value="#38bdf8" placeholder="Accent color">
+            <select id="imageLayout">
+              <option value="landscape">Landscape 1600x900</option>
+              <option value="square">Square 1080x1080</option>
+              <option value="portrait">Portrait 1080x1350</option>
+            </select>
+          </div>
+          <div class="button-row">
+            <button onclick="buildImageFromLearning()">Fill from selected learning</button>
+            <button onclick="buildImageFromComposer()">Fill from composer</button>
+            <button onclick="generateStudyImage()" class="primary">Create image</button>
+          </div>
+          <div id="imageStudioMeta" class="meta-line">No image generated yet</div>
+          <div class="image-preview-wrap">
+            <img id="imagePreview" class="image-preview" alt="Generated study image preview">
+          </div>
+          <div class="button-row">
+            <button onclick="downloadGeneratedImage()">Download SVG</button>
+          </div>
         </div>
       </section>
 
