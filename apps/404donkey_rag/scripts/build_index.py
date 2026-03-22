@@ -11,8 +11,9 @@ import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-BASE = Path("/opt/chat_admin_webgui")
-RAG = Path("/opt/404donkey_rag")
+PLATFORM_BASE = Path(__file__).resolve().parents[2]
+BASE = PLATFORM_BASE / "apps" / "chat_admin_webgui"
+RAG = Path(__file__).resolve().parent.parent
 INDEX_DIR = RAG / "indexes"
 DATA_DIR = RAG / "data"
 CHUNKS_JSONL = DATA_DIR / "chunks" / "chunks.jsonl"
@@ -25,10 +26,10 @@ SOURCES = [
     BASE / "data" / "repo_templates",
     BASE / "frontend",
     BASE / "data" / "chats",
-    Path("/opt/404donkey_rag/data/web_cache"),
+    RAG / "data" / "web_cache",
 ]
 
-EMBED_MODEL = "/opt/404donkey_rag/models/bge-large-en-v1.5"
+EMBED_MODEL = str(RAG / "models" / "bge-large-en-v1.5")
 
 def read_text(path: Path) -> str:
     try:
