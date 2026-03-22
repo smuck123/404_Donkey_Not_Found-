@@ -12,6 +12,7 @@ let savedLearningItems = [];
 let selectedChatId = "";
 let lastRetrieved = [];
 let lastPlannedChanges = null;
+let lastGeneratedImage = "";
 
 async function api(url, method = "GET", data = null) {
   const opts = { method, headers: { "Content-Type": "application/json" } };
@@ -357,6 +358,57 @@ function applyPromptPreset(text) {
   messageBox.focus();
 }
 
+function fillLearningFromComposer() {
+  const message = document.getElementById("message").value.trim();
+  if (!message) {
+    setStatus("Write something in the composer first.");
+    return;
+  }
+  if (!document.getElementById("learningTitle").value.trim()) {
+    document.getElementById("learningTitle").value = `Study note ${new Date().toISOString().slice(0, 10)}`;
+  }
+  document.getElementById("learningContent").value = message;
+  setStatus("Copied composer text into Learning Capture.");
+}
+
+function parseBulkLearningInput(rawText) {
+  return rawText
+    .split(/\n---+\n/g)
+    .map(block => block.trim())
+    .filter(Boolean)
+    .map(block => {
+      const lines = block.split("\n");
+      let title = "";
+      let category = document.getElementById("learningCategory").value.trim() || "reference";
+      let tags = [];
+      const contentLines = [];
+
+      for (const line of lines) {
+        if (!title && line.startsWith("### ")) {
+          title = line.replace(/^###\s+/, "").trim();
+          continue;
+        }
+        if (/^category:/i.test(line)) {
+          category = line.split(":").slice(1).join(":").trim() || category;
+          continue;
+        }
+        if (/^tags:/i.test(line)) {
+          tags = line.split(":").slice(1).join(":").split(",").map(x => x.trim()).filter(Boolean);
+          continue;
+        }
+        contentLines.push(line);
+      }
+
+      return {
+        title: title || `Study item ${Math.random().toString(36).slice(2, 8)}`,
+        category,
+        tags,
+        content: contentLines.join("\n").trim()
+      };
+    })
+    .filter(item => item.title && item.content);
+}
+
 async function saveLearningItem() {
   const title = document.getElementById("learningTitle").value.trim();
   const category = document.getElementById("learningCategory").value.trim();
@@ -376,6 +428,201 @@ async function saveLearningItem() {
   } catch (err) {
     setStatus("Failed to save learning item: " + err.message);
   }
+}
+
+async function importLearningBatch() {
+  const rawText = document.getElementById("learningBulkInput").value.trim();
+  if (!rawText) {
+    setStatus("Paste study material into the bulk import box first.");
+    return;
+  }
+
+  const items = parseBulkLearningInput(rawText);
+  if (items.length === 0) {
+    setStatus("Bulk import format was empty or invalid.");
+    return;
+  }
+
+  try {
+    const data = await api("/api/chat/learning/save-batch", "POST", { items });
+    document.getElementById("learningBulkInput").value = "";
+    await loadState();
+    setStatus(`Imported ${data.count || items.length} study item(s).`);
+  } catch (err) {
+    setStatus("Bulk import failed: " + err.message);
+  }
+}
+
+async function appendSelectionToComposer() {
+  const ids = getSelectedLearningIds();
+  if (ids.length === 0) {
+    setStatus("Select one or more learning items first.");
+    return;
+  }
+
+  try {
+    const loaded = await Promise.all(ids.slice(0, 6).map(id =>
+      api(`/api/chat/learning/read?item_id=${encodeURIComponent(id)}`)
+    ));
+    const messageBox = document.getElementById("message");
+    const blocks = loaded.map(item =>
+      `### ${item.title}\nCategory: ${item.category}\nTags: ${(item.tags || []).join(", ")}\n${item.content}`
+    );
+    messageBox.value = [messageBox.value.trim(), blocks.join("\n\n---\n\n")].filter(Boolean).join("\n\n");
+    messageBox.focus();
+    setStatus(`Added ${loaded.length} learning item(s) to the composer.`);
+  } catch (err) {
+    setStatus("Failed to add learning items to composer: " + err.message);
+  }
+}
+
+function buildImagePayload(titleSource, bodySource) {
+  const cleanedBody = (bodySource || "")
+    .split("\n")
+    .map(line => line.replace(/^[•*-]\s*/, "").trim())
+    .filter(Boolean);
+
+  return {
+    title: (titleSource || "Study Pack").trim().slice(0, 80),
+    subtitle: cleanedBody[0] || "Fast review notes and guided practice.",
+    bullets: cleanedBody.slice(1, 5),
+  };
+}
+
+function buildImageFromComposer() {
+  const message = document.getElementById("message").value.trim();
+  if (!message) {
+    setStatus("Composer is empty.");
+    return;
+  }
+  const payload = buildImagePayload(message.split("\n")[0], message);
+  document.getElementById("imageTitle").value = payload.title;
+  document.getElementById("imageSubtitle").value = payload.subtitle;
+  document.getElementById("imageBullets").value = payload.bullets.join("\n");
+  setStatus("Prepared image content from the composer.");
+}
+
+async function buildImageFromLearning() {
+  const ids = getSelectedLearningIds();
+  if (ids.length === 0) {
+    setStatus("Select a learning item first.");
+    return;
+  }
+  try {
+    const item = await api(`/api/chat/learning/read?item_id=${encodeURIComponent(ids[0])}`);
+    const payload = buildImagePayload(item.title, item.content);
+    document.getElementById("imageTitle").value = payload.title;
+    document.getElementById("imageSubtitle").value = payload.subtitle;
+    document.getElementById("imageBullets").value = payload.bullets.join("\n");
+    setStatus(`Prepared image content from "${item.title}".`);
+  } catch (err) {
+    setStatus("Failed to build image from learning item: " + err.message);
+  }
+}
+
+function escapeXml(text) {
+  return (text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function svgTextBlock(lines, x, startY, lineHeight, size, color, weight = 400) {
+  return lines.map((line, idx) => (
+    `<text x="${x}" y="${startY + (idx * lineHeight)}" fill="${color}" font-size="${size}" font-weight="${weight}" font-family="Arial, sans-serif">${escapeXml(line)}</text>`
+  )).join("");
+}
+
+function wrapSvgText(text, maxChars) {
+  const words = (text || "").split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length > maxChars) {
+      if (current) lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) lines.push(current);
+  return lines.slice(0, 4);
+}
+
+function generateStudyImage() {
+  const title = document.getElementById("imageTitle").value.trim();
+  if (!title) {
+    setStatus("Image title is required.");
+    return;
+  }
+
+  const subtitle = document.getElementById("imageSubtitle").value.trim();
+  const bullets = document.getElementById("imageBullets").value
+    .split("\n")
+    .map(line => line.replace(/^[•*-]\s*/, "").trim())
+    .filter(Boolean)
+    .slice(0, 5);
+  const accent = document.getElementById("imageAccent").value.trim() || "#38bdf8";
+  const layout = document.getElementById("imageLayout").value;
+  const sizes = {
+    landscape: { width: 1600, height: 900 },
+    square: { width: 1080, height: 1080 },
+    portrait: { width: 1080, height: 1350 }
+  };
+  const { width, height } = sizes[layout] || sizes.landscape;
+
+  const titleLines = wrapSvgText(title, layout === "landscape" ? 28 : 22);
+  const subtitleLines = wrapSvgText(subtitle, layout === "landscape" ? 48 : 30);
+  const bulletLines = bullets.flatMap(item => wrapSvgText(`• ${item}`, layout === "landscape" ? 42 : 28));
+  const bulletStartY = layout === "portrait" ? 710 : 590;
+
+  const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="${escapeXml(accent)}"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg)"/>
+  <circle cx="${width - 120}" cy="120" r="180" fill="${escapeXml(accent)}" opacity="0.15"/>
+  <circle cx="140" cy="${height - 120}" r="220" fill="${escapeXml(accent)}" opacity="0.08"/>
+  <rect x="60" y="60" width="${width - 120}" height="${height - 120}" rx="36" fill="#0f172a" fill-opacity="0.35" stroke="#ffffff" stroke-opacity="0.10"/>
+  <text x="110" y="140" fill="${escapeXml(accent)}" font-size="36" font-weight="700" font-family="Arial, sans-serif">404DonkeyNotFound</text>
+  ${svgTextBlock(titleLines, 110, layout === "portrait" ? 270 : 250, 74, layout === "portrait" ? 54 : 64, "#ffffff", 700)}
+  ${svgTextBlock(subtitleLines, 110, layout === "portrait" ? 470 : 430, 42, 28, "#cbd5e1", 400)}
+  ${svgTextBlock(bulletLines, 130, bulletStartY, 40, 26, "#f8fafc", 400)}
+  <rect x="110" y="${height - 150}" width="${Math.min(width - 220, 520)}" height="10" rx="5" fill="url(#accent)"/>
+  <text x="110" y="${height - 90}" fill="#93c5fd" font-size="28" font-weight="600" font-family="Arial, sans-serif">Study card • Ready to share</text>
+</svg>`.trim();
+
+  lastGeneratedImage = svg;
+  const encoded = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  document.getElementById("imagePreview").src = encoded;
+  document.getElementById("imageStudioMeta").textContent = `${layout} • ${width}x${height} • accent ${accent}`;
+  setStatus("Study image created. You can preview or download it.");
+}
+
+function downloadGeneratedImage() {
+  if (!lastGeneratedImage) {
+    setStatus("Generate an image first.");
+    return;
+  }
+  const blob = new Blob([lastGeneratedImage], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `study-card-${new Date().toISOString().slice(0, 10)}.svg`;
+  link.click();
+  URL.revokeObjectURL(url);
+  setStatus("Downloaded generated SVG image.");
 }
 
 async function previewLearningItem() {

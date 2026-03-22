@@ -197,6 +197,9 @@ class LearningItemSaveRequest(BaseModel):
     tags: list[str] = []
     content: str
 
+class LearningBatchSaveRequest(BaseModel):
+    items: list[LearningItemSaveRequest]
+
 def ensure_data_files():
     CHATS_ROOT.mkdir(parents=True, exist_ok=True)
     PROJECTS_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -624,6 +627,38 @@ def chat_learning_save(req: LearningItemSaveRequest):
     }
     get_learning_item_file(item_id).write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return {"status": "saved", "item": payload}
+
+@app.post("/chat/learning/save-batch")
+def chat_learning_save_batch(req: LearningBatchSaveRequest):
+    ensure_data_files()
+    if not req.items:
+        raise HTTPException(status_code=400, detail="At least one learning item is required")
+
+    saved_items = []
+    for raw_item in req.items:
+        title = raw_item.title.strip()
+        content = raw_item.content.strip()
+        if not title or not content:
+            continue
+
+        item_id = f"{safe_slug(title, 'learning')}_{uuid.uuid4().hex[:8]}"
+        tags = [safe_slug(tag, "") for tag in raw_item.tags if safe_slug(tag, "")]
+        now = datetime.utcnow().isoformat() + "Z"
+        payload = {
+            "id": item_id,
+            "title": title,
+            "category": raw_item.category.strip() or "reference",
+            "tags": tags,
+            "content": content,
+            "updated_at": now
+        }
+        get_learning_item_file(item_id).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        saved_items.append(payload)
+
+    if not saved_items:
+        raise HTTPException(status_code=400, detail="No valid learning items were provided")
+
+    return {"status": "saved", "count": len(saved_items), "items": saved_items}
 
 @app.post("/chat/project/save")
 def chat_project_save(req: SaveProjectRequest):

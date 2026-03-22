@@ -302,6 +302,12 @@ html, body {
   text-transform: uppercase;
 }
 
+.helper-text {
+  font-size: 12px;
+  color: #9fb0c7;
+  line-height: 1.5;
+}
+
 .composer {
   background: #1b1f27;
   border: 1px solid #2b3240;
@@ -355,6 +361,12 @@ button.primary {
   flex-wrap: wrap;
 }
 
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 pre {
   background: #0f1217;
   color: #dbe7f5;
@@ -388,6 +400,27 @@ pre {
   overflow-y: auto;
 }
 
+.image-preview-wrap {
+  border: 1px solid #2b3240;
+  border-radius: 14px;
+  background: #0f1217;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.image-preview {
+  display: none;
+  width: 100%;
+  border-radius: 12px;
+}
+
+.image-preview[src] {
+  display: block;
+}
+
 @media (max-width: 1450px) {
   .app-shell {
     grid-template-columns: 240px 1fr;
@@ -416,6 +449,10 @@ pre {
 
   .main-topbar {
     flex-direction: column;
+  }
+
+  .two-col-grid {
+    grid-template-columns: 1fr;
   }
 
   .message {
