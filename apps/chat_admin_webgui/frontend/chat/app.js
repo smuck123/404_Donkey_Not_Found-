@@ -1,11 +1,10 @@
 let chatHistory = [];
 let activeModel = "qwen3:8b";
 let systemPrompt = "You are a helpful assistant.";
-let activeProject = "General";
+const activeProject = "General";
 let activeTemplate = "";
 let activeRepo = "";
 let savedChats = [];
-let savedProjects = [];
 let savedRepoTemplates = [];
 let savedRepos = [];
 let savedLearningItems = [];
@@ -55,10 +54,59 @@ function setStatus(text) {
   document.getElementById("status").textContent = text;
 }
 
+function startImagePromptInChat() {
+  const starter = [
+    "Make me a picture.",
+    "Topic:",
+    "Style:",
+    "What must be visible:",
+    "Optional text inside image:"
+  ].join("\n");
+  const box = document.getElementById("message");
+  box.value = starter;
+  box.focus();
+  switchRightPanelMode("image");
+  setStatus("Added a picture request starter to the chat box.");
+}
+
 function jumpToSection(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.scrollIntoView({ behavior: "smooth", block: "start" });
+  el.classList.remove("flash-focus");
+  void el.offsetWidth;
+  el.classList.add("flash-focus");
+}
+
+function focusResultCard(id, mode = null) {
+  if (mode) switchRightPanelMode(mode);
+  jumpToSection(id);
+}
+
+function currentModelLooksVisionCapable() {
+  const name = String(activeModel || "").toLowerCase();
+  return ["llava", "vision", "minicpm-v", "bakllava", "moondream", "qwen2.5vl", "qwen-vl", "multimodal"].some(token => name.includes(token));
+}
+
+function switchRightPanelMode(targetMode = null) {
+  const select = document.getElementById("rightPanelMode");
+  const mode = targetMode || select?.value || "image";
+  if (select) select.value = mode;
+  document.querySelectorAll(".right-panel-card").forEach(card => {
+    const show = card.dataset.panelMode === mode;
+    card.classList.toggle("is-active", show);
+    card.classList.toggle("hidden-by-mode", !show);
+  });
+}
+
+function openRightPanelMode(mode, focusId = null) {
+  switchRightPanelMode(mode);
+  if (focusId) jumpToSection(focusId);
+}
+
+function setLearningActionStatus(text) {
+  const el = document.getElementById("learningActionStatus");
+  if (el) el.textContent = text;
 }
 
 function escapeHtml(text) {
@@ -100,21 +148,6 @@ function renderModelSelect() {
   updateModelDescription();
 }
 
-function renderProjectSelect() {
-  const select = document.getElementById("projectSelect");
-  select.innerHTML = "";
-  const allProjects = savedProjects.length ? savedProjects : ["General"];
-  if (!allProjects.includes(activeProject)) activeProject = allProjects[0];
-  for (const name of allProjects) {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    if (name === activeProject) opt.selected = true;
-    select.appendChild(opt);
-  }
-  document.getElementById("activeProjectLabel").textContent = `Project: ${activeProject}`;
-}
-
 function renderTemplateSelect() {
   const select = document.getElementById("templateSelect");
   select.innerHTML = '<option value="">None</option>';
@@ -142,14 +175,7 @@ function renderRepoSelect() {
 }
 
 function renderProjects() {
-  const box = document.getElementById("projectsList");
-  if (savedProjects.length === 0) {
-    box.innerHTML = '<div class="item-meta">No projects yet</div>';
-    return;
-  }
-  box.innerHTML = savedProjects.map(name => `
-    <button class="sidebar-item ${name === activeProject ? "active" : ""}" onclick="selectProject(${JSON.stringify(name)})">${escapeHtml(name)}</button>
-  `).join("");
+  return;
 }
 
 function renderChats() {
@@ -355,6 +381,7 @@ function showDiff(index) {
   const path = files[index];
   document.getElementById("diffMeta").textContent = path;
   document.getElementById("diffViewer").textContent = lastPlannedChanges.diffs?.[path] || lastPlannedChanges.files[path] || "";
+  focusResultCard("diffPreviewCard", "changes");
 }
 
 async function openSourceByIndex(index) {
@@ -385,23 +412,10 @@ async function openSourceByIndex(index) {
     const data = await api(`/api/chat/source/view?${params.toString()}`);
     document.getElementById("sourceMeta").textContent = `${data.source_type}: ${data.path}`;
     document.getElementById("sourceViewer").textContent = data.content;
+    focusResultCard("sourceViewerCard", "sources");
   } catch (err) {
     setStatus("Failed to open source: " + err.message);
   }
-}
-
-function selectProject(name) {
-  activeProject = name;
-  document.getElementById("projectNameInput").value = name;
-  renderProjects();
-  renderProjectSelect();
-}
-
-function changeProjectFromSelect() {
-  activeProject = document.getElementById("projectSelect").value;
-  document.getElementById("projectNameInput").value = activeProject;
-  renderProjects();
-  renderProjectSelect();
 }
 
 async function selectTemplate(name) {
@@ -427,7 +441,8 @@ function changeModelContext() {
   activeModel = document.getElementById("modelSelect").value || activeModel;
   localStorage.setItem("chat_model", activeModel);
   renderModelSelect();
-  setStatus(`Active model changed to ${activeModel}.`);
+  const visionHint = currentModelLooksVisionCapable() ? " Vision should work with uploaded pictures." : " For Image Vision, switch to a vision-capable model if needed.";
+  setStatus(`Active model changed to ${activeModel}.` + visionHint);
 }
 
 async function refreshModels() {
@@ -467,7 +482,6 @@ async function loadState() {
     api("/api/models").catch(() => ({ models: [] }))
   ]);
 
-  savedProjects = data.projects || [];
   savedChats = data.chats || [];
   savedRepoTemplates = templateData.templates || [];
   savedRepos = repoData.repos || [];
@@ -478,15 +492,12 @@ async function loadState() {
   document.getElementById("mainBrand").textContent = data.brand || "404DonkeyNotFound";
   document.getElementById("mainSlogan").textContent = data.slogan || "if it works, make sure donkey can break IT!";
 
-  if (!savedProjects.includes(activeProject)) activeProject = savedProjects.length ? savedProjects[0] : "General";
   if (activeRepo && !savedRepos.includes(activeRepo)) activeRepo = "";
   if (activeTemplate && !savedRepoTemplates.some(x => x.template_name === activeTemplate)) activeTemplate = "";
 
-  renderProjects();
   renderChats();
   renderRepoTemplates();
   renderLearningItems();
-  renderProjectSelect();
   renderTemplateSelect();
   renderRepoSelect();
   renderModelSelect();
@@ -497,42 +508,20 @@ async function loadState() {
   await refreshTemplateSegments();
 }
 
-async function saveProject() {
-  const input = document.getElementById("projectNameInput");
-  const name = input.value.trim();
-  if (!name) {
-    setStatus("Enter a project name first.");
-    return;
-  }
-  try {
-    await api("/api/chat/project/save", "POST", { name });
-    activeProject = name;
-    await loadState();
-    setStatus(`Saved project "${name}".`);
-  } catch (err) {
-    setStatus("Failed to save project: " + err.message);
-  }
-}
-
-async function deleteCurrentProject() {
-  const name = activeProject || document.getElementById("projectNameInput").value.trim();
-  if (!name) {
-    setStatus("Choose a project first.");
-    return;
-  }
-  if (name === "General") {
-    setStatus('Keep "General" as a default project.');
-    return;
-  }
-  try {
-    await api("/api/chat/project/delete", "POST", { name });
-    activeProject = "General";
-    document.getElementById("projectNameInput").value = "";
-    await loadState();
-    setStatus(`Deleted project "${name}".`);
-  } catch (err) {
-    setStatus("Failed to delete project: " + err.message);
-  }
+function showWorkspaceGuide() {
+  const guide = [
+    "Workspace guide:",
+    "1. Add repos from Admin, then come back and select the repo here.",
+    "2. Save a template pack from the selected repo if you want reusable context.",
+    "3. Choose Mode: Auto uses all sources, Templates only limits retrieval to templates, Repos only limits retrieval to repos, Website only limits retrieval to website files.",
+    "4. To make pictures, use Image Studio on the right and watch the preview panel below the buttons.",
+    "5. For Image Vision, choose a vision-capable model first, upload a picture, then click Look at picture.",
+    "6. Use Learning Capture to save notes, upload files, or import a URL. Successful actions now keep that panel open and show status there.",
+    "7. When you click a source or diff, the page now jumps directly to the output viewer."
+  ].join("\n");
+  document.getElementById("message").value = guide;
+  setStatus("Added the workspace guide to the composer.");
+  jumpToSection("workspaceContext");
 }
 
 async function saveCurrentChat() {
@@ -544,7 +533,7 @@ async function saveCurrentChat() {
   try {
     await api("/api/chat/session/save", "POST", {
       title,
-      project: activeProject || "General",
+      project: activeProject,
       messages: chatHistory,
       model: activeModel,
       template: activeTemplate || "",
@@ -562,19 +551,15 @@ async function loadSavedChat(chatId) {
   try {
     const data = await api(`/api/chat/session/read?chat_id=${encodeURIComponent(chatId)}`);
     chatHistory = data.messages || [];
-    activeProject = data.project || "General";
     activeModel = data.model || activeModel;
     activeTemplate = data.template || "";
     activeRepo = data.repo || "";
     selectedChatId = chatId;
-    renderProjects();
     renderChats();
-    renderProjectSelect();
     renderTemplateSelect();
     renderRepoSelect();
     renderModelSelect();
     renderChat();
-    document.getElementById("projectNameInput").value = activeProject;
     setStatus(`Loaded saved chat: ${data.title}`);
   } catch (err) {
     setStatus("Failed to load saved chat: " + err.message);
@@ -622,6 +607,8 @@ function fillLearningFromComposer() {
     document.getElementById("learningTitle").value = `Study note ${new Date().toISOString().slice(0, 10)}`;
   }
   document.getElementById("learningContent").value = message;
+  setLearningActionStatus("Composer text copied into the learning form.");
+  openRightPanelMode("learning", "learningCaptureCard");
   setStatus("Copied composer text into Learning Capture.");
 }
 
@@ -674,10 +661,12 @@ async function saveLearningItem() {
   }
   try {
     await api("/api/chat/learning/save", "POST", { title, category, tags, content });
+    setLearningActionStatus(`Saved learning item: ${title}`);
     document.getElementById("learningTitle").value = "";
     document.getElementById("learningTags").value = "";
     document.getElementById("learningContent").value = "";
     await loadState();
+    openRightPanelMode("learning", "learningCaptureCard");
     setStatus(`Saved learning item "${title}".`);
   } catch (err) {
     setStatus("Failed to save learning item: " + err.message);
@@ -699,8 +688,10 @@ async function uploadLearningFiles() {
 
   try {
     const data = await apiForm("/api/chat/learning/upload", formData);
+    setLearningActionStatus(`Uploaded ${data.count || files.length} file(s) into the learning library.`);
     input.value = "";
     await loadState();
+    openRightPanelMode("learning", "learningCaptureCard");
     setStatus(`Uploaded ${data.count || files.length} file(s) into the learning library.`);
   } catch (err) {
     setStatus("File upload failed: " + err.message);
@@ -717,8 +708,10 @@ async function importLearningUrl() {
   const tags = document.getElementById("learningTags").value.split(",").map(x => x.trim()).filter(Boolean);
   try {
     await api("/api/chat/learning/import-url", "POST", { url, category, tags });
+    setLearningActionStatus(`Imported URL source: ${url}`);
     document.getElementById("learningUrlInput").value = "";
     await loadState();
+    openRightPanelMode("learning", "learningCaptureCard");
     setStatus("Imported URL into the learning library.");
   } catch (err) {
     setStatus("URL import failed: " + err.message);
@@ -740,8 +733,10 @@ async function importLearningBatch() {
 
   try {
     const data = await api("/api/chat/learning/save-batch", "POST", { items });
+    setLearningActionStatus(`Imported ${data.count || items.length} study item(s).`);
     document.getElementById("learningBulkInput").value = "";
     await loadState();
+    openRightPanelMode("learning", "learningCaptureCard");
     setStatus(`Imported ${data.count || items.length} study item(s).`);
   } catch (err) {
     setStatus("Bulk import failed: " + err.message);
@@ -765,6 +760,8 @@ async function appendSelectionToComposer() {
     );
     messageBox.value = [messageBox.value.trim(), blocks.join("\n\n---\n\n")].filter(Boolean).join("\n\n");
     messageBox.focus();
+    setLearningActionStatus(`Added ${loaded.length} selected learning item(s) into the composer.`);
+    openRightPanelMode("learning", "learningCaptureCard");
     setStatus(`Added ${loaded.length} learning item(s) to the composer.`);
   } catch (err) {
     setStatus("Failed to add learning items to composer: " + err.message);
@@ -866,6 +863,7 @@ async function generateStudyImage() {
     document.getElementById("imagePreview").src = image.data_url || "";
     document.getElementById("imageStudioMeta").textContent = `${layout} • ${image.width || 0}x${image.height || 0} • ${activeModel}`;
     renderImageSummary();
+    focusResultCard("imageStudioCard", "image");
     setStatus("Image prompt sent through the backend pipeline.");
   } catch (err) {
     setStatus("Image generation failed: " + err.message);
@@ -923,9 +921,11 @@ async function generateRealImage() {
     document.getElementById("imagePreview").src = data.data_url || "";
     document.getElementById("imageStudioMeta").textContent = `${data.width || width}x${data.height || height} • ${data.model || imageModel} • ${data.format || format}`;
     renderImageSummary();
+    focusResultCard("imageStudioCard", "image");
     setStatus(`Generated real image ${data.filename || ""}`.trim());
   } catch (err) {
-    setStatus("Real image generation failed: " + err.message);
+    const hint = String(err.message || "").includes("Not Found") ? " Check whether the image backend endpoint is configured and reachable." : "";
+    setStatus("Real image generation failed: " + err.message + hint);
   }
 }
 
@@ -1025,7 +1025,7 @@ function copyImageHelp() {
     "6. Save to gallery if you want to reopen or download it later."
   ].join("\n");
   document.getElementById("message").value = help;
-  jumpToSection("imageStudioCard");
+  openRightPanelMode("image", "imageStudioCard");
   setStatus("Added image creation help to the composer.");
 }
 
@@ -1053,9 +1053,11 @@ async function analyzeUploadedImage() {
     if (data.preview_data_url) {
       document.getElementById("imagePreview").src = data.preview_data_url;
     }
+    focusResultCard("imageStudioCard", "image");
     setStatus("Image analysis completed.");
   } catch (err) {
-    setStatus("Image analysis failed: " + err.message);
+    const hint = currentModelLooksVisionCapable() ? "" : " Try switching to a vision-capable model first.";
+    setStatus("Image analysis failed: " + err.message + hint);
   }
 }
 
@@ -1079,6 +1081,7 @@ async function previewLearningItem() {
     const data = await api(`/api/chat/learning/read?item_id=${encodeURIComponent(ids[0])}`);
     document.getElementById("sourceMeta").textContent = `learning: ${data.title}`;
     document.getElementById("sourceViewer").textContent = data.content;
+    focusResultCard("sourceViewerCard", "sources");
     setStatus(`Previewed learning item "${data.title}".`);
   } catch (err) {
     setStatus("Failed to preview learning item: " + err.message);
@@ -1253,6 +1256,7 @@ async function showGitStatus() {
     const data = await api(`/api/repo/git/status?repo_name=${encodeURIComponent(activeRepo)}`);
     document.getElementById("sourceMeta").textContent = `git status: ${activeRepo}`;
     document.getElementById("sourceViewer").textContent = data.status || "(clean)";
+    focusResultCard("sourceViewerCard", "sources");
     setStatus("Git status loaded.");
   } catch (err) {
     setStatus("Git status failed: " + err.message);
@@ -1290,8 +1294,9 @@ async function commitAndPush() {
 window.onload = async function () {
   loadLocalSettings();
   renderChat();
+  switchRightPanelMode("image");
   await loadState();
-  document.getElementById("projectNameInput").value = activeProject;
   renderImageSummary();
+  setLearningActionStatus("No learning action yet");
   setStatus(`Ready. Active model: ${activeModel}`);
 };

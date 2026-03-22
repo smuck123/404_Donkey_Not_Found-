@@ -32,7 +32,7 @@
       <section class="sidebar-section quick-links">
         <div class="section-title">Workspace</div>
         <div class="list-stack">
-          <button class="sidebar-item" onclick="jumpToSection('workspaceContext')">Projects + models</button>
+          <button class="sidebar-item" onclick="jumpToSection('workspaceContext')">Models + context</button>
           <button class="sidebar-item" onclick="jumpToSection('chatComposer')">Chat composer</button>
           <button class="sidebar-item" onclick="jumpToSection('imageStudioCard')">Image studio</button>
           <button class="sidebar-item" onclick="jumpToSection('learningCaptureCard')">Learning capture</button>
@@ -41,15 +41,9 @@
       </section>
 
       <div class="sidebar-section">
-        <div class="section-title">Projects</div>
-        <div class="inline-stack">
-          <input id="projectNameInput" type="text" placeholder="Create project">
-          <div class="button-row tight">
-            <button onclick="saveProject()">Save</button>
-            <button onclick="deleteCurrentProject()">Delete</button>
-          </div>
-        </div>
-        <div id="projectsList" class="list-stack"></div>
+        <div class="section-title">Workspace mode</div>
+        <div class="helper-text">Projects were removed from this page to keep chat simpler. The workspace now stays on one shared context.</div>
+        <div class="sidebar-item static-note">Shared workspace: General</div>
       </div>
 
       <div class="sidebar-section">
@@ -82,7 +76,7 @@
         <div>
           <div class="eyebrow">AI workspace</div>
           <h1>Build templates, chat with context, generate visuals, and train your local Ollama stack.</h1>
-          <p>Keep template creation segmented, reuse project context, turn notes into shareable images, and upload your own source material so the assistant learns from your stack.</p>
+          <p>Keep template creation segmented, reuse repo and template context, turn notes into shareable images, and upload your own source material so the assistant learns from your stack.</p>
         </div>
         <div class="hero-chips">
           <span>Segmented templates</span>
@@ -93,12 +87,10 @@
       </section>
 
       <section class="context-bar" id="workspaceContext">
+        <div class="workspace-alert">
+          <strong>Quick start:</strong> Choose a repo, template, mode, and model here. Repos are added in <a href="/admin/" target="_blank" rel="noopener">Admin</a>. Templates require a selected repo. Image Vision works best with a vision-capable model such as LLaVA or another multimodal Ollama model.
+        </div>
         <div class="context-grid">
-          <div class="context-item">
-            <label for="projectSelect">Project</label>
-            <select id="projectSelect" onchange="changeProjectFromSelect()"></select>
-          </div>
-
           <div class="context-item">
             <label for="templateSelect">Template</label>
             <select id="templateSelect" onchange="changeTemplateContext()">
@@ -135,11 +127,12 @@
             <div class="button-row tight">
               <button onclick="refreshModels()">Refresh models</button>
               <button onclick="copyImageHelp()">How to make a picture</button>
+              <button onclick="showWorkspaceGuide()">Show workspace guide</button>
             </div>
           </div>
           <div class="context-helper-card">
             <strong>What works here</strong>
-            <p>Create projects, save chats, build templates from repos, upload learning notes, then generate and preview images in one page.</p>
+            <p>Select a repo and optional template, choose a mode, upload learning notes, then generate and preview images in one page.</p>
           </div>
         </div>
       </section>
@@ -150,7 +143,6 @@
           <div id="mainSlogan" class="main-subtitle">if it works, make sure donkey can break IT!</div>
         </div>
         <div class="topbar-meta">
-          <span id="activeProjectLabel">Project: General</span>
           <span id="activeModelLabel">Model: qwen3:8b</span>
           <span id="activeTemplateLabel">Template: None</span>
           <span id="activeRepoLabel">Repo: None</span>
@@ -164,7 +156,7 @@
         </article>
         <article class="workspace-card">
           <div class="workspace-title">2. Chat + Retrieval</div>
-          <p>Use projects, templates, repos, and selected learning items together so Ollama answers with the right local context.</p>
+          <p>Use templates, repos, and selected learning items together so Ollama answers with the right local context.</p>
         </article>
         <article class="workspace-card">
           <div class="workspace-title">3. Teach + Create</div>
@@ -179,6 +171,7 @@
       <section class="composer-wrap" id="chatComposer">
         <div class="prompt-toolbar">
           <span>Quick prompts:</span>
+          <button onclick="startImagePromptInChat()">Make picture from chat</button>
           <button onclick="applyPromptPreset('Use the selected learning items and template to explain how to build a Zabbix widget step by step, including file structure and common mistakes.')">Zabbix widget guide</button>
           <button onclick="applyPromptPreset('Use the selected learning items and code examples to create a reusable Zabbix template plan with items, triggers, tags, and discovery notes.')">Template plan</button>
           <button onclick="applyPromptPreset('Review the selected repo and learning items, then propose code changes that improve training quality, examples, and implementation clarity.')">Improve training repo</button>
@@ -197,7 +190,20 @@
     </main>
 
     <aside class="rightbar">
-      <section class="inspector-card">
+      <section class="inspector-card compact-picker-card">
+        <h3>Choose what to do</h3>
+        <div class="helper-text">Show one tool at a time to keep the page compact.</div>
+        <select id="rightPanelMode" onchange="switchRightPanelMode()">
+          <option value="image">Make picture</option>
+          <option value="learning">Learning capture</option>
+          <option value="template">Template studio</option>
+          <option value="vision">Image vision</option>
+          <option value="gallery">Saved images</option>
+          <option value="sources">Retrieved sources</option>
+          <option value="changes">Code changes</option>
+        </select>
+      </section>
+      <section class="inspector-card right-panel-card hidden-by-mode" id="templateStudioCard" data-panel-mode="template">
         <h3>Template Studio</h3>
         <div class="stack-form">
           <div class="helper-text">Create a reusable template from the selected repo and review segmented file groups for faster reuse.</div>
@@ -212,17 +218,18 @@
         </div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="imageQuickHelpCard" data-panel-mode="image">
         <h3>Image quick help</h3>
         <div class="helper-text">
           1) Choose a model in the top bar. 2) Fill title or prompt. 3) Click <strong>Create SVG concept</strong> for fast results or <strong>Create real image</strong> for backend generation. 4) Preview appears immediately below. 5) Save it to the gallery to reopen later.
         </div>
       </section>
 
-      <section class="inspector-card" id="learningCaptureCard">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="learningCaptureCard" data-panel-mode="learning">
         <h3>Learning Capture</h3>
         <div class="stack-form">
           <div class="helper-text">Save a single note, bulk-import structured study items, or upload source files to teach your local Ollama workflows.</div>
+          <div id="learningActionStatus" class="meta-line">No learning action yet</div>
           <input id="learningTitle" type="text" placeholder="Learning item title">
           <input id="learningCategory" type="text" value="zabbix-code" placeholder="Category">
           <input id="learningTags" type="text" placeholder="Tags comma separated: zabbix, widget, template">
@@ -249,7 +256,7 @@
         </div>
       </section>
 
-      <section class="inspector-card" id="imageStudioCard">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="imageStudioCard" data-panel-mode="image">
         <h3>Image Studio</h3>
         <div class="stack-form">
           <div class="helper-text">Create either a fast SVG concept card or a real backend-generated image, and optionally inspect uploaded pictures with a vision-capable Ollama model.</div>
@@ -290,6 +297,7 @@
             <button onclick="generateRealImage()">Create real image</button>
           </div>
           <div id="imageStudioMeta" class="meta-line">No image generated yet</div>
+          <div class="helper-text result-hint">When an image is created, this panel auto-scrolls into view and the latest result is shown below.</div>
           <div class="image-preview-wrap">
             <img id="imagePreview" class="image-preview" alt="Generated study image preview">
           </div>
@@ -305,7 +313,7 @@
         </div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="imageVisionCard" data-panel-mode="vision">
         <h3>Image Vision</h3>
         <div class="stack-form">
           <div class="helper-text">Upload a picture and ask the active Ollama vision model to describe it, extract visible text, or explain what is happening.</div>
@@ -315,17 +323,18 @@
             <button onclick="analyzeUploadedImage()">Look at picture</button>
           </div>
           <div id="imageAnalysisMeta" class="meta-line">No image analyzed yet</div>
+          <div class="helper-text result-hint">If analysis fails, switch to a vision-capable model first, then try again.</div>
           <pre id="imageAnalysisResult" class="code-viewer"></pre>
         </div>
       </section>
 
-      <section class="inspector-card" id="imageGalleryCard">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="imageGalleryCard" data-panel-mode="gallery">
         <h3>Image Gallery</h3>
         <div class="helper-text">Browse saved image history, reopen prior SVGs in the studio, or download/delete them.</div>
         <div id="imageGalleryList" class="list-stack compact"></div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="serverSetupCard" data-panel-mode="sources">
         <h3>Server-side setup</h3>
         <div class="helper-text">
           To make chats, templates, model switching, retrieval, and real image generation work reliably, the server must expose Ollama, the local search API, writable data folders, and optionally an image backend such as AUTOMATIC1111/SD WebUI at <code>IMAGE_BACKEND_URL</code>.
@@ -335,18 +344,18 @@
         </div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="retrievedSourcesCard" data-panel-mode="sources">
         <h3>Retrieved Sources</h3>
         <div id="sourcesList" class="list-stack compact"></div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="sourceViewerCard" data-panel-mode="sources">
         <h3>Source Viewer</h3>
         <div id="sourceMeta" class="meta-line">No source selected</div>
         <pre id="sourceViewer" class="code-viewer"></pre>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="proposedChangesCard" data-panel-mode="changes">
         <h3>Proposed Changes</h3>
         <div id="changeFilesList" class="list-stack compact"></div>
         <div class="button-row">
@@ -356,7 +365,7 @@
         </div>
       </section>
 
-      <section class="inspector-card">
+      <section class="inspector-card right-panel-card hidden-by-mode" id="diffPreviewCard" data-panel-mode="changes">
         <h3>Diff Preview</h3>
         <div id="diffMeta" class="meta-line">No diff selected</div>
         <pre id="diffViewer" class="code-viewer"></pre>
