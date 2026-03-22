@@ -164,6 +164,9 @@ class SaveChatRequest(BaseModel):
     project: str = "General"
     messages: list
     model: str = DEFAULT_MODEL
+    template: str | None = None
+    repo: str | None = None
+    learning_ids: list[str] = []
 
 class RepoCloneRequest(BaseModel):
     repo_url: str
@@ -224,6 +227,13 @@ class LearningItemSaveRequest(BaseModel):
 
 class LearningBatchSaveRequest(BaseModel):
     items: list[LearningItemSaveRequest]
+
+
+class LearningUrlImportRequest(BaseModel):
+    url: str
+    title: str | None = None
+    category: str = "web-reference"
+    tags: list[str] = []
 
 
 class SaveImageRequest(BaseModel):
@@ -989,6 +999,33 @@ def chat_learning_save_batch(req: LearningBatchSaveRequest):
 
     return {"status": "saved", "count": len(saved_items), "items": saved_items}
 
+@app.post("/chat/learning/import-url")
+def chat_learning_import_url(req: LearningUrlImportRequest):
+    ensure_data_files()
+    if not req.url.strip():
+        raise HTTPException(status_code=400, detail="URL is required")
+
+    page = fetch_web_text(req.url.strip())
+    title = (req.title or "").strip() or page.get("title") or req.url.strip()
+    content = (page.get("content") or "").strip()
+    if not content:
+        raise HTTPException(status_code=400, detail="Fetched URL had no readable text content")
+
+    item_id = f"{safe_slug(title, 'learning')}_{uuid.uuid4().hex[:8]}"
+    tags = [safe_slug(tag, "") for tag in req.tags if safe_slug(tag, "")]
+    now = datetime.utcnow().isoformat() + "Z"
+    payload = {
+        "id": item_id,
+        "title": title,
+        "category": req.category.strip() or "web-reference",
+        "tags": tags,
+        "content": content[:120000],
+        "source_url": req.url.strip(),
+        "updated_at": now
+    }
+    get_learning_item_file(item_id).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return {"status": "saved", "item": payload}
+
 @app.post("/chat/learning/upload")
 async def chat_learning_upload(
     files: list[UploadFile] = File(...),
@@ -1067,6 +1104,9 @@ def chat_session_save(req: SaveChatRequest):
         "title": title,
         "project": project,
         "model": req.model,
+        "template": (req.template or "").strip(),
+        "repo": (req.repo or "").strip(),
+        "learning_ids": req.learning_ids or [],
         "updated_at": now,
         "messages": req.messages
     }
