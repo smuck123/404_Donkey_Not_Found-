@@ -1,0 +1,15 @@
+[Unit]
+Description=Telegram Zabbix Router
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/openclaw_zabbix_mcp
+ExecStart=/opt/openclaw_zabbix_mcp/venv/bin/python3 /opt/openclaw_zabbix_mcp/telegram_zabbix_router.py
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

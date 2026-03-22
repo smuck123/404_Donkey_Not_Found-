@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/admin/style.css" rel="stylesheet">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-wrap">
+        <img src="/admin/assets/logo.png" alt="Logo" class="brand-logo">
+        <div class="brand-texts">
+          <div class="brand">404DonkeyNotFound</div>
+          <div class="brand-sub">Admin tools for repos, web fetch, templates, modules, and AI edits</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/">Chat</a>
+        <a href="/admin/">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="hero card">
+      <h1>Simple Admin Portal</h1>
+      <p>Choose one task at a time from the dropdown. This keeps the page cleaner and easier to use.</p>
+    </section>
+
+    <section class="card">
+      <h2>Choose what you want to do</h2>
+      <div class="row">
+        <label for="modeSelect">Task</label>
+        <select id="modeSelect" onchange="switchMode()">
+          <option value="settings">Chat settings</option>
+          <option value="repo">Repository tools</option>
+          <option value="web">Web fetch and summarize</option>
+          <option value="paste">Paste file and summarize</option>
+          <option value="website">Website file editor</option>
+        </select>
+      </div>
+    </section>
+
+    <section id="panel-settings" class="card mode-panel">
+      <h2>Chat settings</h2>
+
+      <div class="row">
+        <label for="modelSelect">Model</label>
+        <div class="inline-row">
+          <select id="modelSelect" onchange="showModelInfo()"></select>
+          <button onclick="loadModels()">Refresh</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label>Model info</label>
+        <pre id="modelInfo">Select a model.</pre>
+      </div>
+
+      <div class="row">
+        <label for="systemPrompt">System prompt for main chat</label>
+        <textarea id="systemPrompt" rows="5">You are a helpful assistant for Linux, Bash, Python, web development, Ansible, Zabbix modules, Zabbix templates, and server administration.</textarea>
+      </div>
+
+      <div class="row">
+        <button class="primary" onclick="saveSettings()">Save chat settings</button>
+      </div>
+
+      <pre id="settingsStatus"></pre>
+    </section>
+
+    <section id="panel-repo" class="card mode-panel hidden">
+      <h2>Repository tools</h2>
+      <p class="help">
+        Workflow:
+        <br>1. Paste repository URL
+        <br>2. Click Auto name
+        <br>3. Click Test repo URL
+        <br>4. Click Clone repo
+        <br>5. Select repo and load files
+        <br>6. Open file, edit, or ask Ollama to improve it
+      </p>
+
+      <div class="opened-box">
+        <strong>Opened repo file:</strong>
+        <span id="openedRepoFileLabel">None</span>
+      </div>
+
+      <div class="row">
+        <label for="repoImprovePreview">Generated repo preview</label>
+        <pre id="repoImprovePreview"></pre>
+      </div>
+
+      <pre id="repoStatus"></pre>
+
+      <div class="row">
+        <label for="repoUrl">Repository URL</label>
+        <input id="repoUrl" type="text" placeholder="https://github.com/example/repo.git" oninput="suggestRepoName()">
+      </div>
+
+      <div class="row">
+        <label for="repoName">Local repo name</label>
+        <div class="inline-row-wide">
+          <input id="repoName" type="text" placeholder="example_repo">
+          <button onclick="suggestRepoName()">Auto name</button>
+        </div>
+      </div>
+
+      <div class="row buttons">
+        <button onclick="testRepoUrl()">Test repo URL</button>
+        <button class="primary" onclick="cloneRepo()">Clone repo</button>
+        <button onclick="loadRepos()">Refresh repo list</button>
+      </div>
+
+      <div class="row">
+        <label for="repoSelect">Cloned repositories</label>
+        <select id="repoSelect" size="6" onchange="loadRepoFiles()"></select>
+      </div>
+
+      <div class="row buttons">
+        <button onclick="pullRepo()">Pull selected repo</button>
+        <button onclick="loadRepoFiles()">Load repo files</button>
+        <button onclick="deleteRepo()">Delete selected repo</button>
+      </div>
+
+      <div class="row">
+        <label for="repoFileList">Repository files</label>
+        <select id="repoFileList" size="12" multiple></select>
+      </div>
+
+      <div class="row buttons">
+        <button onclick="selectAllRepoFiles()">Select all files</button>
+        <button onclick="clearRepoFileSelection()">Clear selection</button>
+        <button class="primary" onclick="openRepoFile()">Open first selected file</button>
+      </div>
+
+      <div class="row">
+        <label for="repoTemplateName">Save selected files as template</label>
+        <input id="repoTemplateName" type="text" placeholder="zabbix_widget_template_v1">
+      </div>
+
+      <div class="row buttons">
+        <button class="primary" onclick="saveRepoTemplate()">Save template</button>
+        <button onclick="loadRepoTemplates()">Refresh templates</button>
+      </div>
+
+      <div class="row">
+        <label for="repoTemplateList">Saved templates</label>
+        <select id="repoTemplateList" size="6"></select>
+      </div>
+
+      <div class="row buttons">
+        <button onclick="deleteRepoTemplate()">Delete selected template</button>
+      </div>
+
+      <div class="row">
+        <label for="repoPath">Repo file path</label>
+        <input id="repoPath" type="text" readonly>
+      </div>
+
+      <div class="row">
+        <label for="repoContent">Repo file content</label>
+        <textarea id="repoContent" rows="14"></textarea>
+      </div>
+
+      <div class="row buttons">
+        <button class="primary" onclick="saveRepoFile()">Save repo file</button>
+      </div>
+
+      <div class="row">
+        <label for="repoImproveTask">Ask Ollama to improve opened repo file</label>
+        <textarea id="repoImproveTask" rows="5">Improve this Zabbix module/template file. Make it cleaner, clearer, and easier to maintain.</textarea>
+      </div>
+
+      <div class="row buttons">
+        <button class="primary" onclick="askImproveRepo()">Generate improved repo file</button>
+        <button onclick="applySelectedGeneratedRepoFile()">Apply selected generated repo file</button>
+        <button onclick="applyImproveRepo()">Apply all generated repo files</button>
+      </div>
+
+      <div class="row">
+        <label for="generatedRepoFileList">Generated repo files</label>
+        <select id="generatedRepoFileList" size="6" onchange="previewGeneratedRepoFile()"></select>
+      </div>
+    </section>
+
+    <section id="panel-web" class="card mode-panel hidden">
+      <h2>Web fetch and summarize</h2>
+      <p class="help">Paste a page URL, fetch its text, then summarize it with Ollama.</p>
+
+      <div class="row">
+        <label for="webUrl">Web URL</label>
+        <input id="webUrl" type="text" placeholder="https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates">
+      </div>
+
+      <div class="row buttons">
+        <button class="primary" onclick="fetchWebPage()">Fetch page</button>
+        <button onclick="summarizeWebPage()">Fetch and summarize</button>
+      </div>
+
+      <div class="row">
+        <label for="webContent">Fetched or summarized content</label>
+        <textarea id="webContent" rows="12"></textarea>
+      </div>
+
+      <pre id="webStatus"></pre>
+    </section>
+
+    <section id="panel-paste" class="card mode-panel hidden">
+      <h2>Paste file and summarize</h2>
+
+      <div class="row">
+        <label for="summaryTask">Task</label>
+        <input id="summaryTask" type="text" value="Summarize this and explain what it does.">
+      </div>
+
+      <div class="row">
+        <label for="summaryInput">Pasted text</label>
+        <textarea id="summaryInput" rows="12" placeholder="Paste YAML, XML, JSON, PHP, JS, or other text here..."></textarea>
+      </div>
+
+      <div class="row buttons">
+        <button class="primary" onclick="summarizeText()">Summarize pasted text</button>
+      </div>
+
+      <div class="row">
+        <label for="summaryOutput">Summary result</label>
+        <textarea id="summaryOutput" rows="10"></textarea>
+      </div>
+
+      <pre id="summaryStatus"></pre>
+    </section>
+
+    <section id="panel-website" class="card mode-panel hidden">
+      <h2>Website file editor</h2>
+
+      <div class="row">
+        <label for="sectionSelect">Website area</label>
+        <select id="sectionSelect" onchange="loadFiles()">
+          <option value="chat">chat</option>
+          <option value="admin">admin</option>
+        </select>
+      </div>
+
+      <div class="row buttons">
+        <button onclick="loadFiles()">Load files</button>
+        <button onclick="openCurrentPage()">Open page in browser</button>
+      </div>
+
+      <div class="row">
+        <label for="fileList">Files</label>
+        <select id="fileList" size="8"></select>
+      </div>
+
+      <div class="row buttons">
+        <button class="primary" onclick="openSelectedFile()">Open file</button>
+      </div>
+
+      <div class="opened-box">
+        <strong>Opened website file:</strong>
+        <span id="openedFileLabel">None</span>
+      </div>
+
+      <div class="row">
+        <label for="filePath">Path</label>
+        <input id="filePath" type="text" readonly>
+      </div>
+
+      <div class="row">
+        <label for="fileContent">Content</label>
+        <textarea id="fileContent" rows="14"></textarea>
+      </div>
+
+      <div class="row buttons">
+        <button class="primary" onclick="saveFile()">Save file</button>
+      </div>
+
+      <div class="row">
+        <label for="improveTask">Ask Ollama to improve opened website file</label>
+        <textarea id="improveTask" rows="5">Improve this file so it is easier to use, clearer, and better organized.</textarea>
+      </div>
+
+      <div class="row buttons">
+        <button class="primary" onclick="askImprove()">Generate improved version</button>
+        <button onclick="applySelectedGeneratedFile()">Apply selected generated file</button>
+      </div>
+
+      <div class="row">
+        <label for="generatedFileList">Generated files</label>
+        <select id="generatedFileList" size="6" onchange="previewGeneratedFile()"></select>
+      </div>
+
+      <div class="row">
+        <label>Generated preview</label>
+        <pre id="improvePreview"></pre>
+      </div>
+
+      <pre id="fileStatus"></pre>
+      <pre id="improveStatus"></pre>
+    </section>
+  </main>
+
+  <script src="/admin/app.js"></script>
+</body>
+</html>

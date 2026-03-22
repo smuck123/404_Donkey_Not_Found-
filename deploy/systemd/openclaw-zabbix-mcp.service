@@ -1,0 +1,15 @@
+[Unit]
+Description=Zabbix MCP API (FastAPI)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/openclaw_zabbix_mcp
+ExecStart=/opt/openclaw_zabbix_mcp/venv/bin/python3 -m uvicorn app:app --host 127.0.0.1 --port 8888
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>404DonkeyNotFound</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-wrap">
+        <div class="brand-mark">404</div>
+        <div class="brand-texts">
+          <div class="brand-name">404DonkeyNotFound</div>
+          <div class="brand-sub">if it works, make sure donkey can break IT!</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="/">Chat</a>
+        <a href="/admin/">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-actions">
+        <button class="new-chat-btn" onclick="newChat()">+ New chat</button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-head">
+          <div class="section-title">Projects</div>
+          <button class="small-btn" onclick="deleteSelectedProject()">Delete</button>
+        </div>
+        <div id="projectsList" class="list-stack"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-head">
+          <div class="section-title">Chats</div>
+          <button class="small-btn" onclick="deleteSelectedChat()">Delete</button>
+        </div>
+        <div id="chatsList" class="list-stack"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Saved Templates</div>
+        <div id="repoTemplatesList" class="list-stack"></div>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <section class="context-bar">
+        <div class="context-grid">
+          <div class="context-item">
+            <label for="projectSelect">Active project</label>
+            <select id="projectSelect" onchange="changeProjectFromSelect()"></select>
+          </div>
+
+          <div class="context-item">
+            <label for="templateSelect">Use saved template context</label>
+            <select id="templateSelect" onchange="changeTemplateContext()">
+              <option value="">None</option>
+            </select>
+          </div>
+
+          <div class="context-item">
+            <label for="chatTitle">Chat title</label>
+            <input id="chatTitle" type="text" placeholder="Current chat name">
+          </div>
+        </div>
+      </section>
+
+      <section class="main-topbar">
+        <div>
+          <div id="mainBrand" class="main-title">404DonkeyNotFound</div>
+          <div id="mainSlogan" class="main-subtitle">if it works, make sure donkey can break IT!</div>
+        </div>
+        <div class="topbar-meta">
+          <span id="activeProjectLabel">Project: General</span>
+          <span id="activeModelLabel">Model: qwen3:8b</span>
+          <span id="activeTemplateLabel">Template: None</span>
+        </div>
+      </section>
+
+      <section class="chat-stage">
+        <div id="chatBox" class="chat-box"></div>
+      </section>
+
+      <section class="composer-wrap">
+        <div class="composer">
+          <textarea id="message" rows="4" placeholder="Ask about Zabbix widgets, templates, modules, Linux, Bash, Python, or current saved templates..."></textarea>
+          <div class="composer-actions">
+            <button class="primary" onclick="sendMessage()">Send</button>
+            <button onclick="clearChat()">Clear</button>
+            <button onclick="saveCurrentChat()">Save chat</button>
+          </div>
+        </div>
+
+        <pre id="status">Loading 404DonkeyNotFound...</pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

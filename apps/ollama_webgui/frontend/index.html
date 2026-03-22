@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ollama Zabbix Widget Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Ollama + Zabbix Widget Builder</h1>
+    <p>Server: 192.168.0.109</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1. Models</h2>
+      <div class="row">
+        <label for="modelSelect">Ollama model</label>
+        <select id="modelSelect"></select>
+        <button onclick="loadModels()">Refresh models</button>
+      </div>
+      <pre id="modelStatus"></pre>
+    </section>
+
+    <section class="card">
+      <h2>2. Chat</h2>
+      <div id="chatHistory" class="chat-box"></div>
+
+      <div class="row">
+        <label for="systemPrompt">System prompt</label>
+        <textarea id="systemPrompt" rows="3">You are a helpful assistant for Zabbix widgets, Python, Bash, Linux, and web development.</textarea>
+      </div>
+
+      <div class="row">
+        <label for="chatInput">Message</label>
+        <textarea id="chatInput" rows="5">Hello. Help me create a Zabbix widget example.</textarea>
+      </div>
+
+      <div class="row buttons">
+        <button onclick="sendChatMessage()">Send chat</button>
+        <button onclick="clearChat()">Clear chat</button>
+      </div>
+
+      <pre id="chatStatus"></pre>
+    </section>
+
+    <section class="card">
+      <h2>3. Upload Zabbix example ZIP</h2>
+      <div class="row">
+        <input type="file" id="zipFile" accept=".zip">
+        <button onclick="uploadZip()">Upload ZIP</button>
+      </div>
+      <pre id="zipStatus"></pre>
+    </section>
+
+    <section class="card">
+      <h2>4. Browse example folders</h2>
+      <div class="row">
+        <button onclick="loadExamples()">Refresh examples</button>
+      </div>
+      <div class="row">
+        <label for="exampleSelect">Examples</label>
+        <select id="exampleSelect" size="8"></select>
+      </div>
+      <div class="row">
+        <button onclick="listExampleFiles()">Show example files</button>
+      </div>
+      <div class="row">
+        <label for="exampleFileSelect">Files in selected example</label>
+        <select id="exampleFileSelect" size="12"></select>
+      </div>
+      <div class="row">
+        <button onclick="readExampleFile()">Open selected example file</button>
+      </div>
+      <pre id="exampleStatus"></pre>
+      <pre id="exampleFileContent"></pre>
+    </section>
+
+    <section class="card">
+      <h2>5. Generate widget from example</h2>
+      <div class="row">
+        <label for="outputFolder">Output folder name</label>
+        <input id="outputFolder" type="text" value="generated_widget_01">
+      </div>
+      <div class="row">
+        <label for="userRequest">What should Ollama generate?</label>
+        <textarea id="userRequest" rows="10">Create a Zabbix widget/module example based on the selected example. Add a manifest.json, a README.md, a simple Module.php, one action file, and one view file. Keep the structure easy to understand.</textarea>
+      </div>
+      <div class="row">
+        <button onclick="generateFromExample()">Generate from selected example</button>
+      </div>
+      <pre id="generateStatus"></pre>
+    </section>
+
+    <section class="card">
+      <h2>6. Browse generated output</h2>
+      <div class="row">
+        <button onclick="loadGeneratedFolders()">Refresh generated folders</button>
+      </div>
+      <div class="row">
+        <label for="generatedFolderSelect">Generated folders</label>
+        <select id="generatedFolderSelect" size="8"></select>
+      </div>
+      <div class="row">
+        <button onclick="listGeneratedFiles()">Show generated files</button>
+      </div>
+      <div class="row">
+        <label for="generatedFileSelect">Files in generated folder</label>
+        <select id="generatedFileSelect" size="12"></select>
+      </div>
+      <div class="row">
+        <button onclick="readGeneratedFile()">Open selected generated file</button>
+      </div>
+      <pre id="generatedStatus"></pre>
+      <pre id="generatedFileContent"></pre>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
