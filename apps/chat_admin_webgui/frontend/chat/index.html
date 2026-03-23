@@ -2,376 +2,131 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>404DonkeyNotFound</title>
+  <title>404DonkeyNotFound Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand-wrap">
-        <div class="brand-mark">404</div>
-        <div class="brand-texts">
-          <div class="brand-name">404DonkeyNotFound</div>
-          <div class="brand-sub">if it works, make sure donkey can break IT!</div>
-        </div>
-      </div>
-      <nav class="nav">
-        <a href="/">Chat</a>
-        <a href="/admin/">Admin</a>
-      </nav>
+    <div>
+      <div class="eyebrow">Local Ollama workspace</div>
+      <h1>Chat, teach, build Zabbix templates, and make pictures.</h1>
+      <p class="lead">A rebuilt single-page chat workspace for your local Ollama stack.</p>
     </div>
+    <nav class="nav-links">
+      <a href="/">Chat</a>
+      <a href="/admin/">Admin portal</a>
+    </nav>
   </header>
 
-  <div class="app-shell">
-    <aside class="leftbar">
-      <div class="sidebar-actions">
-        <button class="new-chat-btn" onclick="newChat()">+ New chat</button>
+  <main class="layout two-col">
+    <section class="panel stack gap-md">
+      <div class="panel-header">
+        <h2>Chat with Ollama</h2>
+        <button id="refreshModelsBtn" class="secondary">Refresh models</button>
       </div>
-
-      <section class="sidebar-section quick-links">
-        <div class="section-title">Workspace</div>
-        <div class="list-stack">
-          <button class="sidebar-item" onclick="jumpToSection('workspaceContext')">Models + context</button>
-          <button class="sidebar-item" onclick="jumpToSection('chatComposer')">Chat composer</button>
-          <button class="sidebar-item" onclick="jumpToSection('imageStudioCard')">Image studio</button>
-          <button class="sidebar-item" onclick="jumpToSection('learningCaptureCard')">Learning capture</button>
-          <button class="sidebar-item" onclick="jumpToSection('imageGalleryCard')">Saved images</button>
-        </div>
-      </section>
-
-      <div class="sidebar-section">
-        <div class="section-title">Workspace mode</div>
-        <div class="helper-text">Projects were removed from this page to keep chat simpler. The workspace now stays on one shared context.</div>
-        <div class="sidebar-item static-note">Shared workspace: General</div>
+      <label>Model
+        <select id="modelSelect"></select>
+      </label>
+      <label>System prompt
+        <textarea id="systemPrompt" rows="4">You are a practical assistant for Linux, Bash, Python, Zabbix templates, Zabbix widgets, image prompts, and local automation.</textarea>
+      </label>
+      <label>Ask Ollama
+        <textarea id="chatInput" rows="5" placeholder="Ask for help with templates, widgets, code, troubleshooting, or documentation."></textarea>
+      </label>
+      <div class="actions">
+        <button id="sendBtn" class="primary">Send</button>
+        <button id="saveChatBtn" class="secondary">Save chat</button>
+        <button id="clearChatBtn" class="secondary">Clear</button>
       </div>
+      <div id="chatStatus" class="status">Loading…</div>
+      <div id="chatMessages" class="chat-log"></div>
+    </section>
 
-      <div class="sidebar-section">
-        <div class="section-title">Chats</div>
-        <div class="button-row tight">
-          <button onclick="saveCurrentChat()">Save current</button>
-          <button onclick="deleteSelectedChat()">Delete selected</button>
-        </div>
-        <div id="chatsList" class="list-stack"></div>
+    <section class="panel stack gap-md">
+      <div class="panel-header">
+        <h2>Teach it better</h2>
+        <button id="refreshLearningBtn" class="secondary">Refresh library</button>
       </div>
-
-      <div class="sidebar-section">
-        <div class="section-title">Saved Templates</div>
-        <div class="button-row tight">
-          <button onclick="refreshTemplateSegments()">Refresh selected</button>
-          <button onclick="deleteActiveTemplate()">Delete selected</button>
-        </div>
-        <div id="repoTemplatesList" class="list-stack"></div>
+      <label>Learning title
+        <input id="learningTitle" type="text" placeholder="Example: Zabbix template naming rules">
+      </label>
+      <label>Category
+        <input id="learningCategory" type="text" value="zabbix-reference">
+      </label>
+      <label>Tags
+        <input id="learningTags" type="text" placeholder="zabbix, template, trigger, style">
+      </label>
+      <label>Knowledge to save
+        <textarea id="learningContent" rows="8" placeholder="Paste documentation, patterns, examples, notes, runbooks, or prompt-ready guidance."></textarea>
+      </label>
+      <div class="actions wrap">
+        <button id="saveLearningBtn" class="primary">Save learning item</button>
+        <button id="previewLearningBtn" class="secondary">Preview selected</button>
       </div>
+      <label>Library items
+        <select id="learningList" size="8" multiple></select>
+      </label>
+      <pre id="learningPreview" class="code-box"></pre>
+    </section>
 
-      <div class="sidebar-section">
-        <div class="section-title">Learning Library</div>
-        <div id="learningList" class="list-stack"></div>
-        <button onclick="previewLearningItem()">Preview selected</button>
+    <section class="panel stack gap-md">
+      <div class="panel-header">
+        <h2>Create pictures</h2>
       </div>
-    </aside>
+      <label>Image prompt
+        <textarea id="imagePrompt" rows="5" placeholder="Create a Zabbix dashboard hero image, architecture diagram concept, or explainer art."></textarea>
+      </label>
+      <div class="grid two-up">
+        <label>Aspect ratio
+          <select id="aspectRatio">
+            <option>16:9</option>
+            <option>4:3</option>
+            <option>1:1</option>
+            <option>9:16</option>
+          </select>
+        </label>
+        <label>Accent color
+          <input id="accentColor" type="text" value="#38bdf8">
+        </label>
+      </div>
+      <div class="actions wrap">
+        <button id="makePreviewBtn" class="primary">Make SVG concept</button>
+        <button id="generateRealBtn" class="secondary">Generate real image</button>
+      </div>
+      <div id="imageStatus" class="status muted">No image generated yet.</div>
+      <img id="imagePreview" class="image-preview hidden" alt="Generated preview">
+      <a id="downloadLink" class="hidden" target="_blank" rel="noopener">Download generated image</a>
+      <pre id="imageMeta" class="code-box"></pre>
+    </section>
 
-    <main class="centerpanel">
-      <section class="hero-panel">
-        <div>
-          <div class="eyebrow">AI workspace</div>
-          <h1>Build templates, chat with context, generate visuals, and train your local Ollama stack.</h1>
-          <p>Keep template creation segmented, reuse repo and template context, turn notes into shareable images, and upload your own source material so the assistant learns from your stack.</p>
-        </div>
-        <div class="hero-chips">
-          <span>Segmented templates</span>
-          <span>Context-aware chat</span>
-          <span>Image studio</span>
-          <span>Upload training data</span>
-        </div>
-      </section>
-
-      <section class="context-bar" id="workspaceContext">
-        <div class="workspace-alert">
-          <strong>Quick start:</strong> Choose a repo, template, mode, and model here. Repos are added in <a href="/admin/" target="_blank" rel="noopener">Admin</a>. Templates require a selected repo. Image Vision works best with a vision-capable model such as LLaVA or another multimodal Ollama model.
-        </div>
-        <div class="context-grid">
-          <div class="context-item">
-            <label for="templateSelect">Template</label>
-            <select id="templateSelect" onchange="changeTemplateContext()">
-              <option value="">None</option>
-            </select>
-          </div>
-
-          <div class="context-item">
-            <label for="repoSelect">Repo</label>
-            <select id="repoSelect" onchange="changeRepoContext()">
-              <option value="">None</option>
-            </select>
-          </div>
-
-          <div class="context-item">
-            <label for="modeSelect">Mode</label>
-            <select id="modeSelect">
-              <option value="auto">Auto</option>
-              <option value="template">Templates only</option>
-              <option value="repo">Repos only</option>
-              <option value="website">Website only</option>
-            </select>
-          </div>
-
-          <div class="context-item">
-            <label for="modelSelect">Model</label>
-            <select id="modelSelect" onchange="changeModelContext()"></select>
-          </div>
-        </div>
-        <div class="context-helper-row">
-          <div class="context-helper-card">
-            <strong>Model controls</strong>
-            <p id="modelDescription">Pick a model for chat, image prompt rewriting, and vision tasks.</p>
-            <div class="button-row tight">
-              <button onclick="refreshModels()">Refresh models</button>
-              <button onclick="copyImageHelp()">How to make a picture</button>
-              <button onclick="showWorkspaceGuide()">Show workspace guide</button>
-            </div>
-          </div>
-          <div class="context-helper-card">
-            <strong>What works here</strong>
-            <p>Select a repo and optional template, choose a mode, upload learning notes, then generate and preview images in one page.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="main-topbar">
-        <div>
-          <div id="mainBrand" class="main-title">404DonkeyNotFound</div>
-          <div id="mainSlogan" class="main-subtitle">if it works, make sure donkey can break IT!</div>
-        </div>
-        <div class="topbar-meta">
-          <span id="activeModelLabel">Model: qwen3:8b</span>
-          <span id="activeTemplateLabel">Template: None</span>
-          <span id="activeRepoLabel">Repo: None</span>
-        </div>
-      </section>
-
-      <section class="workspace-strip">
-        <article class="workspace-card">
-          <div class="workspace-title">1. Template Studio</div>
-          <p>Save the active repo as a reusable template pack, then review file segments by folder before chatting or proposing changes.</p>
-        </article>
-        <article class="workspace-card">
-          <div class="workspace-title">2. Chat + Retrieval</div>
-          <p>Use templates, repos, and selected learning items together so Ollama answers with the right local context.</p>
-        </article>
-        <article class="workspace-card">
-          <div class="workspace-title">3. Teach + Create</div>
-          <p>Upload notes, code, configs, or documents into the learning library and turn them into explainer images for your team.</p>
-        </article>
-      </section>
-
-      <section class="chat-stage">
-        <div id="chatBox" class="chat-box"></div>
-      </section>
-
-      <section class="composer-wrap" id="chatComposer">
-        <div class="prompt-toolbar">
-          <span>Quick prompts:</span>
-          <button onclick="startImagePromptInChat()">Make picture from chat</button>
-          <button onclick="applyPromptPreset('Use the selected learning items and template to explain how to build a Zabbix widget step by step, including file structure and common mistakes.')">Zabbix widget guide</button>
-          <button onclick="applyPromptPreset('Use the selected learning items and code examples to create a reusable Zabbix template plan with items, triggers, tags, and discovery notes.')">Template plan</button>
-          <button onclick="applyPromptPreset('Review the selected repo and learning items, then propose code changes that improve training quality, examples, and implementation clarity.')">Improve training repo</button>
-        </div>
-        <div class="composer">
-          <textarea id="message" rows="5" placeholder="Ask about Zabbix widgets, templates, modules, repos, or use the selected template/repo as context..."></textarea>
-          <div class="composer-actions">
-            <button class="primary" onclick="sendMessage()">Send</button>
-            <button onclick="proposeChanges()">Propose changes</button>
-            <button onclick="clearChat()">Clear</button>
-            <button onclick="saveCurrentChat()">Save chat</button>
-          </div>
-        </div>
-        <pre id="status">Loading 404DonkeyNotFound...</pre>
-      </section>
-    </main>
-
-    <aside class="rightbar">
-      <section class="inspector-card compact-picker-card">
-        <h3>Choose what to do</h3>
-        <div class="helper-text">Show one tool at a time to keep the page compact.</div>
-        <select id="rightPanelMode" onchange="switchRightPanelMode()">
-          <option value="image">Make picture</option>
-          <option value="learning">Learning capture</option>
-          <option value="template">Template studio</option>
-          <option value="vision">Image vision</option>
-          <option value="gallery">Saved images</option>
-          <option value="sources">Retrieved sources</option>
-          <option value="changes">Code changes</option>
-        </select>
-      </section>
-      <section class="inspector-card right-panel-card hidden-by-mode" id="templateStudioCard" data-panel-mode="template">
-        <h3>Template Studio</h3>
-        <div class="stack-form">
-          <div class="helper-text">Create a reusable template from the selected repo and review segmented file groups for faster reuse.</div>
-          <input id="templateNameInput" type="text" placeholder="Template pack name">
-          <div class="button-row">
-            <button onclick="saveTemplateSnapshot()" class="primary">Save template pack</button>
-            <button onclick="refreshTemplateSegments()">Refresh segments</button>
-            <button onclick="deleteActiveTemplate()">Delete selected</button>
-          </div>
-          <div id="templateStudioMeta" class="meta-line">No template segment loaded</div>
-          <div id="templateSegmentsList" class="list-stack compact"></div>
-        </div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="imageQuickHelpCard" data-panel-mode="image">
-        <h3>Image quick help</h3>
-        <div class="helper-text">
-          1) Choose a model in the top bar. 2) Fill title or prompt. 3) Click <strong>Create SVG concept</strong> for fast results or <strong>Create real image</strong> for backend generation. 4) Preview appears immediately below. 5) Save it to the gallery to reopen later.
-        </div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="learningCaptureCard" data-panel-mode="learning">
-        <h3>Learning Capture</h3>
-        <div class="stack-form">
-          <div class="helper-text">Save a single note, bulk-import structured study items, or upload source files to teach your local Ollama workflows.</div>
-          <div id="learningActionStatus" class="meta-line">No learning action yet</div>
-          <input id="learningTitle" type="text" placeholder="Learning item title">
-          <input id="learningCategory" type="text" value="zabbix-code" placeholder="Category">
-          <input id="learningTags" type="text" placeholder="Tags comma separated: zabbix, widget, template">
-          <textarea id="learningContent" rows="10" placeholder="Paste code, notes, widget snippets, template XML/JSON, troubleshooting patterns, or step-by-step implementation guidance here."></textarea>
-          <div class="button-row">
-            <button onclick="saveLearningItem()">Save to learning library</button>
-            <button onclick="fillLearningFromComposer()">Use composer text</button>
-          </div>
-          <textarea id="learningBulkInput" rows="8" placeholder="Bulk import format:&#10;### Title&#10;Category: zabbix-widget&#10;Tags: chart, api&#10;Content here...&#10;&#10;---&#10;### Another Title&#10;Tags: discovery, dashboard&#10;More study material..."></textarea>
-          <div class="button-row">
-            <button onclick="importLearningBatch()">Bulk import study material</button>
-            <button onclick="appendSelectionToComposer()">Add selected study items to composer</button>
-          </div>
-          <div class="upload-dropzone">
-            <div class="helper-text">Upload `.txt`, `.md`, `.json`, `.yaml`, `.xml`, `.csv`, `.py`, `.js`, `.html`, `.css`, `.ini`, `.conf`, or similar text/code files.</div>
-            <input id="learningUploadFiles" type="file" multiple>
-            <button onclick="uploadLearningFiles()">Upload files into learning library</button>
-          </div>
-          <div class="upload-dropzone">
-            <div class="helper-text">Add more sources from a live URL. The backend fetches the page text and stores it as a learning item for retrieval.</div>
-            <input id="learningUrlInput" type="url" placeholder="https://example.com/runbook-or-doc">
-            <button onclick="importLearningUrl()">Import URL as source</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="imageStudioCard" data-panel-mode="image">
-        <h3>Image Studio</h3>
-        <div class="stack-form">
-          <div class="helper-text">Create either a fast SVG concept card or a real backend-generated image, and optionally inspect uploaded pictures with a vision-capable Ollama model.</div>
-          <input id="imageTitle" type="text" placeholder="Image title">
-          <input id="imageSubtitle" type="text" placeholder="Subtitle or short supporting line">
-          <textarea id="imageBullets" rows="5" placeholder="Bullets, one per line:&#10;• Widget layout&#10;• Data flow&#10;• Common mistakes"></textarea>
-          <textarea id="imagePrompt" rows="4" placeholder="Optional direct prompt for real image generation. If blank, title/subtitle/bullets are combined."></textarea>
-          <textarea id="imageNegativePrompt" rows="3" placeholder="Negative prompt for real image generation (optional)."></textarea>
-          <div class="two-col-grid">
-            <input id="imageAccent" type="text" value="#38bdf8" placeholder="Accent color">
-            <select id="imageLayout">
-              <option value="landscape">Landscape 1600x900</option>
-              <option value="square">Square 1080x1080</option>
-              <option value="portrait">Portrait 1080x1350</option>
-            </select>
-          </div>
-          <div class="two-col-grid">
-            <input id="imageModelName" type="text" value="stabilityai/stable-diffusion-xl-base-1.0" placeholder="Image model/checkpoint">
-            <label class="checkbox-line"><input id="imageRewritePrompt" type="checkbox" checked> Rewrite prompt with Ollama before generation</label>
-          </div>
-          <div class="three-col-grid">
-            <input id="imageWidth" type="number" value="832" min="256" step="8" placeholder="Width">
-            <input id="imageHeight" type="number" value="1216" min="256" step="8" placeholder="Height">
-            <input id="imageSteps" type="number" value="30" min="1" max="150" placeholder="Steps">
-          </div>
-          <div class="two-col-grid">
-            <input id="imageGuidance" type="number" value="6.5" min="1" max="20" step="0.1" placeholder="Guidance">
-            <select id="imageOutputFormat">
-              <option value="png">PNG</option>
-              <option value="jpg">JPG</option>
-              <option value="webp">WEBP</option>
-            </select>
-          </div>
-          <div class="button-row">
-            <button onclick="buildImageFromLearning()">Fill from selected learning</button>
-            <button onclick="buildImageFromComposer()">Fill from composer</button>
-            <button onclick="generateStudyImage()" class="primary">Create SVG concept</button>
-            <button onclick="generateRealImage()">Create real image</button>
-          </div>
-          <div id="imageStudioMeta" class="meta-line">No image generated yet</div>
-          <div class="helper-text result-hint">When an image is created, this panel auto-scrolls into view and the latest result is shown below.</div>
-          <div class="image-preview-wrap">
-            <img id="imagePreview" class="image-preview" alt="Generated study image preview">
-          </div>
-          <div id="imageResultSummary" class="meta-panel">
-            <div class="item-title">No image yet</div>
-            <div class="item-meta">Generate an SVG concept or a real image to see details and reuse it later.</div>
-          </div>
-          <div class="button-row">
-            <button onclick="saveGeneratedImage()">Save to gallery</button>
-            <button onclick="downloadGeneratedImage()">Download current image</button>
-          </div>
-          <div class="helper-text">CLI equivalent for real generation: <code>python scripts/make_image_sdxl.py "prompt" --model stabilityai/stable-diffusion-xl-base-1.0 --width 832 --height 1216 --steps 30 --guidance 6.5</code></div>
-        </div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="imageVisionCard" data-panel-mode="vision">
-        <h3>Image Vision</h3>
-        <div class="stack-form">
-          <div class="helper-text">Upload a picture and ask the active Ollama vision model to describe it, extract visible text, or explain what is happening.</div>
-          <input id="imageAnalysisFile" type="file" accept="image/*">
-          <textarea id="imageAnalysisPrompt" rows="3" placeholder="What should the model look for? Example: Describe this image, list important objects, and extract any visible text."></textarea>
-          <div class="button-row">
-            <button onclick="analyzeUploadedImage()">Look at picture</button>
-          </div>
-          <div id="imageAnalysisMeta" class="meta-line">No image analyzed yet</div>
-          <div class="helper-text result-hint">If analysis fails, switch to a vision-capable model first, then try again.</div>
-          <pre id="imageAnalysisResult" class="code-viewer"></pre>
-        </div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="imageGalleryCard" data-panel-mode="gallery">
-        <h3>Image Gallery</h3>
-        <div class="helper-text">Browse saved image history, reopen prior SVGs in the studio, or download/delete them.</div>
-        <div id="imageGalleryList" class="list-stack compact"></div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="serverSetupCard" data-panel-mode="sources">
-        <h3>Server-side setup</h3>
-        <div class="helper-text">
-          To make chats, templates, model switching, retrieval, and real image generation work reliably, the server must expose Ollama, the local search API, writable data folders, and optionally an image backend such as AUTOMATIC1111/SD WebUI at <code>IMAGE_BACKEND_URL</code>.
-        </div>
-        <div class="helper-text">
-          User flows: add repos under Admin, save templates from a repo, upload/import learning sources here, choose a model in the top bar, then chat or create images.
-        </div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="retrievedSourcesCard" data-panel-mode="sources">
-        <h3>Retrieved Sources</h3>
-        <div id="sourcesList" class="list-stack compact"></div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="sourceViewerCard" data-panel-mode="sources">
-        <h3>Source Viewer</h3>
-        <div id="sourceMeta" class="meta-line">No source selected</div>
-        <pre id="sourceViewer" class="code-viewer"></pre>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="proposedChangesCard" data-panel-mode="changes">
-        <h3>Proposed Changes</h3>
-        <div id="changeFilesList" class="list-stack compact"></div>
-        <div class="button-row">
-          <button onclick="applyPlannedChanges()">Apply changes</button>
-          <button onclick="showGitStatus()">Git status</button>
-          <button onclick="commitAndPush()">Commit + push</button>
-        </div>
-      </section>
-
-      <section class="inspector-card right-panel-card hidden-by-mode" id="diffPreviewCard" data-panel-mode="changes">
-        <h3>Diff Preview</h3>
-        <div id="diffMeta" class="meta-line">No diff selected</div>
-        <pre id="diffViewer" class="code-viewer"></pre>
-      </section>
-    </aside>
-  </div>
+    <section class="panel stack gap-md full-width">
+      <div class="panel-header">
+        <h2>Template packs for Zabbix</h2>
+        <button id="refreshTemplatesBtn" class="secondary">Refresh templates</button>
+      </div>
+      <div class="grid two-up">
+        <label>Template name
+          <input id="templateName" type="text" placeholder="zabbix_widget_pack_v1">
+        </label>
+        <label>Source repo
+          <select id="repoSelect"></select>
+        </label>
+      </div>
+      <div class="actions wrap">
+        <button id="saveTemplateBtn" class="primary">Save selected repo as template</button>
+        <button id="loadTemplateFilesBtn" class="secondary">Show template files</button>
+      </div>
+      <div class="grid two-up">
+        <label>Saved templates
+          <select id="templateList" size="8"></select>
+        </label>
+        <label>Template files / preview
+          <pre id="templatePreview" class="code-box tall"></pre>
+        </label>
+      </div>
+    </section>
+  </main>
 
   <script src="/app.js"></script>
 </body>
