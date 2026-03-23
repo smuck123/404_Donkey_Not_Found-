@@ -945,6 +945,38 @@ def fetch_web_text(url: str) -> dict:
         "content": cleaned[:120000]
     }
 
+
+
+@app.get("/")
+def serve_chat_ui():
+    return FileResponse(str(CHAT_ROOT / "index.html"))
+
+
+@app.get("/style.css")
+def serve_chat_style():
+    return FileResponse(str(CHAT_ROOT / "style.css"), media_type="text/css")
+
+
+@app.get("/app.js")
+def serve_chat_script():
+    return FileResponse(str(CHAT_ROOT / "app.js"), media_type="application/javascript")
+
+
+@app.get("/admin/")
+def serve_admin_ui():
+    return FileResponse(str(ADMIN_ROOT / "index.html"))
+
+
+@app.get("/admin/style.css")
+def serve_admin_style():
+    return FileResponse(str(ADMIN_ROOT / "style.css"), media_type="text/css")
+
+
+@app.get("/admin/app.js")
+def serve_admin_script():
+    return FileResponse(str(ADMIN_ROOT / "app.js"), media_type="application/javascript")
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "app": "404DonkeyNotFound"}
