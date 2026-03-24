@@ -24,6 +24,7 @@ OLLAMA_TAGS_URL = "http://127.0.0.1:11434/api/tags"
 OLLAMA_CHAT_URL = "http://127.0.0.1:11434/api/chat"
 DEFAULT_MODEL = "qwen3:8b"
 SEARCH_API_URL = "http://127.0.0.1:8020/search"
+WARSAW_BEER_LIST_URL = "https://warsawbeerfestival.com/beer-list/"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 CHAT_ROOT = (BASE_DIR / "frontend" / "chat").resolve()
@@ -42,6 +43,7 @@ REPO_TEMPLATES_ROOT = (DATA_ROOT / "repo_templates").resolve()
 REPO_TEMPLATES_META_ROOT = (DATA_ROOT / "repo_templates_meta").resolve()
 LEARNING_ROOT = (DATA_ROOT / "learning_library").resolve()
 GENERATED_IMAGES_ROOT = (DATA_ROOT / "generated_images").resolve()
+BEER_CACHE_FILE = (DATA_ROOT / "beer_cache" / "warsaw_beer_list.json").resolve()
 
 IMAGE_BACKEND_URL = os.getenv("IMAGE_BACKEND_URL", "http://127.0.0.1:7860/sdapi/v1/txt2img")
 IMAGE_BACKEND_TIMEOUT = int(os.getenv("IMAGE_BACKEND_TIMEOUT", "300"))
@@ -944,6 +946,175 @@ def fetch_web_text(url: str) -> dict:
         "content_type": content_type,
         "content": cleaned[:120000]
     }
+
+
+def normalize_space(value: str) -> str:
+    return re.sub(r"\s+", " ", (value or "").strip())
+
+
+def parse_warsaw_beer_list_html(html: str) -> list[dict]:
+    soup = BeautifulSoup(html, "html.parser")
+    beers = []
+
+    def add_beer(entry: dict):
+        name = normalize_space(entry.get("name", ""))
+        if not name:
+            return
+        normalized = {
+            "name": name,
+            "brewery": normalize_space(entry.get("brewery", "")),
+            "style": normalize_space(entry.get("style", "")),
+            "abv": normalize_space(entry.get("abv", "")),
+            "notes": normalize_space(entry.get("notes", "")),
+        }
+        if all(not normalized.get(k) for k in ("brewery", "style", "abv", "notes")):
+            return
+        beers.append(normalized)
+
+    for row in soup.select("table tr"):
+        cells = [normalize_space(cell.get_text(" ", strip=True)) for cell in row.select("th, td")]
+        cells = [c for c in cells if c]
+        if len(cells) < 2:
+            continue
+        add_beer({
+            "name": cells[0],
+            "brewery": cells[1] if len(cells) > 1 else "",
+            "style": cells[2] if len(cells) > 2 else "",
+            "abv": cells[3] if len(cells) > 3 else "",
+            "notes": " | ".join(cells[4:]) if len(cells) > 4 else ""
+        })
+
+    for item in soup.select("li, article, div"):
+        text = normalize_space(item.get_text(" ", strip=True))
+        if len(text) < 18 or len(text) > 240:
+            continue
+        if not re.search(r"\b(ipa|lager|ale|stout|porter|pils|sour|wit|weizen|abv|%|brewery)\b", text.lower()):
+            continue
+        parts = [normalize_space(p) for p in re.split(r"\s+[–|-]\s+|\s+\|\s+", text) if normalize_space(p)]
+        if len(parts) < 2:
+            continue
+        add_beer({
+            "name": parts[0],
+            "brewery": parts[1] if len(parts) > 1 else "",
+            "style": parts[2] if len(parts) > 2 else "",
+            "abv": parts[3] if len(parts) > 3 and "%" in parts[3] else "",
+            "notes": " | ".join(parts[3:]) if len(parts) > 3 else ""
+        })
+
+    deduped = []
+    seen = set()
+    for beer in beers:
+        key = (
+            beer.get("name", "").lower(),
+            beer.get("brewery", "").lower(),
+            beer.get("style", "").lower(),
+            beer.get("abv", "").lower()
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(beer)
+    return deduped
+
+
+def load_warsaw_beer_catalog(max_age_hours: int = 24) -> dict:
+    ensure_data_files()
+    BEER_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    now = datetime.utcnow()
+    if BEER_CACHE_FILE.exists():
+        try:
+            cached = json.loads(BEER_CACHE_FILE.read_text(encoding="utf-8"))
+            updated_at = datetime.fromisoformat(cached.get("updated_at", "").replace("Z", "+00:00"))
+            age_seconds = (now - updated_at.replace(tzinfo=None)).total_seconds()
+            if age_seconds <= max_age_hours * 3600 and cached.get("beers"):
+                cached["source"] = "cache:fresh"
+                return cached
+        except Exception:
+            pass
+
+    try:
+        r = requests.get(
+            WARSAW_BEER_LIST_URL,
+            timeout=60,
+            headers={"User-Agent": "404DonkeyNotFound-BeerBot/1.0"}
+        )
+        r.raise_for_status()
+        beers = parse_warsaw_beer_list_html(r.text)
+        payload = {
+            "source_url": WARSAW_BEER_LIST_URL,
+            "updated_at": now.isoformat() + "Z",
+            "source": "web:live",
+            "beers": beers,
+            "count": len(beers),
+        }
+        BEER_CACHE_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        return payload
+    except Exception as exc:
+        if BEER_CACHE_FILE.exists():
+            try:
+                stale = json.loads(BEER_CACHE_FILE.read_text(encoding="utf-8"))
+                stale["source"] = "cache:stale"
+                stale["warning"] = f"Live refresh failed: {exc}"
+                return stale
+            except Exception:
+                pass
+        return {
+            "source_url": WARSAW_BEER_LIST_URL,
+            "updated_at": now.isoformat() + "Z",
+            "source": "unavailable",
+            "warning": f"Beer list unavailable: {exc}",
+            "beers": [],
+            "count": 0
+        }
+
+
+def select_beers_for_query(beers: list[dict], query: str, limit: int = 24) -> list[dict]:
+    if not beers:
+        return []
+    tokens = [t for t in re.findall(r"[a-zA-Z0-9%+]+", (query or "").lower()) if len(t) >= 3]
+    if not tokens:
+        return beers[:limit]
+    scored = []
+    for beer in beers:
+        haystack = " ".join([
+            beer.get("name", ""),
+            beer.get("brewery", ""),
+            beer.get("style", ""),
+            beer.get("abv", ""),
+            beer.get("notes", "")
+        ]).lower()
+        score = sum(1 for token in tokens if token in haystack)
+        if score > 0:
+            scored.append((score, beer))
+    scored.sort(key=lambda pair: pair[0], reverse=True)
+    return [beer for _, beer in scored[:limit]] if scored else beers[:limit]
+
+
+def build_beer_context(catalog: dict, latest_user: str) -> str:
+    beers = catalog.get("beers", [])
+    matched = select_beers_for_query(beers, latest_user, limit=24)
+    sample = beers[:120]
+
+    matched_lines = [
+        f"- {b.get('name','')} | brewery: {b.get('brewery','?')} | style: {b.get('style','?')} | abv: {b.get('abv','?')}"
+        for b in matched
+    ]
+    sample_lines = [
+        f"- {b.get('name','')} | brewery: {b.get('brewery','?')} | style: {b.get('style','?')} | abv: {b.get('abv','?')}"
+        for b in sample
+    ]
+
+    warning = catalog.get("warning", "")
+    warning_line = f"\nWARNING: {warning}" if warning else ""
+    return (
+        f"Beer catalog source: {catalog.get('source_url', WARSAW_BEER_LIST_URL)}\n"
+        f"Catalog status: {catalog.get('source', 'unknown')} (updated_at: {catalog.get('updated_at', 'unknown')})\n"
+        f"Total beers remembered: {catalog.get('count', len(beers))}{warning_line}\n\n"
+        "Top beers matching the latest user message:\n"
+        + ("\n".join(matched_lines) if matched_lines else "- No direct matches found yet.")
+        + "\n\nCatalog sample (for broad memory grounding):\n"
+        + ("\n".join(sample_lines) if sample_lines else "- No beer data available.")
+    )
 
 
 
@@ -1959,10 +2130,20 @@ def chat_messages_retrieval(req: RetrievalChatRequest):
 
         template_context = load_template_content(req.selected_template) if req.selected_template else ""
         learning_context = load_learning_context(req.selected_learning_ids)
+        beer_catalog = load_warsaw_beer_catalog(max_age_hours=12)
+        beer_context = build_beer_context(beer_catalog, latest_user)
 
         system_message = {
             "role": "system",
             "content": f"""You are a coding assistant focused on LOCAL DATA.
+
+PERSONA:
+- You are "Warsaw Festival Donkey Beer Senior Analyzer".
+- Be funny, playful, and a little dramatic, but still useful.
+- You help users decide what beer to drink next.
+- If user preference is unclear, ask short clarifying questions (style, bitterness, ABV, fruity vs dry, etc.).
+- Only recommend beers from the Warsaw beer list context below. If uncertain, say so clearly.
+- Keep track of preferences from prior messages in this chat and refine recommendations.
 
 RULES:
 - ALWAYS use TEMPLATE CONTENT if present.
@@ -1984,6 +2165,9 @@ LEARNING LIBRARY CONTENT:
 
 RETRIEVED CONTEXT:
 {retrieval_context}
+
+WARSAW BEER FESTIVAL LIST CONTEXT:
+{beer_context}
 """
         }
 
