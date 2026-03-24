@@ -4,7 +4,6 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, field_validator
 from pathlib import Path
 from datetime import datetime
-from bs4 import BeautifulSoup
 import requests
 import shutil
 import shutil as pyshutil
@@ -16,6 +15,7 @@ import difflib
 import base64
 import mimetypes
 import os
+from beer_bot import build_beer_bot_context
 
 
 app = FastAPI(title="404DonkeyNotFound")
@@ -930,12 +930,11 @@ def fetch_web_text(url: str) -> dict:
     cleaned = text
 
     if "html" in content_type or "<html" in text.lower():
-        soup = BeautifulSoup(text, "html.parser")
-        for tag in soup(["script", "style", "noscript"]):
-            tag.decompose()
-        if soup.title and soup.title.string:
-            title = soup.title.string.strip()
-        cleaned = soup.get_text("\n")
+        title_match = re.search(r"(?is)<title[^>]*>(.*?)</title>", text)
+        if title_match:
+            title = re.sub(r"\s+", " ", title_match.group(1)).strip()
+        cleaned = re.sub(r"(?is)<(script|style|noscript).*?>.*?</\1>", " ", text)
+        cleaned = re.sub(r"(?s)<[^>]+>", "\n", cleaned)
         cleaned = "\n".join(line.strip() for line in cleaned.splitlines() if line.strip())
 
     return {
@@ -1959,10 +1958,27 @@ def chat_messages_retrieval(req: RetrievalChatRequest):
 
         template_context = load_template_content(req.selected_template) if req.selected_template else ""
         learning_context = load_learning_context(req.selected_learning_ids)
+        beer_context = build_beer_bot_context(
+            data_root=DATA_ROOT,
+            messages=req.messages,
+            latest_user=latest_user
+        )
 
         system_message = {
             "role": "system",
             "content": f"""You are a coding assistant focused on LOCAL DATA.
+
+PERSONA:
+- You are "Warsaw Festival Donkey Beer Senior Analyzer".
+- Be funny, playful, and a little dramatic, but still useful.
+- You help users decide what beer to drink next.
+- If user preference is unclear, ask short clarifying questions (style, bitterness, ABV, fruity vs dry, etc.).
+- Only recommend beers from the Warsaw beer list context below. If uncertain, say so clearly.
+- Keep track of preferences from prior messages in this chat and refine recommendations.
+- If user says "piwa_what to do" (or similar), give a day-based festival action plan plus map-oriented tips.
+- Use varied speaking styles: festival guide, donkey detective, lab analyzer, and friendly bartender.
+- Explicitly avoid recommending beers the user already said they drank.
+- If user asks "help beers", return concise command help and examples.
 
 RULES:
 - ALWAYS use TEMPLATE CONTENT if present.
@@ -1984,6 +2000,9 @@ LEARNING LIBRARY CONTENT:
 
 RETRIEVED CONTEXT:
 {retrieval_context}
+
+WARSAW BEER FESTIVAL LIST CONTEXT:
+{beer_context}
 """
         }
 
