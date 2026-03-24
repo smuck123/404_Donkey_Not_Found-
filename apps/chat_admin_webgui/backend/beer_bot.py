@@ -73,13 +73,15 @@ def parse_beer_list_html(html: str) -> list[dict]:
         cells = [c for c in cells if c]
         if len(cells) < 2:
             continue
-        add_beer({
-            "name": cells[0],
-            "brewery": cells[1] if len(cells) > 1 else "",
-            "style": cells[2] if len(cells) > 2 else "",
-            "abv": cells[3] if len(cells) > 3 else "",
-            "notes": " | ".join(cells[4:]) if len(cells) > 4 else "",
-        })
+        add_beer(
+            {
+                "name": cells[0],
+                "brewery": cells[1] if len(cells) > 1 else "",
+                "style": cells[2] if len(cells) > 2 else "",
+                "abv": cells[3] if len(cells) > 3 else "",
+                "notes": " | ".join(cells[4:]) if len(cells) > 4 else "",
+            }
+        )
 
     for item in soup.select("li, article, div"):
         text = normalize_space(item.get_text(" ", strip=True))
@@ -90,13 +92,15 @@ def parse_beer_list_html(html: str) -> list[dict]:
         parts = [normalize_space(p) for p in re.split(r"\s+[–|-]\s+|\s+\|\s+", text) if normalize_space(p)]
         if len(parts) < 2:
             continue
-        add_beer({
-            "name": parts[0],
-            "brewery": parts[1] if len(parts) > 1 else "",
-            "style": parts[2] if len(parts) > 2 else "",
-            "abv": parts[3] if len(parts) > 3 and "%" in parts[3] else "",
-            "notes": " | ".join(parts[3:]) if len(parts) > 3 else "",
-        })
+        add_beer(
+            {
+                "name": parts[0],
+                "brewery": parts[1] if len(parts) > 1 else "",
+                "style": parts[2] if len(parts) > 2 else "",
+                "abv": parts[3] if len(parts) > 3 and "%" in parts[3] else "",
+                "notes": " | ".join(parts[3:]) if len(parts) > 3 else "",
+            }
+        )
 
     seen = set()
     deduped = []
@@ -166,9 +170,15 @@ def read_or_refresh_cache(data_root: Path, max_age_hours: int = 12) -> dict:
         beer_r = requests.get(WARSAW_BEER_LIST_URL, timeout=45, headers={"User-Agent": "DonkeyBeerBot/1.0"})
         beer_r.raise_for_status()
         payload["beers"] = parse_beer_list_html(beer_r.text)
-        if len(payload["beers"]) == 0 and cached and cached.get("beers"):
-            payload["beers"] = cached.get("beers", [])
+        if len(payload["beers"]) == 0 and cache_file.exists():
             errors.append("beer list refresh parsed 0 beers; kept previous cached beer list")
+            try:
+                stale = json.loads(cache_file.read_text(encoding="utf-8"))
+                stale["source"] = "cache:stale"
+                stale["warning"] = " | ".join(errors)
+                return stale
+            except Exception:
+                pass
     except Exception as exc:
         errors.append(f"beer list refresh failed: {exc}")
 
