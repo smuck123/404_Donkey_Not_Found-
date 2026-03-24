@@ -3,8 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 import json
+import logging
 import re
 import requests
+from bs4 import BeautifulSoup
 
 
 WARSAW_BEER_LIST_URL = "https://warsawbeerfestival.com/beer-list/"
@@ -32,6 +34,7 @@ HELP_BEERS_EXAMPLES = [
     "piwa_what to do",
     "revisit drank beers",
 ]
+logger = logging.getLogger(__name__)
 
 
 def normalize_space(value: str) -> str:
@@ -47,25 +50,54 @@ def strip_html_tags(html: str) -> str:
 
 
 def parse_beer_list_html(html: str) -> list[dict]:
-    text = strip_html_tags(html)
-    lines = [normalize_space(x) for x in re.split(r"[;\n\r]+", text) if normalize_space(x)]
+    soup = BeautifulSoup(html, "html.parser")
     beers = []
-    style_re = re.compile(r"\b(ipa|lager|ale|stout|porter|pils|sour|wit|weizen|gose|ko[źz]lak|pale)\b", re.I)
-    for line in lines:
-        if len(line) < 14 or len(line) > 240:
+
+    def add_beer(entry: dict):
+        name = normalize_space(entry.get("name", ""))
+        if not name:
+            return
+        normalized = {
+            "name": name,
+            "brewery": normalize_space(entry.get("brewery", "")),
+            "style": normalize_space(entry.get("style", "")),
+            "abv": normalize_space(entry.get("abv", "")),
+            "notes": normalize_space(entry.get("notes", "")),
+        }
+        if all(not normalized.get(k) for k in ("brewery", "style", "abv", "notes")):
+            return
+        beers.append(normalized)
+
+    for row in soup.select("table tr"):
+        cells = [normalize_space(cell.get_text(" ", strip=True)) for cell in row.select("th, td")]
+        cells = [c for c in cells if c]
+        if len(cells) < 2:
             continue
-        if not style_re.search(line) and "%" not in line:
+        add_beer({
+            "name": cells[0],
+            "brewery": cells[1] if len(cells) > 1 else "",
+            "style": cells[2] if len(cells) > 2 else "",
+            "abv": cells[3] if len(cells) > 3 else "",
+            "notes": " | ".join(cells[4:]) if len(cells) > 4 else "",
+        })
+
+    for item in soup.select("li, article, div"):
+        text = normalize_space(item.get_text(" ", strip=True))
+        if len(text) < 18 or len(text) > 240:
             continue
-        parts = [normalize_space(p) for p in re.split(r"\s+[–|-]\s+|\s+\|\s+", line) if normalize_space(p)]
+        if not re.search(r"\b(ipa|lager|ale|stout|porter|pils|sour|wit|weizen|abv|%|brewery)\b", text.lower()):
+            continue
+        parts = [normalize_space(p) for p in re.split(r"\s+[–|-]\s+|\s+\|\s+", text) if normalize_space(p)]
         if len(parts) < 2:
             continue
-        beers.append({
+        add_beer({
             "name": parts[0],
             "brewery": parts[1] if len(parts) > 1 else "",
             "style": parts[2] if len(parts) > 2 else "",
             "abv": parts[3] if len(parts) > 3 and "%" in parts[3] else "",
-            "notes": " | ".join(parts[3:]) if len(parts) > 3 else ""
+            "notes": " | ".join(parts[3:]) if len(parts) > 3 else "",
         })
+
     seen = set()
     deduped = []
     for beer in beers:
@@ -107,6 +139,7 @@ def read_or_refresh_cache(data_root: Path, max_age_hours: int = 12) -> dict:
     cache_file = (data_root / "beer_cache" / "festival_context.json").resolve()
     cache_file.parent.mkdir(parents=True, exist_ok=True)
     now = datetime.utcnow()
+    cached = None
     if cache_file.exists():
         try:
             cached = json.loads(cache_file.read_text(encoding="utf-8"))
@@ -133,6 +166,9 @@ def read_or_refresh_cache(data_root: Path, max_age_hours: int = 12) -> dict:
         beer_r = requests.get(WARSAW_BEER_LIST_URL, timeout=45, headers={"User-Agent": "DonkeyBeerBot/1.0"})
         beer_r.raise_for_status()
         payload["beers"] = parse_beer_list_html(beer_r.text)
+        if len(payload["beers"]) == 0 and cached and cached.get("beers"):
+            payload["beers"] = cached.get("beers", [])
+            errors.append("beer list refresh parsed 0 beers; kept previous cached beer list")
     except Exception as exc:
         errors.append(f"beer list refresh failed: {exc}")
 
@@ -145,6 +181,7 @@ def read_or_refresh_cache(data_root: Path, max_age_hours: int = 12) -> dict:
 
     payload["beer_count"] = len(payload["beers"])
     payload["ambassador_count"] = len(payload["ambassadors"])
+    logger.info("beer cache refresh complete: beer_count=%s", payload["beer_count"])
     if errors:
         payload["warning"] = " | ".join(errors)
     if payload["beers"] or payload["ambassadors"]:
