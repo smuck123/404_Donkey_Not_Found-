@@ -307,6 +307,19 @@ def build_day_plan_actions(today_hint: str) -> str:
     ])
 
 
+def extract_requested_style(latest_user: str) -> str:
+    text = normalize_space((latest_user or "").lower())
+    if not text:
+        return ""
+    style_match = re.search(r"\b(ipa|stout|porter|lager|pils|sour|gose|wheat|hazy|ale)\b", text)
+    if not style_match:
+        return ""
+    style = style_match.group(1)
+    if re.search(r"\b(want|looking for|like|prefer|chce|poprosz[eę]|lubi[eę]|beer want)\b", text):
+        return style
+    return style if len(text.split()) <= 5 else ""
+
+
 def filter_beers(beers: list[dict], style: str = "", abv_min: float | None = None, abv_max: float | None = None) -> list[dict]:
     out = []
     style_low = (style or "").lower().strip()
@@ -378,9 +391,12 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
     wants_plan = detect_festival_plan_intent(latest_user)
     wants_help = detect_help_beers_intent(latest_user)
     wants_revisit = detect_revisit_intent(latest_user)
+    requested_style = extract_requested_style(latest_user)
     starter = ""
     latest_low = (latest_user or "").lower()
-    if "beer" in latest_low or "piwo" in latest_low or "piwa" in latest_low:
+    if normalize_space(latest_low) in {"beer", "piwo", "piwa"}:
+        starter = "User asked only for beer. First ask: 'What beer style do you want (e.g., stout, ipa, lager)?'"
+    elif "beer" in latest_low or "piwo" in latest_low or "piwa" in latest_low:
         starter = "Detected the word 'beer/piwo'. Ask: 'Do you want to get a beer now? If yes, what style mood do you want?'"
     elif not memory["styles"]:
         starter = "If preference is missing, ask a quick preference question before recommending."
@@ -408,6 +424,13 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
     route_examples = "\n".join(f"- {x}" for x in ROUTE_EXAMPLES)
     day_plan_actions = build_day_plan_actions(today_hint)
     help_beers_text = build_help_beers_text()
+    style_focus = filter_beers(beers, style=requested_style) if requested_style else []
+    if style_focus and not wants_revisit:
+        style_focus = exclude_consumed(style_focus, consumed)
+    style_focus_lines = [
+        f"- {b.get('name','')} | brewery: {b.get('brewery','?')} | style: {b.get('style','?')} | abv: {b.get('abv','?')}"
+        for b in style_focus[:8]
+    ]
 
     return f"""Festival source status: {catalog.get('source', 'unknown')}, updated_at={catalog.get('updated_at', 'unknown')}
 Beer list URL: {catalog.get('beer_list_url', WARSAW_BEER_LIST_URL)}
@@ -431,6 +454,7 @@ Starter behavior:
 - Plan intent detected now: {"yes" if wants_plan else "no"}
 - Help intent detected now: {"yes" if wants_help else "no"}
 - Revisit consumed beers intent detected: {"yes" if wants_revisit else "no"}
+- Requested style detected from latest message: {requested_style or "none"}
 - Help command examples: {", ".join(HELP_BEERS_EXAMPLES)}
 
 Route intelligence:
@@ -446,6 +470,9 @@ Remembered consumed beers (avoid repeats):
 
 Best matches for latest message and filters:
 {chr(10).join(match_lines) if match_lines else "- No beer matches available after filters/consumed exclusion."}
+
+Direct style matches for latest style request (e.g. 'beer want stout'):
+{chr(10).join(style_focus_lines) if style_focus_lines else "- No style-specific matches detected from latest message."}
 
 Ambassadors remembered:
 {chr(10).join(ambassador_lines) if ambassador_lines else "- No ambassadors extracted yet."}
