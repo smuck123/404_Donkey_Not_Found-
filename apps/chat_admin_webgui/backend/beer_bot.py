@@ -9,6 +9,7 @@ import requests
 
 WARSAW_BEER_LIST_URL = "https://warsawbeerfestival.com/beer-list/"
 WARSAW_AMBASSADORS_URL = "https://warsawbeerfestival.com/#ambasadors"
+WARSAW_SCHEDULE_URL = "https://warsawbeerfestival.com/#schedule"
 WARSAW_PIWA_MAP_URL = "https://warszawskifestiwalpiwa.pl/mapa_interaktywna.pdf"
 ROUTE_IDEAS = {
     1: "Hop Hunter: Start near main bar, go to IPA-heavy taps, then finish near food zone.",
@@ -29,6 +30,9 @@ HELP_BEERS_EXAMPLES = [
     "help beers",
     "beer route 2 IPA top 4 under 7%",
     "piwa what now",
+    "piwa plan",
+    "piwa next 5 ipa",
+    "beer next 3 sour under 6%",
     "piwa_what to do",
     "revisit drank beers",
 ]
@@ -123,9 +127,11 @@ def read_or_refresh_cache(data_root: Path, max_age_hours: int = 12) -> dict:
         "source": "web:partial",
         "beer_list_url": WARSAW_BEER_LIST_URL,
         "ambassadors_url": WARSAW_AMBASSADORS_URL,
+        "schedule_url": WARSAW_SCHEDULE_URL,
         "map_url": WARSAW_PIWA_MAP_URL,
         "beers": [],
         "ambassadors": [],
+        "schedule_snippets": [],
     }
 
     errors = []
@@ -142,6 +148,13 @@ def read_or_refresh_cache(data_root: Path, max_age_hours: int = 12) -> dict:
         payload["ambassadors"] = extract_ambassadors(amb_r.text)
     except Exception as exc:
         errors.append(f"ambassadors refresh failed: {exc}")
+
+    try:
+        schedule_r = requests.get(WARSAW_SCHEDULE_URL, timeout=45, headers={"User-Agent": "DonkeyBeerBot/1.0"})
+        schedule_r.raise_for_status()
+        payload["schedule_snippets"] = extract_schedule_snippets(schedule_r.text)
+    except Exception as exc:
+        errors.append(f"schedule refresh failed: {exc}")
 
     payload["beer_count"] = len(payload["beers"])
     payload["ambassador_count"] = len(payload["ambassadors"])
@@ -261,8 +274,36 @@ def detect_festival_plan_intent(latest_user: str) -> bool:
         "piwa what to do",
         "piwa what",
         "what now piwa",
+        "piwa plan",
+        "beer plan",
+        "festival plan",
+        "co dzisiaj",
+        "plan dnia",
     ]
     return any(t in text for t in triggers)
+
+
+def detect_next_beers_intent(latest_user: str) -> bool:
+    text = normalize_space((latest_user or "").lower().replace("_", " "))
+    if not text:
+        return False
+    return bool(re.search(r"\b(next|nastepne|kolejne)\b", text)) and ("beer" in text or "piw" in text)
+
+
+def parse_next_beers_command(latest_user: str) -> dict:
+    text = normalize_space((latest_user or "").lower())
+    count_match = re.search(r"\b(next|nastepne|kolejne)\s*(\d+)\b", text)
+    count = int(count_match.group(2)) if count_match else DEFAULT_ROUTE_SIZE
+    count = max(1, min(12, count))
+    style_match = re.search(r"\b(ipa|stout|porter|lager|pils|sour|gose|wheat|hazy|ale)\b", text)
+    abv_cap_match = re.search(r"\b(?:under|max|below)\s*(\d+(?:[.,]\d+)?)\s*%?\b", text)
+    abv_floor_match = re.search(r"\b(?:over|min|above)\s*(\d+(?:[.,]\d+)?)\s*%?\b", text)
+    return {
+        "count": count,
+        "style": style_match.group(1) if style_match else "",
+        "abv_min": float(abv_floor_match.group(1).replace(",", ".")) if abv_floor_match else None,
+        "abv_max": float(abv_cap_match.group(1).replace(",", ".")) if abv_cap_match else None,
+    }
 
 
 def detect_help_beers_intent(latest_user: str) -> bool:
@@ -291,9 +332,12 @@ def build_help_beers_text() -> str:
     return "\n".join([
         "- help beers",
         "- beer route <route_id> <style> top <count> under <abv>%",
+        "- piwa beer route 5  (gives 5 next beers from wildcard route)",
+        "- beer next <count> <style> under <abv>%",
         "- beer route 3 stout top 5 over 8%",
-        "- piwa what now  (for day plan + map tips)",
+        "- piwa plan / piwa what now  (for day plan + map tips)",
         "- revisit drank beers  (allow previously consumed beers again)",
+        "- i drank <beer name>  (bot remembers consumed beers and avoids repeats)",
     ])
 
 
@@ -305,6 +349,49 @@ def build_day_plan_actions(today_hint: str) -> str:
         "- Alternate strong and light beers to reduce palate fatigue.",
         "- Mark 2 fallback stands nearby in case queues are long.",
     ])
+
+
+def extract_schedule_snippets(html: str) -> list[str]:
+    text = strip_html_tags(html)
+    candidates = [normalize_space(x) for x in re.split(r"[;\n\r]+", text) if normalize_space(x)]
+    keep = []
+    for line in candidates:
+        low = line.lower()
+        if len(line) < 18 or len(line) > 220:
+            continue
+        if re.search(r"\b(schedule|panel|stage|workshop|music|dj|tasting|opening|closing|piątek|sobota|niedziela|friday|saturday|sunday)\b", low):
+            keep.append(line)
+    uniq = []
+    seen = set()
+    for row in keep:
+        key = row.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        uniq.append(row)
+    return uniq[:80]
+
+
+def schedule_today_focus(schedule_rows: list[str], now: datetime | None = None) -> list[str]:
+    now = now or datetime.utcnow()
+    weekday_en = now.strftime("%A").lower()
+    weekday_pl = {
+        "monday": "poniedziałek",
+        "tuesday": "wtorek",
+        "wednesday": "środa",
+        "thursday": "czwartek",
+        "friday": "piątek",
+        "saturday": "sobota",
+        "sunday": "niedziela",
+    }.get(weekday_en, "")
+    day_num = str(now.day)
+    month_num = now.strftime("%m")
+    picks = []
+    for row in schedule_rows:
+        low = row.lower()
+        if weekday_en in low or weekday_pl in low or f"{day_num}." in low or f"{day_num}/{month_num}" in low:
+            picks.append(row)
+    return picks[:12]
 
 
 def extract_requested_style(latest_user: str) -> str:
@@ -391,7 +478,11 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
     wants_plan = detect_festival_plan_intent(latest_user)
     wants_help = detect_help_beers_intent(latest_user)
     wants_revisit = detect_revisit_intent(latest_user)
+    wants_next_beers = detect_next_beers_intent(latest_user)
     requested_style = extract_requested_style(latest_user)
+    next_cmd = parse_next_beers_command(latest_user)
+    schedule_rows = catalog.get("schedule_snippets", [])
+    today_schedule = schedule_today_focus(schedule_rows)
     starter = ""
     latest_low = (latest_user or "").lower()
     if normalize_space(latest_low) in {"beer", "piwo", "piwa"}:
@@ -410,6 +501,13 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
             abv_max=route.get("abv_max"),
         )
         filtered = filtered[: route.get("count", 5)]
+    elif wants_next_beers:
+        filtered = filter_beers(
+            beers,
+            style=next_cmd.get("style", ""),
+            abv_min=next_cmd.get("abv_min"),
+            abv_max=next_cmd.get("abv_max"),
+        )[: next_cmd.get("count", DEFAULT_ROUTE_SIZE)]
     if not wants_revisit:
         filtered = exclude_consumed(filtered, consumed)
 
@@ -431,10 +529,13 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
         f"- {b.get('name','')} | brewery: {b.get('brewery','?')} | style: {b.get('style','?')} | abv: {b.get('abv','?')}"
         for b in style_focus[:8]
     ]
+    schedule_lines = [f"- {x}" for x in today_schedule[:10]]
+    schedule_general_lines = [f"- {x}" for x in schedule_rows[:12]]
 
     return f"""Festival source status: {catalog.get('source', 'unknown')}, updated_at={catalog.get('updated_at', 'unknown')}
 Beer list URL: {catalog.get('beer_list_url', WARSAW_BEER_LIST_URL)}
 Ambassadors URL: {catalog.get('ambassadors_url', WARSAW_AMBASSADORS_URL)}
+Schedule URL: {catalog.get('schedule_url', WARSAW_SCHEDULE_URL)}
 Interactive map URL: {catalog.get('map_url', WARSAW_PIWA_MAP_URL)}
 Remembered beers: {catalog.get('beer_count', len(beers))}
 Remembered ambassadors: {catalog.get('ambassador_count', len(catalog.get('ambassadors', [])))}
@@ -454,7 +555,9 @@ Starter behavior:
 - Plan intent detected now: {"yes" if wants_plan else "no"}
 - Help intent detected now: {"yes" if wants_help else "no"}
 - Revisit consumed beers intent detected: {"yes" if wants_revisit else "no"}
+- Next beers intent detected: {"yes" if wants_next_beers else "no"}
 - Requested style detected from latest message: {requested_style or "none"}
+- Next beers command parse: count={next_cmd.get("count")}, style={next_cmd.get("style") or "none"}, abv_min={next_cmd.get("abv_min")}, abv_max={next_cmd.get("abv_max")}
 - Help command examples: {", ".join(HELP_BEERS_EXAMPLES)}
 
 Route intelligence:
@@ -484,6 +587,14 @@ Map guidance hints:
 If plan command is detected, return this day-plan template:
 {day_plan_actions}
 
+Today schedule snippets from official page (prioritize these when user asks "piwa plan/what now"):
+{chr(10).join(schedule_lines) if schedule_lines else "- No day-specific snippets found; use general plan + suggest checking official schedule URL."}
+
+General schedule snippets memory:
+{chr(10).join(schedule_general_lines) if schedule_general_lines else "- No schedule snippets extracted yet."}
+
 If help command is detected, return this concise command help:
 {help_beers_text}
+
+When user asks for route/map hints, mention the interactive map PDF and propose a practical walking loop with zones (entry -> lighter beers -> heavier beers -> food/water reset -> wildcard stand).
 """
