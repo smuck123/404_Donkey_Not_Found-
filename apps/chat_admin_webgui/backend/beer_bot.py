@@ -17,6 +17,21 @@ ROUTE_IDEAS = {
     4: "Sour Safari: Fruity and sour-focused stands, with palate reset at water points.",
     5: "Wildcard Donkey: One classic, one weird, one ambassador pick, one local surprise.",
 }
+ROUTE_EXAMPLES = [
+    "Route 1 (Hop Hunt): IPA-heavy stands near the main festival flow.",
+    "Route 2 (Crisp Cruiser): pils/lagers with short walking distance.",
+    "Route 3 (Dark Lord): porter/stout route in chill, shaded areas.",
+    "Route 4 (Sour Safari): sours + fruit beers, with water reset points.",
+    "Route 5 (Wildcard Donkey): classic + weird + ambassador + local surprise.",
+]
+DEFAULT_ROUTE_SIZE = 5
+HELP_BEERS_EXAMPLES = [
+    "help beers",
+    "beer route 2 IPA top 4 under 7%",
+    "piwa what now",
+    "piwa_what to do",
+    "revisit drank beers",
+]
 
 
 def normalize_space(value: str) -> str:
@@ -204,7 +219,7 @@ def parse_abv_value(value: str) -> float | None:
 def parse_route_command(latest_user: str) -> dict:
     text = (latest_user or "").strip()
     low = text.lower()
-    route_match = re.search(r"\bbeer\s*route\b", low)
+    route_match = re.search(r"\bbeer\s*route\b|\bpiwa\s*route\b|\btrasa\s*piw\b", low)
     if not route_match:
         return {"active": False, "debug": "No 'beer route' command detected."}
 
@@ -218,7 +233,7 @@ def parse_route_command(latest_user: str) -> dict:
     route_id = max(1, min(5, route_id))
     start_stop = nums[1] if len(nums) > 1 else None
     end_stop = nums[2] if len(nums) > 2 else None
-    count = int(count_match.group(1)) if count_match else 5
+    count = int(count_match.group(1)) if count_match else DEFAULT_ROUTE_SIZE
     count = max(1, min(12, count))
     abv_max = float(abv_cap_match.group(1).replace(",", ".")) if abv_cap_match else None
     abv_min = float(abv_floor_match.group(1).replace(",", ".")) if abv_floor_match else None
@@ -235,6 +250,61 @@ def parse_route_command(latest_user: str) -> dict:
         "abv_max": abv_max,
         "debug": f"Parsed route={route_id}, start={start_stop}, end={end_stop}, style={style_match.group(1) if style_match else 'none'}, count={count}, abv_min={abv_min}, abv_max={abv_max}",
     }
+
+
+def detect_festival_plan_intent(latest_user: str) -> bool:
+    text = normalize_space((latest_user or "").lower().replace("_", " "))
+    if not text:
+        return False
+    triggers = [
+        "piwa what now",
+        "piwa what to do",
+        "piwa what",
+        "what now piwa",
+    ]
+    return any(t in text for t in triggers)
+
+
+def detect_help_beers_intent(latest_user: str) -> bool:
+    text = normalize_space((latest_user or "").lower().replace("_", " "))
+    if not text:
+        return False
+    return ("help beers" in text) or ("beer help" in text) or ("pomoc piwa" in text)
+
+
+def detect_revisit_intent(latest_user: str) -> bool:
+    text = normalize_space((latest_user or "").lower().replace("_", " "))
+    if not text:
+        return False
+    triggers = [
+        "revisit",
+        "repeat",
+        "again",
+        "show drank beers",
+        "revisit drank beers",
+        "pokaz znowu",
+    ]
+    return any(t in text for t in triggers)
+
+
+def build_help_beers_text() -> str:
+    return "\n".join([
+        "- help beers",
+        "- beer route <route_id> <style> top <count> under <abv>%",
+        "- beer route 3 stout top 5 over 8%",
+        "- piwa what now  (for day plan + map tips)",
+        "- revisit drank beers  (allow previously consumed beers again)",
+    ])
+
+
+def build_day_plan_actions(today_hint: str) -> str:
+    return "\n".join([
+        f"- {today_hint}",
+        "- Start near your closest zone on the interactive map, then move in one direction only.",
+        "- Use a 2+1 rhythm: two beer stops, then one water/food stop.",
+        "- Alternate strong and light beers to reduce palate fatigue.",
+        "- Mark 2 fallback stands nearby in case queues are long.",
+    ])
 
 
 def filter_beers(beers: list[dict], style: str = "", abv_min: float | None = None, abv_max: float | None = None) -> list[dict]:
@@ -305,6 +375,9 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
     consumed = extract_consumed_beers(messages)
     today_hint = build_today_hint()
     route = parse_route_command(latest_user)
+    wants_plan = detect_festival_plan_intent(latest_user)
+    wants_help = detect_help_beers_intent(latest_user)
+    wants_revisit = detect_revisit_intent(latest_user)
     starter = ""
     latest_low = (latest_user or "").lower()
     if "beer" in latest_low or "piwo" in latest_low or "piwa" in latest_low:
@@ -321,7 +394,8 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
             abv_max=route.get("abv_max"),
         )
         filtered = filtered[: route.get("count", 5)]
-    filtered = exclude_consumed(filtered, consumed)
+    if not wants_revisit:
+        filtered = exclude_consumed(filtered, consumed)
 
     match_lines = [
         f"- {b.get('name','')} | brewery: {b.get('brewery','?')} | style: {b.get('style','?')} | abv: {b.get('abv','?')}"
@@ -331,6 +405,9 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
     warning = catalog.get("warning", "")
     route_lines = [f"- Route {key}: {value}" for key, value in ROUTE_IDEAS.items()]
     consumed_lines = [f"- {x}" for x in consumed]
+    route_examples = "\n".join(f"- {x}" for x in ROUTE_EXAMPLES)
+    day_plan_actions = build_day_plan_actions(today_hint)
+    help_beers_text = build_help_beers_text()
 
     return f"""Festival source status: {catalog.get('source', 'unknown')}, updated_at={catalog.get('updated_at', 'unknown')}
 Beer list URL: {catalog.get('beer_list_url', WARSAW_BEER_LIST_URL)}
@@ -347,13 +424,19 @@ Conversation memory:
 
 Starter behavior:
 - {starter}
-- Add variety in tone: use bartender, scientist, donkey detective, and festival guide speaking styles.
-- Handle command 'piwa_what to do' or 'piwa_what_to_do' by giving the day-specific action plan below.
+- Add variety in tone: use festival guide, donkey detective, lab analyzer, fankydog, and friendly/crazy bartender speaking styles.
+- Handle command variants like 'piwa what now', 'piwa_what to do', or 'piwa what to do' by giving the day-specific action plan below.
 - {today_hint}
-- If user says 'help beers', return a short command help with examples.
+- If user says 'help beers' (or similar), return a concise beer-command help with examples.
+- Plan intent detected now: {"yes" if wants_plan else "no"}
+- Help intent detected now: {"yes" if wants_help else "no"}
+- Revisit consumed beers intent detected: {"yes" if wants_revisit else "no"}
+- Help command examples: {", ".join(HELP_BEERS_EXAMPLES)}
 
 Route intelligence:
 {chr(10).join(route_lines)}
+- Route example set:
+{route_examples}
 - Route parse diagnostics: {route.get("debug", "none")}
 - Active route hint: {route.get("route_hint", "none")}
 - Route start/end stops: {route.get("start_stop", "n/a")} -> {route.get("end_stop", "n/a")}
@@ -370,4 +453,10 @@ Ambassadors remembered:
 Map guidance hints:
 - Use the interactive map URL to suggest nearby stands and shorter walking loops.
 - Prefer a route that alternates strong and light beers, and include water/food break hints.
+
+If plan command is detected, return this day-plan template:
+{day_plan_actions}
+
+If help command is detected, return this concise command help:
+{help_beers_text}
 """
