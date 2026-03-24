@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>404DonkeyNotFound Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/admin/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">Admin portal</div>
+      <h1>Manage repos, templates, and editable site files.</h1>
+      <p class="lead">A simpler rebuild that focuses on the workflows you asked for.</p>
+    </div>
+    <nav class="nav-links">
+      <a href="/">Chat workspace</a>
+      <a href="/admin/">Admin portal</a>
+    </nav>
+  </header>
+
+  <main class="layout admin-grid">
+    <section class="panel stack gap-md">
+      <h2>Repository tools</h2>
+      <label>Repository URL
+        <input id="repoUrl" type="text" placeholder="https://github.com/example/repo.git">
+      </label>
+      <label>Local repo name
+        <input id="repoName" type="text" placeholder="example_repo">
+      </label>
+      <div class="actions wrap">
+        <button id="testRepoBtn" class="secondary">Test URL</button>
+        <button id="cloneRepoBtn" class="primary">Clone repo</button>
+        <button id="refreshReposBtn" class="secondary">Refresh repos</button>
+      </div>
+      <label>Available repos
+        <select id="repoList" size="8"></select>
+      </label>
+      <div class="actions wrap">
+        <button id="loadRepoFilesBtn" class="secondary">Load files</button>
+        <button id="pullRepoBtn" class="secondary">Pull repo</button>
+      </div>
+      <label>Repository files
+        <select id="repoFiles" size="12"></select>
+      </label>
+      <div class="actions wrap">
+        <button id="openRepoFileBtn" class="secondary">Open file</button>
+        <button id="saveRepoFileBtn" class="primary">Save file</button>
+      </div>
+      <label>File contents
+        <textarea id="repoContent" rows="14"></textarea>
+      </label>
+      <label>Template name
+        <input id="templateNameInput" type="text" placeholder="zabbix_template_pack">
+      </label>
+      <button id="saveTemplatePackBtn" class="primary">Save template pack from repo</button>
+      <div id="repoStatus" class="status">Ready.</div>
+    </section>
+
+    <section class="panel stack gap-md">
+      <h2>Template library</h2>
+      <div class="actions wrap">
+        <button id="refreshTemplatesBtn" class="secondary">Refresh templates</button>
+        <button id="showTemplateFilesBtn" class="secondary">Show files</button>
+      </div>
+      <label>Saved template packs
+        <select id="templateList" size="8"></select>
+      </label>
+      <pre id="templatePreview" class="code-box"></pre>
+      <h2>Editable site files</h2>
+      <label>Section
+        <select id="sectionSelect">
+          <option value="chat">chat</option>
+          <option value="admin">admin</option>
+          <option value="editable">editable</option>
+        </select>
+      </label>
+      <div class="actions wrap">
+        <button id="loadSiteFilesBtn" class="secondary">Load site files</button>
+        <button id="openSiteFileBtn" class="secondary">Open file</button>
+        <button id="saveSiteFileBtn" class="primary">Save file</button>
+      </div>
+      <label>Site files
+        <select id="siteFiles" size="10"></select>
+      </label>
+      <label>Site file content
+        <textarea id="siteContent" rows="14"></textarea>
+      </label>
+      <div id="siteStatus" class="status">Ready.</div>
+    </section>
+  </main>
+
+  <script src="/admin/app.js"></script>
+</body>
+</html>

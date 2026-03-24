@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>404DonkeyNotFound Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">Local Ollama workspace</div>
+      <h1>Chat, teach, build Zabbix templates, and make pictures.</h1>
+      <p class="lead">A rebuilt single-page chat workspace for your local Ollama stack.</p>
+    </div>
+    <nav class="nav-links">
+      <a href="/">Chat</a>
+      <a href="/admin/">Admin portal</a>
+    </nav>
+  </header>
+
+  <main class="layout two-col">
+    <section class="panel stack gap-md">
+      <div class="panel-header">
+        <h2>Chat with Ollama</h2>
+        <button id="refreshModelsBtn" class="secondary">Refresh models</button>
+      </div>
+      <label>Model
+        <select id="modelSelect"></select>
+      </label>
+      <label>System prompt
+        <textarea id="systemPrompt" rows="4">You are Warsaw Festival Donkey Beer Senior Analyzer. Be funny, ask taste preferences when needed, and suggest the best matching beer from the festival list.</textarea>
+      </label>
+      <label>Ask Ollama
+        <textarea id="chatInput" rows="5" placeholder="Tell the Donkey your mood (hoppy, sour, dark, low ABV...). Try: piwa_what to do"></textarea>
+      </label>
+      <div class="actions">
+        <button id="sendBtn" class="primary">Send</button>
+        <button id="saveChatBtn" class="secondary">Save chat</button>
+        <button id="clearChatBtn" class="secondary">Clear</button>
+      </div>
+      <div id="chatStatus" class="status">Loading…</div>
+      <div id="chatMessages" class="chat-log"></div>
+    </section>
+
+    <section class="panel stack gap-md">
+      <div class="panel-header">
+        <h2>Teach it better</h2>
+        <button id="refreshLearningBtn" class="secondary">Refresh library</button>
+      </div>
+      <label>Learning title
+        <input id="learningTitle" type="text" placeholder="Example: Zabbix template naming rules">
+      </label>
+      <label>Category
+        <input id="learningCategory" type="text" value="zabbix-reference">
+      </label>
+      <label>Tags
+        <input id="learningTags" type="text" placeholder="zabbix, template, trigger, style">
+      </label>
+      <label>Knowledge to save
+        <textarea id="learningContent" rows="8" placeholder="Paste documentation, patterns, examples, notes, runbooks, or prompt-ready guidance."></textarea>
+      </label>
+      <div class="actions wrap">
+        <button id="saveLearningBtn" class="primary">Save learning item</button>
+        <button id="previewLearningBtn" class="secondary">Preview selected</button>
+      </div>
+      <label>Library items
+        <select id="learningList" size="8" multiple></select>
+      </label>
+      <pre id="learningPreview" class="code-box"></pre>
+    </section>
+
+    <section class="panel stack gap-md">
+      <div class="panel-header">
+        <h2>Create pictures</h2>
+      </div>
+      <label>Image prompt
+        <textarea id="imagePrompt" rows="5" placeholder="Create a Zabbix dashboard hero image, architecture diagram concept, or explainer art."></textarea>
+      </label>
+      <div class="grid two-up">
+        <label>Aspect ratio
+          <select id="aspectRatio">
+            <option>16:9</option>
+            <option>4:3</option>
+            <option>1:1</option>
+            <option>9:16</option>
+          </select>
+        </label>
+        <label>Accent color
+          <input id="accentColor" type="text" value="#38bdf8">
+        </label>
+      </div>
+      <div class="actions wrap">
+        <button id="makePreviewBtn" class="primary">Make SVG concept</button>
+        <button id="generateRealBtn" class="secondary">Generate real image</button>
+      </div>
+      <div id="imageStatus" class="status muted">No image generated yet.</div>
+      <img id="imagePreview" class="image-preview hidden" alt="Generated preview">
+      <a id="downloadLink" class="hidden" target="_blank" rel="noopener">Download generated image</a>
+      <pre id="imageMeta" class="code-box"></pre>
+    </section>
+
+    <section class="panel stack gap-md full-width">
+      <div class="panel-header">
+        <h2>Template packs for Zabbix</h2>
+        <button id="refreshTemplatesBtn" class="secondary">Refresh templates</button>
+      </div>
+      <div class="grid two-up">
+        <label>Template name
+          <input id="templateName" type="text" placeholder="zabbix_widget_pack_v1">
+        </label>
+        <label>Source repo
+          <select id="repoSelect"></select>
+        </label>
+      </div>
+      <div class="actions wrap">
+        <button id="saveTemplateBtn" class="primary">Save selected repo as template</button>
+        <button id="loadTemplateFilesBtn" class="secondary">Show template files</button>
+      </div>
+      <div class="grid two-up">
+        <label>Saved templates
+          <select id="templateList" size="8"></select>
+        </label>
+        <label>Template files / preview
+          <pre id="templatePreview" class="code-box tall"></pre>
+        </label>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
