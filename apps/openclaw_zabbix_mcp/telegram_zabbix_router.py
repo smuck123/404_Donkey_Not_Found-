@@ -28,6 +28,22 @@ from fortigate_ai import (
     approve_block_ip,
     approve_site_to_site_vpn,
 )
+from wbf_telegram_commands import (
+    next_beer,
+    recommend,
+    drank,
+    rate,
+    history,
+    set_max_abv,
+    set_location,
+    next_event,
+    events_today,
+    beer_and_event,
+    random_beer,
+    find_beer,
+    find_brewery,
+)
+
 
 
 async def _reply(update: Update, text: str):
@@ -284,6 +300,19 @@ def main():
     validate_config()
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("next_beer", next_beer))
+    app.add_handler(CommandHandler("recommend", recommend))
+    app.add_handler(CommandHandler("drank", drank))
+    app.add_handler(CommandHandler("rate", rate))
+    app.add_handler(CommandHandler("history", history))
+    app.add_handler(CommandHandler("set_max_abv", set_max_abv))
+    app.add_handler(CommandHandler("set_location", set_location))
+    app.add_handler(CommandHandler("next_event", next_event))
+    app.add_handler(CommandHandler("events_today", events_today))
+    app.add_handler(CommandHandler("beer_and_event", beer_and_event))
+    app.add_handler(CommandHandler("random_beer", random_beer))
+    app.add_handler(CommandHandler("find_beer", find_beer))
+    app.add_handler(CommandHandler("find_brewery", find_brewery))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.run_polling()
 
