@@ -28,6 +28,7 @@ DEFAULT_ROUTE_SIZE = 5
 HELP_BEERS_EXAMPLES = [
     "help beers",
     "beer route 2 IPA top 4 under 7%",
+    "hint citrus, low bitterness, funny mood",
     "piwa what now",
     "piwa_what to do",
     "revisit drank beers",
@@ -287,9 +288,28 @@ def detect_revisit_intent(latest_user: str) -> bool:
     return any(t in text for t in triggers)
 
 
+def parse_hint_intent(latest_user: str) -> dict:
+    text = normalize_space(latest_user or "")
+    if not text:
+        return {"active": False, "hint_query": "", "debug": "empty message"}
+    low = text.lower()
+    m = re.search(r"\bhint\b[:\-]?\s*(.*)$", text, flags=re.I)
+    if not m:
+        return {"active": False, "hint_query": "", "debug": "no 'hint' keyword"}
+    hint_query = normalize_space(m.group(1))
+    if not hint_query:
+        hint_query = normalize_space(re.sub(r"\bhint\b", "", low, flags=re.I))
+    return {
+        "active": True,
+        "hint_query": hint_query,
+        "debug": f"hint mode active, query={hint_query or 'none'}",
+    }
+
+
 def build_help_beers_text() -> str:
     return "\n".join([
         "- help beers",
+        "- hint <what you want>  (single beer + funny mini story)",
         "- beer route <route_id> <style> top <count> under <abv>%",
         "- beer route 3 stout top 5 over 8%",
         "- piwa what now  (for day plan + map tips)",
@@ -391,7 +411,10 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
     wants_plan = detect_festival_plan_intent(latest_user)
     wants_help = detect_help_beers_intent(latest_user)
     wants_revisit = detect_revisit_intent(latest_user)
+    hint_intent = parse_hint_intent(latest_user)
     requested_style = extract_requested_style(latest_user)
+    hint_query = hint_intent.get("hint_query", "")
+    effective_query = hint_query or latest_user
     starter = ""
     latest_low = (latest_user or "").lower()
     if normalize_space(latest_low) in {"beer", "piwo", "piwa"}:
@@ -401,7 +424,7 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
     elif not memory["styles"]:
         starter = "If preference is missing, ask a quick preference question before recommending."
 
-    filtered = matched
+    filtered = select_beers_for_query(beers, effective_query, limit=24) if hint_intent.get("active") else matched
     if route.get("active"):
         filtered = filter_beers(
             filtered,
@@ -431,6 +454,10 @@ def build_beer_bot_context(data_root: Path, messages: list[dict], latest_user: s
         f"- {b.get('name','')} | brewery: {b.get('brewery','?')} | style: {b.get('style','?')} | abv: {b.get('abv','?')}"
         for b in style_focus[:8]
     ]
+    hint_focus_lines = [
+        f"- {b.get('name','')} | brewery: {b.get('brewery','?')} | style: {b.get('style','?')} | abv: {b.get('abv','?')}"
+        for b in filtered[:8]
+    ] if hint_intent.get("active") else []
 
     return f"""Festival source status: {catalog.get('source', 'unknown')}, updated_at={catalog.get('updated_at', 'unknown')}
 Beer list URL: {catalog.get('beer_list_url', WARSAW_BEER_LIST_URL)}
@@ -454,8 +481,13 @@ Starter behavior:
 - Plan intent detected now: {"yes" if wants_plan else "no"}
 - Help intent detected now: {"yes" if wants_help else "no"}
 - Revisit consumed beers intent detected: {"yes" if wants_revisit else "no"}
+- Hint intent detected now: {"yes" if hint_intent.get("active") else "no"}
+- Hint parse diagnostics: {hint_intent.get("debug", "none")}
+- Hint query extracted: {hint_query or "none"}
 - Requested style detected from latest message: {requested_style or "none"}
 - Help command examples: {", ".join(HELP_BEERS_EXAMPLES)}
+- If hint intent is active, recommend ONE best beer first and include a funny 2-4 sentence mini story based on the hint text.
+- In hint mode, keep output compact and playful, and end with one optional backup beer.
 
 Route intelligence:
 {chr(10).join(route_lines)}
@@ -473,6 +505,9 @@ Best matches for latest message and filters:
 
 Direct style matches for latest style request (e.g. 'beer want stout'):
 {chr(10).join(style_focus_lines) if style_focus_lines else "- No style-specific matches detected from latest message."}
+
+Hint-mode top candidates:
+{chr(10).join(hint_focus_lines) if hint_focus_lines else "- Hint mode inactive."}
 
 Ambassadors remembered:
 {chr(10).join(ambassador_lines) if ambassador_lines else "- No ambassadors extracted yet."}
