@@ -140,6 +140,128 @@ def dedupe_serving_options(items: List[ServingOption]) -> List[ServingOption]:
     return out
 
 
+def is_obvious_noise(line: str) -> bool:
+    if not line:
+        return True
+    if DISPLAYING_RE.match(line):
+        return True
+    if MORE_INFO_RE.match(line):
+        return True
+    if NO_ITEMS_RE.match(line):
+        return True
+    return False
+
+
+def looks_like_serving(line: str) -> bool:
+    return bool(SERVING_RE.match(line))
+
+
+def looks_like_style_or_beerish_text(line: str) -> bool:
+    if not line:
+        return False
+
+    l = normalize_whitespace(line).lower()
+
+    bad_markers = [
+        " ipa",
+        "stout",
+        "porter",
+        "lager",
+        "pils",
+        "pilsner",
+        "gose",
+        "sour",
+        "wild ale",
+        "historical beer",
+        "wheat beer",
+        "freeze-distilled beer",
+        "mead -",
+        "cider -",
+        "barleywine",
+        "hefeweizen",
+        "new england",
+        "imperial",
+        "smoothie",
+        "abv",
+        "ibu",
+        "rated ",
+    ]
+
+    if any(x in l for x in bad_markers):
+        return True
+
+    if STYLE_LINE_RE.match(LEADING_INDEX_RE.sub("", line)):
+        return True
+
+    return False
+
+
+def looks_like_location_text(line: str) -> bool:
+    if not line:
+        return False
+
+    l = normalize_whitespace(line)
+    low = l.lower()
+
+    location_hints = [
+        ",",
+        "voivodeship",
+        "mazowieck",
+        "małopol",
+        "pomorsk",
+        "warmińsko",
+        "śląsk",
+        "podlask",
+        "lubelsk",
+        "dolnośląsk",
+        "estonia",
+        "latvia",
+        "lithuania",
+        "poland",
+        "germany",
+        "romania",
+        "czech",
+        "fl",
+    ]
+
+    return any(h in low for h in location_hints)
+
+
+def looks_like_brewery_name(line: str) -> bool:
+    if not line:
+        return False
+
+    l = normalize_whitespace(line)
+    low = l.lower()
+
+    if is_obvious_noise(l):
+        return False
+
+    if looks_like_serving(l):
+        return False
+
+    if looks_like_style_or_beerish_text(l):
+        return False
+
+    if len(l) > 80:
+        return False
+
+    if ABV_RE.search(l) or IBU_RE.search(l) or RATING_RE.search(l):
+        return False
+
+    banned_exact = {
+        "unknown brewery",
+        "draft",
+        "bottle",
+        "can",
+        "btl",
+    }
+    if low in banned_exact:
+        return False
+
+    return True
+
+
 def parse_abv_ibu_rating(line: str) -> Dict[str, Any]:
     result: Dict[str, Any] = {
         "abv": None,
@@ -166,32 +288,28 @@ def parse_abv_ibu_rating(line: str) -> Dict[str, Any]:
     cleaned = RATING_RE.sub("", cleaned)
     cleaned = normalize_whitespace(cleaned)
 
-    if cleaned:
-        m = re.match(r"^(?P<brewery>.+?)\s+(?P<location>[^,]+,\s*.+)$", cleaned)
-        if m:
-            result["brewery"] = normalize_whitespace(m.group("brewery"))
-            result["location"] = normalize_whitespace(m.group("location"))
-        else:
-            result["brewery"] = cleaned
+    if not cleaned:
+        return result
+
+    m = re.match(r"^(?P<brewery>.+?)\s+(?P<location>[^,]+,\s*.+)$", cleaned)
+    if m:
+        brewery = normalize_whitespace(m.group("brewery"))
+        location = normalize_whitespace(m.group("location"))
+
+        if looks_like_brewery_name(brewery) and looks_like_location_text(location):
+            result["brewery"] = brewery
+            result["location"] = location
 
     return result
 
 
-def looks_like_serving(line: str) -> bool:
-    return bool(SERVING_RE.match(line))
-
-
 def looks_like_brewery_header(lines: List[str], idx: int) -> bool:
     line = clean_line(lines[idx])
-    if not line:
-        return False
-    if DISPLAYING_RE.match(line) or MORE_INFO_RE.match(line) or looks_like_serving(line):
-        return False
-    if ABV_RE.search(line):
+    if not looks_like_brewery_name(line):
         return False
 
     next_nonempty = None
-    for j in range(idx + 1, min(idx + 5, len(lines))):
+    for j in range(idx + 1, min(idx + 6, len(lines))):
         t = clean_line(lines[j])
         if t:
             next_nonempty = t
@@ -200,10 +318,18 @@ def looks_like_brewery_header(lines: List[str], idx: int) -> bool:
     if next_nonempty is None:
         return False
 
+    next_clean = LEADING_INDEX_RE.sub("", next_nonempty)
+
     if NO_ITEMS_RE.match(next_nonempty):
         return True
 
-    return True
+    if looks_like_style_or_beerish_text(next_clean):
+        return True
+
+    if ABV_RE.search(next_nonempty):
+        return True
+
+    return False
 
 
 def find_style_line(lines: List[str], start_idx: int, max_lookahead: int = 3) -> Optional[int]:
@@ -267,8 +393,12 @@ def parse_beer_block(lines: List[str], start_idx: int, default_brewery: str) -> 
             abv = parsed["abv"]
             ibu = parsed["ibu"]
             rating = parsed["rating"]
-            brewery = parsed["brewery"] or brewery
-            location = parsed["location"]
+
+            if parsed["brewery"]:
+                brewery = parsed["brewery"]
+            if parsed["location"]:
+                location = parsed["location"]
+
             raw_lines.append(info_line)
             i += 1
 
@@ -279,10 +409,9 @@ def parse_beer_block(lines: List[str], start_idx: int, default_brewery: str) -> 
             i += 1
             continue
 
-        if DISPLAYING_RE.match(line):
-            break
-
-        if MORE_INFO_RE.match(line):
+        if is_obvious_noise(line):
+            if DISPLAYING_RE.match(line):
+                break
             i += 1
             continue
 
@@ -347,19 +476,13 @@ def parse_dump(text: str) -> List[Brewery]:
             i += 1
             continue
 
-        if DISPLAYING_RE.match(line):
-            i += 1
-            continue
-
-        if NO_ITEMS_RE.match(line):
+        if is_obvious_noise(line):
             i += 1
             continue
 
         if looks_like_brewery_header(lines, i):
             next_style = find_style_line(lines, i + 1, max_lookahead=2)
             if next_style == i + 1:
-                pass
-            else:
                 brewery_name = line
                 current_brewery = Brewery(brewery=brewery_name)
                 breweries.append(current_brewery)
@@ -371,18 +494,17 @@ def parse_dump(text: str) -> List[Brewery]:
                     if not peek:
                         i += 1
                         continue
-                    if NO_ITEMS_RE.match(peek):
+                    if is_obvious_noise(peek):
                         i += 1
                         break
                     style_pos = find_style_line(lines, i, max_lookahead=2)
                     if style_pos is not None:
                         break
-                    if DISPLAYING_RE.match(peek):
-                        i += 1
-                        break
                     if looks_like_serving(peek):
                         break
                     if ABV_RE.search(peek):
+                        break
+                    if looks_like_style_or_beerish_text(peek):
                         break
                     note_parts.append(peek)
                     i += 1

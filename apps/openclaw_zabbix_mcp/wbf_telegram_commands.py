@@ -1,8 +1,6 @@
-import random
-
 from telegram import Update
 from telegram.ext import ContextTypes
-
+import random
 from wbf_assistant import (
     WarsawBeerFestivalAssistant,
     format_beer,
@@ -14,7 +12,6 @@ assistant = WarsawBeerFestivalAssistant()
 
 def _args(context: ContextTypes.DEFAULT_TYPE) -> str:
     return " ".join(context.args or []).strip()
-
 
 def build_hint_reply(chat_id: int, hint_query: str) -> str:
     assistant.ensure_data_loaded()
@@ -52,6 +49,8 @@ def build_hint_reply(chat_id: int, hint_query: str) -> str:
         )
 
     return "\n".join(lines)
+
+
 
 
 def _parse_fun_beer_filters(query: str) -> dict:
@@ -193,11 +192,11 @@ async def next_beer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     await update.message.reply_text(format_beer(beer))
 
-
 async def hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = _args(context)
     reply = build_hint_reply(update.effective_chat.id, query)
     await update.message.reply_text(reply)
+
 
 
 async def recommend(update: Update, context: ContextTypes.DEFAULT_TYPE):

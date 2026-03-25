@@ -377,7 +377,7 @@ class WBFRepository:
             br.id,
             br.name,
             COUNT(DISTINCT b.id) AS beers,
-            MIN(CASE WHEN s.price_pln IS NOT NULL THEN s.price_pln END) AS cheapest_beer_pln
+            MIN(CASE WHEN s.price_pln IS NOT NULL AND s.price_pln > 0 THEN s.price_pln END) AS cheapest_beer_pln
         FROM breweries br
         LEFT JOIN beers b ON b.brewery_id = br.id
         LEFT JOIN serving_options s ON s.beer_id = b.id
