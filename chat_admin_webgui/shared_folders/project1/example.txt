@@ -1,2 +1,0 @@
-This is an example project folder for Ollama file access.
-You can ask the admin portal to read or improve files in this folder.

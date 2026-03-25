@@ -1,0 +1,4381 @@
+[
+  {
+    "name": "Galeon Marszałka",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Freeze-Distilled Beer",
+    "abv": 16.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "wymrażany imperialny porter bałtycki z cynamonem i skórkami pomarańczy nawiązujący do ulubionego deseru Marszałka Piłsudskiego - sucharów marszałka! freeze-distilled imperial baltic porter with orange peels & cinnamon"
+  },
+  {
+    "name": "Galeon Umami",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Freeze-Distilled Beer",
+    "abv": 16.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "freeze-distilled imperial baltic porter with shiitake mushrooms & cocoa nibs wymrażany imperialny porter bałtycki z grzybami shitake i z ziarnami kakaowca"czech this out
+
+  },
+  {
+    "name": "Lodowiec",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Freeze-Distilled Beer",
+    "abv": 16.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Freeze-Distilled Chocolate & Coffee imperial stout. WFP special."
+  },
+  {
+    "name": "Esencja 2026 WFP Special",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Stout - Imperial",
+    "abv": 13.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "dried lime imperial stout imperialny stout z dodatkiem czarnej limonki!"
+  },
+  {
+    "name": "Przetwór #3 WFP Special",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Freeze-Distilled Beer",
+    "abv": 9.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "freeze-distilled black IPA with cocoa nibs & tonka"
+  },
+  {
+    "name": "Przekład #10 Z Amburaną",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Old Ale",
+    "abv": 8.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Old Ale with amburana (collab Kuli - Birbant)"
+  },
+  {
+    "name": "Stopień #2",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "IPA - American",
+    "abv": 6.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Citra & Mosaic west coast IPA"
+  },
+  {
+    "name": "Przetwór #4",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "IPA - New England",
+    "abv": 6.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Riwaka & Hydra hazy IPA. Soczyste, mętne, turbo owocowe IPA."
+  },
+  {
+    "name": "Harfa 2026",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Stout - Irish Dry",
+    "abv": 4.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Irish dry stout NITRO"
+  },
+  {
+    "name": "Kotwica 2026",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Porter - Baltic",
+    "abv": 8.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Bierz W Ciemno!",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Sour - Fruited Gose",
+    "abv": 5.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Calamansi, coffee & vanilla Gose collab Ola & Michał. Very special beer made for Warsaw Beer Festival!"
+  },
+  {
+    "name": "Odpowiedź #2",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Sour - Fruited",
+    "abv": 4.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Słodko-kwaśne, mega pijalne. Sour ale inspirowany wiśniowym piwem, z tonką."
+  },
+  {
+    "name": "Double Cherry Odpowiedź #2",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Sour - Fruited",
+    "abv": 5.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "cherry coke style sour ale with tonka, extra cherries & kola nuts. WFP special!"
+  },
+  {
+    "name": "Złoto Przetwórni #2",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Pilsner - German",
+    "abv": 4.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Klasyczny niemiecki pils. Jasny, klarowny, goryczkowy, lekki, orzeźwiający."
+  },
+  {
+    "name": "Czeski Sen",
+    "brewery": "Przetwórnia Chmielu",
+    "style": "Lager - Světlé (Czech Pale)",
+    "abv": 5.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "světlý speciál - czeska 13-tka, warzona na czeskim słodzie klepiskowym, chmielona Saazem"
+  },
+{
+    "name": "Iced Pastry Master Elderberry & Bird Cherry (Melon Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Iced Sorry Grigory (Banana And Coconut Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Iced Sorry Grigory (Dried Sweet Cherries Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Iced Hey Alexei (Chilli Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": 18.4,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Iced Boris Is Boris (Bison Grass Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Iced Herr Axolotl With Raspberries (Basil & Maple Syrup Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": 17.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Iced Imperial Smoky Joe (Jackfruit Wood Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Iced Undeath Lord (Red Pepper Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Son of the Son",
+    "brewery": "AleBrowar",
+    "style": "IPA - New England",
+    "abv": 5.7,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "New England DDH DIPA Citra + Galaxy",
+    "brewery": "AleBrowar",
+    "style": "IPA - Imperial",
+    "abv": 7.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Aksamitna struktura, stosunkowo niska goryczka i potężny aromat uzyskany dzięki podwójnemu chmieleniu na zimno. Smooth structure, relatively low bitterness and powerful aroma obtained thanks to double dry hopping."
+  },
+  {
+    "name": "El Fruto",
+    "brewery": "AleBrowar",
+    "style": "IPA - Imperial",
+    "abv": 8.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Hazy Juicy Mango Double IPA"
+  },
+  {
+    "name": "Juicy Sour: Mango & White Guava & Lime",
+    "brewery": "AleBrowar",
+    "style": "Sour - Fruited",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Rowing Jack",
+    "brewery": "AleBrowar",
+    "style": "IPA - American",
+    "abv": 6.2,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "70 IBU"
+  },
+  {
+    "name": "West Coast Pilsner",
+    "brewery": "AleBrowar",
+    "style": "Pilsner - American",
+    "abv": 5.3,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Desitka",
+    "brewery": "AleBrowar",
+    "style": "Pilsner - Czech",
+    "abv": 4.3,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Helles",
+    "brewery": "AleBrowar",
+    "style": "Lager - Helles",
+    "abv": 5.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Piwo Jopejskie Rum & Mead Barrel Age (Smoked Mackerel Special Edition)",
+    "brewery": "AleBrowar",
+    "style": "Historical Beer - Other",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Piwo Jopejskie Rum & Mead Barrel Age",
+    "brewery": "AleBrowar",
+    "style": "Historical Beer - Other",
+    "abv": 9.4,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Piwo Jopejskie (Jopen) aged 22 months in Rum & Mead Barrel"
+  },
+  {
+    "name": "Iced Piwo Jopejskie",
+    "brewery": "AleBrowar",
+    "style": "Freeze-Distilled Beer",
+    "abv": 18.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+
+  {
+    "name": "Baltic Way Mead",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Traditional",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Colaboration project with Noosker Meadery, Estonia"
+  },
+  {
+    "name": "MMC Champion 2023 Dereniak",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Melomel",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Buckwheat honey with dogwood berry."
+  },
+  {
+    "name": "Trójniak Augustowski Późny",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Traditional",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Półsłodki Augustowski Późny."
+  },
+  {
+    "name": "Trójniak Augustowski Wczesny",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Traditional",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Półsłodki Augustowski Wczesny."
+  },
+  {
+    "name": "Augustowski Barrel Aged",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Traditional",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Aged 6 months in fresh Hungarian oak barrels."
+  },
+  {
+    "name": "Jabłko Na Miodzie",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Cyser",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Cyser made with fresh apple juice."
+  },
+  {
+    "name": "Trójniak Augustowski Wczesny Kawowy",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Other",
+    "abv": 13.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Coffee mead macerated on speciality coffee."
+  },
+  {
+    "name": "Półtorak",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Traditional",
+    "abv": 15.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Dense and sweet Polish style mead."
+  },
+  {
+    "name": "Trójniak Kawowy 2019 4yo",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Other",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Aged coffee mead from 2019."
+  },
+  {
+    "name": "Miód Kwarciany",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Metheglin",
+    "abv": 10.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Podlaska Szeptucha",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Metheglin",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Herbal spicy metheglin."
+  },
+  {
+    "name": "Pieprzna Wiśnia Na Miodzie",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Melomel",
+    "abv": 12.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Cherry mead with black pepper and candied ginger."
+  },
+  {
+    "name": "Metsavana",
+    "brewery": "Nöösker",
+    "style": "Mead - Metheglin",
+    "abv": 14.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Metheglin-style mead with pine tips."
+  },
+  {
+    "name": "Berryland Revenge Rhubarb Mead",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Session",
+    "abv": 7.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Sour and refreshing rhubarb session mead."
+  },
+  {
+    "name": "Zbicień Leśny",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Session",
+    "abv": 8.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Session mead with hops, pine twigs and juniper."
+  },
+  {
+    "name": "Zbicień Chmielowy",
+    "brewery": "Augustowska Miodosytnia",
+    "style": "Mead - Session",
+    "abv": 5.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Sweet session mead with honey and hops."
+  },
+
+  {
+    "name": "Morty Suprim",
+    "brewery": "Browar Birbant",
+    "style": "IPA - Session",
+    "abv": 5.4,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Session IPA (Hyperboost Sabro, Hyperboost Idaho 7, Nelson Sauvin, Citra, Simcoe, Mosaic, Columbus)"
+  },
+  {
+    "name": "Klasyczny Pils",
+    "brewery": "Browar Birbant",
+    "style": "Pilsner - Other",
+    "abv": 5.1,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "25 IBU"
+  },
+  {
+    "name": "F.D.W.",
+    "brewery": "Browar Birbant",
+    "style": "Sour - Smoothie",
+    "abv": 5.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Pastry Sour Ale with Gooseberry, Cactus & Lime"
+  },
+  {
+    "name": "TURBO",
+    "brewery": "Browar Birbant",
+    "style": "Sour - Smoothie",
+    "abv": 5.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Pastry Sour Ale with Gooseberry, Guava & Kiwi"
+  },
+  {
+    "name": "Twisted Hops",
+    "brewery": "Browar Birbant",
+    "style": "IPA - Imperial",
+    "abv": 8.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Ultra-Hopped New Zealand Double West Coast IPA"
+  },
+  {
+    "name": "Mordziaty",
+    "brewery": "Browar Birbant",
+    "style": "IPA - Imperial",
+    "abv": 7.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Double Hazy IPA Superdelic & Mosaic & Citra"
+  },
+  {
+    "name": "TURBO% II",
+    "brewery": "Browar Birbant",
+    "style": "Non-Alcoholic - Sour",
+    "abv": 0.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Non-Alcoholic Sour Ale with Gooseberry, Guava & Kiwi"
+  },
+  {
+    "name": "HERO% Hazy IPA",
+    "brewery": "Browar Birbant",
+    "style": "Non-Alcoholic - IPA",
+    "abv": 0.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Non-Alcoholic Hazy IPA (Sabro, Citra, Cascade)"
+  },
+  {
+    "name": "TURBO% Redblast",
+    "brewery": "Browar Birbant",
+    "style": "Non-Alcoholic - Sour",
+    "abv": 0.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Non-Alcoholic Sour Ale with Red Currant, White Guava & Kiwi"
+  },
+  {
+    "name": "Luminar",
+    "brewery": "Browar Birbant",
+    "style": "IPA - Imperial",
+    "abv": 8.4,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "19 IBU. Boosted Double Hazy IPA."
+  },
+  {
+    "name": "True Blue",
+    "brewery": "Browar Birbant",
+    "style": "IPA - Australian",
+    "abv": 7.2,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Aussie West Coast IPA"
+  },
+  {
+    "name": "Smasher",
+    "brewery": "Browar Birbant",
+    "style": "IPA - New England",
+    "abv": 5.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Hexter",
+    "brewery": "Browar Birbant",
+    "style": "IPA - American",
+    "abv": 7.3,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "West Coast IPA Simcoe, Mosaic, Hyperboost Sabro, Columbus"
+  },
+  {
+    "name": "Hawkins Hops",
+    "brewery": "Browar Birbant",
+    "style": "IPA - Imperial",
+    "abv": 8.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "200 IBU"
+  },
+
+  {
+    "name": "Bezalkoholowe Fruit Ale Mango & Marakuja",
+    "brewery": "BROFAKTURA",
+    "style": "Non-Alcoholic - Fruit Beer",
+    "abv": null,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Bezalkoholowe IPA",
+    "brewery": "BROFAKTURA",
+    "style": "Non-Alcoholic - IPA",
+    "abv": 0.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Osmička",
+    "brewery": "BROFAKTURA",
+    "style": "Lager - Světlé (Czech Pale)",
+    "abv": 3.2,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "24 IBU"
+  },
+  {
+    "name": "Coffee Double Foreign Extra Stout",
+    "brewery": "BROFAKTURA",
+    "style": "Stout - Imperial",
+    "abv": 10.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "35 IBU"
+  },
+  {
+    "name": "ÆGIR ÖL",
+    "brewery": "BROFAKTURA",
+    "style": "Porter - Imperial",
+    "abv": 10.2,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "75 IBU"
+  },
+  {
+    "name": "Cherrywood Smoked",
+    "brewery": "BROFAKTURA",
+    "style": "Porter - Imperial",
+    "abv": 11.2,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "60 IBU. Wędzony imperialny porter bałtycki."
+  },
+  {
+    "name": "Imperial Stout",
+    "brewery": "BROFAKTURA",
+    "style": "Stout - Imperial",
+    "abv": 12.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "80 IBU"
+  },
+  {
+    "name": "Lodowy Sad",
+    "brewery": "BROFAKTURA",
+    "style": "Barleywine - Other",
+    "abv": 11.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "30 IBU. Barley Wine with freeze-concentrated apple juice."
+  },
+  {
+    "name": "RANDALL WFP21 Coffee Double FES Z Kokosem, łuską Kakowacą I Wanilią",
+    "brewery": "BROFAKTURA",
+    "style": "Stout - Foreign",
+    "abv": 10.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "35 IBU. Coffee double foreign extra stout with coconut, cacao nibs and vanilla."
+  },
+  {
+    "name": "JUST ONE MORE, BRO!",
+    "brewery": "BROFAKTURA",
+    "style": "IPA - Session",
+    "abv": 3.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "60 IBU"
+  },
+  {
+    "name": "Expect No Mercy",
+    "brewery": "BROFAKTURA",
+    "style": "IPA - Session",
+    "abv": 5.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "120 IBU"
+  },
+  {
+    "name": "Oops! All Tropics",
+    "brewery": "BROFAKTURA",
+    "style": "IPA - Session New England",
+    "abv": 4.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "20 IBU"
+  },
+  {
+    "name": "STRAIGHT OUTTA LUBLIN",
+    "brewery": "BROFAKTURA",
+    "style": "IPA - New England",
+    "abv": 6.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "30 IBU"
+  },
+  {
+    "name": "All Eyes On Me",
+    "brewery": "BROFAKTURA",
+    "style": "IPA - American",
+    "abv": 6.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "105 IBU"
+  },
+  {
+    "name": "OPERATION HOP DROP",
+    "brewery": "BROFAKTURA",
+    "style": "Pilsner - American",
+    "abv": 5.4,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "75 IBU"
+  },
+  {
+    "name": "HOPPY GRODZISZ '26 TOMYSKI & PŁ-01",
+    "brewery": "BROFAKTURA",
+    "style": "Historical Beer - Grodziskie",
+    "abv": 3.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "40 IBU"
+  },
+  {
+    "name": "Rhine Pils",
+    "brewery": "BROFAKTURA",
+    "style": "Pilsner - German",
+    "abv": 4.9,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "46 IBU"
+  },
+
+  {
+    "name": "Wolfgang",
+    "brewery": "Browar Brokreacja",
+    "style": "Märzen",
+    "abv": 5.8,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Modern Märzen."
+  },
+  {
+    "name": "BRO HERO: JERRY",
+    "brewery": "Browar Brokreacja",
+    "style": "Porter - Other",
+    "abv": 5.9,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Brown Porter with coffee, cocoa, vanilla and oak flakes."
+  },
+  {
+    "name": "Under Pressure",
+    "brewery": "Browar Brokreacja",
+    "style": "IPA - New England",
+    "abv": 5.8,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Pressure Foggy IPA"
+  },
+  {
+    "name": "Polaron Prime",
+    "brewery": "Browar Brokreacja",
+    "style": "IPA - Imperial",
+    "abv": 8.8,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Thiolized Double Polish Foggy IPA"
+  },
+  {
+    "name": "Thornbloom",
+    "brewery": "Browar Brokreacja",
+    "style": "Sour - Fruited Gose",
+    "abv": 6.8,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Raspberry Lavender Gose"
+  },
+  {
+    "name": "BRO HERO: SZYMAN",
+    "brewery": "Browar Brokreacja",
+    "style": "IPA - Sour",
+    "abv": 6.9,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Sour IPA"
+  },
+  {
+    "name": "BRO HERO: SZYMAN - WILD TRAMINER GRAPES MUST RED WINE BARREL AGED",
+    "brewery": "Browar Brokreacja",
+    "style": "Wild Ale - Other",
+    "abv": 6.9,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Wild & Sour IPA aged in Red Wine Barrels with Traminer Grapes"
+  },
+  {
+    "name": "Nafciarz Mead & Laphroaig Barrel Aged",
+    "brewery": "Browar Brokreacja",
+    "style": "Porter - Smoked",
+    "abv": 8.1,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Mead & Laphroaig Barrel Aged"
+  }  ,
+  {
+    "name": "Samiec Alfa 2024",
+    "brewery": "Browar Artezan",
+    "style": "Stout - Imperial",
+    "abv": 13.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Imperial stout bourbon barrel aged."
+  },
+  {
+    "name": "Preparat (2016)",
+    "brewery": "Browar Artezan",
+    "style": "Barleywine - English",
+    "abv": 9.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Château (2017)",
+    "brewery": "Browar Artezan",
+    "style": "Sour - Other",
+    "abv": 7.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Red Wine Barrel Aged Sour Red Ale"
+  },
+  {
+    "name": "Château (2013)",
+    "brewery": "Browar Artezan",
+    "style": "Sour - Other",
+    "abv": 7.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Second Batch Sour Red Ale"
+  },
+  {
+    "name": "Château Cuvée 2021",
+    "brewery": "Browar Artezan",
+    "style": "Sour - Other",
+    "abv": 9.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Jardin Du Chateau Pêche",
+    "brewery": "Browar Artezan",
+    "style": "Wild Ale - Other",
+    "abv": 7.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Wild sour ale barrel aged with peaches"
+  },
+  {
+    "name": "Jardin Du Chateau Fraise",
+    "brewery": "Browar Artezan",
+    "style": "Wild Ale - Other",
+    "abv": 7.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Wild sour ale barrel aged with strawberries and rhubarb"
+  },
+  {
+    "name": "Jardin Du Chateau Druif",
+    "brewery": "Browar Artezan",
+    "style": "Wild Ale - Other",
+    "abv": 7.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Wild sour ale barrel aged with grapes"
+  },
+  {
+    "name": "Samiec Alfa 2023 Social Vanilla",
+    "brewery": "Browar Artezan",
+    "style": "Stout - Russian Imperial",
+    "abv": 13.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Imperial stout with vanilla from Uganda"
+  },
+  {
+    "name": "Samiec Alfa 2026: Salted Chocolate & Oysters",
+    "brewery": "Browar Artezan",
+    "style": "Stout - Oyster",
+    "abv": 13.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Imperial stout with oysters, cacao and salt"
+  },
+  {
+    "name": "Too Young To Be Herod 2025",
+    "brewery": "Browar Artezan",
+    "style": "Stout - Other",
+    "abv": 8.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Christmas stout with honey, almonds and vanilla"
+  },
+  {
+    "name": "Backlog: Cześć Bogdan!",
+    "brewery": "Browar Artezan",
+    "style": "IPA - Rye",
+    "abv": 7.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Rye IPA with Simcoe, Citra, Amarillo, Centennial"
+  },
+  {
+    "name": "Squeeze: Berry Twist",
+    "brewery": "Browar Artezan",
+    "style": "Sour - Berliner Weisse",
+    "abv": 4.3,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Berry and blackcurrant sour"
+  },
+  {
+    "name": "Double Mera IPA",
+    "brewery": "Browar Artezan",
+    "style": "IPA - Imperial",
+    "abv": 8.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Double IPA with Simcoe and Amarillo"
+  },
+  {
+    "name": "Atlantic",
+    "brewery": "Browar Artezan",
+    "style": "IPA - New England",
+    "abv": 6.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Hazy IPA with Citra and Strata"
+  },
+  {
+    "name": "Fair Enough",
+    "brewery": "Browar Artezan",
+    "style": "IPA - New Zealand",
+    "abv": 7.9,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Double hazy IPA with NZ hops"
+  },
+  {
+    "name": "DDH Pacific",
+    "brewery": "Browar Artezan",
+    "style": "Pale Ale - New Zealand",
+    "abv": 5.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "DDH pale ale with Citra and Nelson Sauvin"
+  },
+  {
+    "name": "Fafik (2025)",
+    "brewery": "Browar Artezan",
+    "style": "Historical Beer - Grodziskie",
+    "abv": 3.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "To Je Jedno",
+    "brewery": "Browar Artezan",
+    "style": "Pilsner - Czech",
+    "abv": 5.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+
+  {
+    "name": "Powrót Alchemika",
+    "brewery": "Browar Bałtów",
+    "style": "Red Ale - Irish",
+    "abv": 6.3,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Off Road Bezalkoholowe Tropical Ale",
+    "brewery": "Browar Bałtów",
+    "style": "Non-Alcoholic - Pale Ale",
+    "abv": 0.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Off Road IPA Bezalkoholowe",
+    "brewery": "Browar Bałtów",
+    "style": "Non-Alcoholic - IPA",
+    "abv": 0.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Płomienne Zorze",
+    "brewery": "Browar Bałtów",
+    "style": "IPA - New England",
+    "abv": 5.6,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Wilczy Trop",
+    "brewery": "Browar Bałtów",
+    "style": "Stout - Oatmeal",
+    "abv": 5.1,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Pieśń Pszczoły",
+    "brewery": "Browar Bałtów",
+    "style": "Honey Beer",
+    "abv": 4.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Zmiana Warty",
+    "brewery": "Browar Bałtów",
+    "style": "Pale Ale - American",
+    "abv": 4.9,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Tajemnica Wiedźmy",
+    "brewery": "Browar Bałtów",
+    "style": "Wheat Beer - Hefeweizen",
+    "abv": 5.2,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Serce Smoka",
+    "brewery": "Browar Bałtów",
+    "style": "Pilsner - Other",
+    "abv": 4.9,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Czarcia Stopka",
+    "brewery": "Browar Bałtów",
+    "style": "Lager - Dortmunder",
+    "abv": 5.4,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+
+  {
+    "name": "Superluminal Observer",
+    "brewery": "Browar Bednary",
+    "style": "Belgian Quadrupel",
+    "abv": 10.0,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Blend of barrel-aged beers"
+  },
+  {
+    "name": "Ale Ciacho!",
+    "brewery": "Browar Bednary",
+    "style": "Spiced",
+    "abv": 6.2,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": "Spiced beer with ginger, cinnamon, cloves"
+  },
+  {
+    "name": "Swojskie",
+    "brewery": "Browar Bednary",
+    "style": "Lager - Vienna",
+    "abv": 4.3,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+  {
+    "name": "Origami Crane Bezalkoholowe",
+    "brewery": "Browar Bednary",
+    "style": "Non-Alcoholic - IPA",
+    "abv": 0.5,
+    "zone": "",
+    "stand": "",
+    "source_url": "manual",
+    "description": ""
+  },
+{
+  "name": "ALIEN'S MILK 1",
+  "brewery": "Browar Green Head",
+  "style": "Sour - Smoothie",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Dragonfruit & condensed milk pastry sour"
+},
+{
+  "name": "SPECIMEN 001",
+  "brewery": "Browar Green Head",
+  "style": "IPA - American",
+  "abv": 6.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "West Coast IPA, dry, bitter, clear"
+},
+{
+  "name": "Xeno Gambit",
+  "brewery": "Browar Green Head",
+  "style": "Wheat Beer - Witbier",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Award-winning witbier recipe"
+},
+{
+  "name": "Abyss",
+  "brewery": "Browar Green Head",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 3.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Modern grodziskie with Polish hops ABIS"
+},
+{
+  "name": "WFP #20 Chocolate Cream Stout",
+  "brewery": "Browar Green Head",
+  "style": "Stout - Pastry",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Creamy chocolate stout"
+},
+{
+  "name": "I'M GREEN",
+  "brewery": "Browar Green Head",
+  "style": "Sour - Smoothie",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Choco Comet",
+  "brewery": "Browar Green Head",
+  "style": "Stout - Imperial",
+  "abv": 10.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial stout with cocoa"
+},
+{
+  "name": "SIRIUS",
+  "brewery": "Browar Green Head",
+  "style": "Porter - Imperial",
+  "abv": 10.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Peated Baltic porter aged 9 months"
+},
+{
+  "name": "BLOWN",
+  "brewery": "Browar Green Head",
+  "style": "IPA - New England",
+  "abv": 5.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Citra, Nectaron, Superdelic hazy IPA"
+},
+
+{
+  "name": "Grodziskie Rouge De Fumée",
+  "brewery": "Browar Kazimierz",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 3.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Spontaneous fermentation in red wine barrel"
+},
+{
+  "name": "AleDŹWIEDŹ",
+  "brewery": "Browar Kazimierz",
+  "style": "IPA - Black",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Black IPA"
+},
+{
+  "name": "Latający Jeleń ICE",
+  "brewery": "Browar Kazimierz",
+  "style": "Freeze-Distilled Beer",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Freeze distilled imperial baltic porter"
+},
+{
+  "name": "JINX",
+  "brewery": "Acid Joe",
+  "style": "Wild Ale - Other",
+  "abv": 5.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wild sour ale"
+},
+{
+  "name": "Babcia Rózia",
+  "brewery": "Browar Kazimierz",
+  "style": "Fruit Beer",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Peach and rose fruit beer"
+},
+{
+  "name": "DataPro",
+  "brewery": "Browar Kazimierz",
+  "style": "IPA - New England",
+  "abv": 5.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazy IPA"
+},
+{
+  "name": "Flying Cloud",
+  "brewery": "Browar Kazimierz",
+  "style": "Porter - American",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+
+{
+  "name": "Mizunami",
+  "brewery": "Browar Kingpin",
+  "style": "Sour - Gose",
+  "abv": 4.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Gose aged 3 years in Riesling barrels with seaweed"
+},
+{
+  "name": "Shinkai",
+  "brewery": "Browar Kingpin",
+  "style": "Sour - Gose",
+  "abv": 4.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Gose aged with kombu kelp"
+},
+{
+  "name": "Risonanza",
+  "brewery": "Browar Kingpin",
+  "style": "Farmhouse Ale - Saison",
+  "abv": 6.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Barrel-aged saison with bergamot"
+},
+{
+  "name": "Gravita",
+  "brewery": "Browar Kingpin",
+  "style": "Farmhouse Ale - Saison",
+  "abv": 6.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Saison with galangal and hojicha"
+},
+{
+  "name": "Serenata",
+  "brewery": "Browar Kingpin",
+  "style": "Grape Ale",
+  "abv": 6.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Saison aged in Riesling barrels with grape pomace"
+},
+{
+  "name": "Split Screen",
+  "brewery": "Browar Kingpin",
+  "style": "IPA - Cold",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Cold IPA, clean and hoppy"
+},
+{
+  "name": "Daydream",
+  "brewery": "Browar Kingpin",
+  "style": "Pale Ale - New England",
+  "abv": 5.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Juicy hazy APA"
+},
+{
+  "name": "Comfy",
+  "brewery": "Browar Kingpin",
+  "style": "IPA - New England",
+  "abv": 6.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Juicy hazy IPA"
+},
+
+{
+  "name": "Unicorn Farts 2026",
+  "brewery": "Browar Monsters",
+  "style": "Sour - Fruited",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mango Killer",
+  "brewery": "Browar Monsters",
+  "style": "Sour - Smoothie",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Mango, orange, vanilla smoothie sour"
+},
+{
+  "name": "Pucker Up!",
+  "brewery": "Browar Monsters",
+  "style": "Sour - Other",
+  "abv": 5.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Not Enough Mana",
+  "brewery": "Browar Monsters",
+  "style": "IPA - New England",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "TDH hazy IPA"
+},
+{
+  "name": "Aroma Spots",
+  "brewery": "Browar Stu Mostów",
+  "style": "IPA - New England",
+  "abv": 6.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Light IPA with citrus, pineapple and gooseberry"
+},
+{
+  "name": "FRESH DELIVERY | NEIPA NELSON BLISS HOP KIEF",
+  "brewery": "Browar Stu Mostów",
+  "style": "IPA - New England",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Juicy experimental NEIPA"
+},
+{
+  "name": "BGM 2026 Local Bond",
+  "brewery": "Browar Stu Mostów",
+  "style": "IPA - Sour",
+  "abv": 4.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hybrid IPA and fruited sour with mandarin and banana"
+},
+{
+  "name": "BGM 2026 Sunlit Path",
+  "brewery": "Browar Stu Mostów",
+  "style": "IPA - Australian",
+  "abv": 6.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Festival NEIPA with HPA 033 and Galaxy"
+},
+{
+  "name": "BGM 2026 Sweet Venture",
+  "brewery": "Browar Stu Mostów",
+  "style": "Sour - Smoothie",
+  "abv": 6.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Pastry sour with creamsicle character and pecans"
+},
+{
+  "name": "XI Anniversary | Imperial Stout",
+  "brewery": "Browar Stu Mostów",
+  "style": "Stout - Imperial",
+  "abv": 12.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "11th anniversary release"
+},
+{
+  "name": "WILD | Table Beer | Peach + Blueberry + Cherry |",
+  "brewery": "Browar Stu Mostów",
+  "style": "Wild Ale - Other",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wild beer with second-use peaches, blueberries and cherries"
+},
+{
+  "name": "Carrot Fever",
+  "brewery": "Browar Stu Mostów",
+  "style": "Sour - Smoothie",
+  "abv": 4.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Pastry sour with carrot, mango, citrus and eggnog notes"
+},
+{
+  "name": "Mystic Sangria",
+  "brewery": "Browar Stu Mostów",
+  "style": "Sour - Fruited Gose",
+  "abv": 4.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Gose with apples, oranges, grapes, mint and cinnamon"
+},
+{
+  "name": "Jopejskie Cinamon | Vanilla",
+  "brewery": "Browar Stu Mostów",
+  "style": "Historical Beer - Other",
+  "abv": 9.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Jopejskie aged in red wine barrels with cinnamon and vanilla"
+},
+{
+  "name": "Orange Espresso Sour",
+  "brewery": "Browar Stu Mostów",
+  "style": "Sour - Other",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Orange juice and coffee sour"
+},
+{
+  "name": "WRCLW Bezalkoholowy",
+  "brewery": "WRCLW",
+  "style": "Non-Alcoholic - IPA",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Alcohol-free IPA with Sabro, Citra and Cascade"
+},
+{
+  "name": "Wild | Apricot & Palo Santo |",
+  "brewery": "Browar Stu Mostów",
+  "style": "Wild Ale - Other",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Three-year saison with apricot and palo santo"
+},
+{
+  "name": "Wild | Raspberry & Blackberry & Blueberry |",
+  "brewery": "Browar Stu Mostów",
+  "style": "Wild Ale - Other",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wild fruit beer with raspberry, blackberry and blueberry"
+},
+{
+  "name": "X Anniversary 3/10 WILD#29",
+  "brewery": "Browar Stu Mostów",
+  "style": "Wild Ale - Other",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Pine wild ale"
+},
+
+{
+  "name": "BezalkØ Pan IPAni",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Non-Alcoholic - IPA",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Alcohol-free version of Pan IPAni"
+},
+{
+  "name": "Pan IPAni",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "IPA - White",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wheat IPA with Citra, Mosaic and Amarillo"
+},
+{
+  "name": "OLD SCHOOL - Classic English IPA",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "IPA - English",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Classic English IPA with Challenger, EKG and Fuggles"
+},
+{
+  "name": "NEW SCHOOL - Hazy English IPA",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "IPA - New England",
+  "abv": 5.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazy English IPA with Harlequin, Olicana and Godiva"
+},
+{
+  "name": "Our New IPA Needs No Introduction - Triple New England IPA",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "IPA - Triple New England",
+  "abv": 7.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Triple NEIPA with Galaxy, Talus and Dolcita"
+},
+{
+  "name": "Lager Trzech Kumpli",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Lager - Pale",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Craft pale lager"
+},
+{
+  "name": "Witbier Trzech Kumpli",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Wheat Beer - Witbier",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Classic witbier with orange peel and coriander"
+},
+{
+  "name": "Gose z mango i marakują",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Sour - Fruited Gose",
+  "abv": 4.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Gose with mango and passionfruit"
+},
+{
+  "name": "Nitro Wheat Cocoa Stout",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Stout - Other",
+  "abv": 6.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Nitro cocoa wheat stout"
+},
+{
+  "name": "Piwo w Stylu Grodziskie",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 2.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Traditional Polish grodziskie"
+},
+{
+  "name": "Porter Bałtycki Żytnio-Orkiszowy",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Porter - Baltic",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Baltic porter with rye and spelt"
+},
+{
+  "name": "WFP WIOSNA 2026 - Imperial Stout + Raisins, Chocolate & Date Syrup",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Stout - Imperial",
+  "abv": 10.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial stout with raisins, chocolate and date syrup"
+},
+{
+  "name": "Igrok",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Stout - Russian Imperial",
+  "abv": 10.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Bourbon barrel aged RIS"
+},
+{
+  "name": "Ivar",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Porter - Imperial",
+  "abv": 10.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Peated whisky barrel aged imperial baltic porter"
+},
+{
+  "name": "Floki",
+  "brewery": "Browar Trzech Kumpli",
+  "style": "Porter - Imperial",
+  "abv": 10.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Bourbon barrel aged imperial baltic porter"
+},
+
+{
+  "name": "Czeski Lager",
+  "brewery": "Browar Warszawski",
+  "style": "Lager - Světlé (Czech Pale)",
+  "abv": 4.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Grodziskie",
+  "brewery": "Browar Warszawski",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 3.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Milkshake IPA",
+  "brewery": "Browar Warszawski",
+  "style": "IPA - Milkshake",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Helles",
+  "brewery": "Browar Warszawski",
+  "style": "Lager - Helles",
+  "abv": 4.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Onlyfans Phantasm Juicy IPA",
+  "brewery": "Browar Warszawski",
+  "style": "IPA - New England",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Pszeniczne",
+  "brewery": "Browar Warszawski",
+  "style": "Wheat Beer - Hefeweizen",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "The Unit",
+  "brewery": "Browar Warszawski",
+  "style": "IPA - New England",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Marcowe",
+  "brewery": "Browar Warszawski",
+  "style": "Märzen",
+  "abv": 5.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+
+{
+  "name": "Węglarz Ze Śliwką",
+  "brewery": "Browar Wąsowo",
+  "style": "Stout - Foreign",
+  "abv": 7.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Stout with smoked and dried plums"
+},
+{
+  "name": "Utopiec",
+  "brewery": "Browar Wąsowo",
+  "style": "IPA - American",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "West Coast IPA"
+},
+{
+  "name": "Rewolucjonistka",
+  "brewery": "Browar Wąsowo",
+  "style": "Farmhouse Ale - Saison",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Rustic saison"
+},
+{
+  "name": "Południca",
+  "brewery": "Browar Wąsowo",
+  "style": "IPA - New England",
+  "abv": 6.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Creamy NEIPA with tropical fruit"
+},
+{
+  "name": "Leszy",
+  "brewery": "Browar Wąsowo",
+  "style": "Bock - Weizenbock",
+  "abv": 7.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wheat bock"
+},
+{
+  "name": "Kowal",
+  "brewery": "Browar Wąsowo",
+  "style": "Pilsner - German",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Kikimora",
+  "brewery": "Browar Wąsowo",
+  "style": "IPA - Black",
+  "abv": 6.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Black IPA"
+},
+{
+  "name": "Grodzisznik",
+  "brewery": "Browar Wąsowo",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 3.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Polish grodziskie"
+},
+{
+  "name": "Dżentelmen",
+  "brewery": "Browar Wąsowo",
+  "style": "Bitter - Best",
+  "abv": 4.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Classic English best bitter"
+},
+{
+  "name": "Ćmok",
+  "brewery": "Browar Wąsowo",
+  "style": "IPA - Session New England",
+  "abv": 5.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazy session IPA"
+},
+{
+  "name": "Chmielarz",
+  "brewery": "Browar Wąsowo",
+  "style": "IPA - American",
+  "abv": 6.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "American IPA"
+},
+{
+  "name": "Bies",
+  "brewery": "Browar Wąsowo",
+  "style": "Porter - Baltic",
+  "abv": 7.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Baltic porter"
+},
+
+{
+  "name": "Winobranie 2025",
+  "brewery": "Browar Zakładowy",
+  "style": "Grape Ale - Other",
+  "abv": 9.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial sour ale with white grapes"
+},
+{
+  "name": "Siadaj, Opowiadaj",
+  "brewery": "Browar Zakładowy",
+  "style": "IPA - American",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Cold brew coffee West Coast IPA"
+},
+{
+  "name": "Zachcianka",
+  "brewery": "Browar Zakładowy",
+  "style": "Sour - Fruited Gose",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Gose with strawberries and cherries"
+},
+{
+  "name": "Bestia z Poniatowej",
+  "brewery": "Browar Zakładowy",
+  "style": "Stout - Imperial",
+  "abv": 13.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial stout with coconut and vanilla"
+},
+{
+  "name": "Pytasz Dzika",
+  "brewery": "Browar Zakładowy",
+  "style": "IPA - Imperial",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Oat Cream Double IPA"
+},
+{
+  "name": "Sokowirówka z żurawinami i malinami",
+  "brewery": "Browar Zakładowy",
+  "style": "Sour - Fruited",
+  "abv": 4.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Sour ale with cranberries and raspberries"
+},
+{
+  "name": "Przejdźmy Na Pan",
+  "brewery": "Browar Zakładowy",
+  "style": "IPA - Imperial",
+  "abv": 9.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Double West Coast IPA"
+},
+{
+  "name": "Poszło Z Dymem",
+  "brewery": "Browar Zakładowy",
+  "style": "Stout - Smoked",
+  "abv": 12.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial Heavy Smoked Stout"
+},
+
+{
+  "name": "Chlebicek",
+  "brewery": "Funky Fluid",
+  "style": "Pilsner - Czech",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Czech pils with Saaz"
+},
+{
+  "name": "PIWS2KO",
+  "brewery": "Funky Fluid",
+  "style": "Non-Alcoholic - Pale Ale",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Alcohol-free hazy APA"
+},
+{
+  "name": "Florida Vibes: Grove",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Fruited",
+  "abv": 7.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Fruited sour with dragonfruit and passionfruit"
+},
+{
+  "name": "Gelato: Peach Limoncello",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Smoothie",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Gelato sour with lemon and peach"
+},
+{
+  "name": "Gelato: Banana & Raspberry Coconut Smoothie",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Smoothie",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Banana, raspberry, coconut"
+},
+{
+  "name": "Gelato: Banana & Peach Pudding",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Smoothie",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Banana, peach, vanilla"
+},
+{
+  "name": "Whirl",
+  "brewery": "Funky Fluid",
+  "style": "IPA - Sour",
+  "abv": 6.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Sour IPA"
+},
+{
+  "name": "Let It Happen",
+  "brewery": "Funky Fluid",
+  "style": "IPA - New England",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "NEIPA with Enigma, Vic Secret and Galaxy"
+},
+{
+  "name": "Wet Hop: Krush",
+  "brewery": "Funky Fluid",
+  "style": "IPA - New England",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "NEIPA with Krush"
+},
+{
+  "name": "Ambrosia 7.0",
+  "brewery": "Funky Fluid",
+  "style": "IPA - New England",
+  "abv": 6.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "NEIPA with Citra, Krush and Nelson Sauvin"
+},
+{
+  "name": "Gelato XTREME: Berries & Cream",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Smoothie",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Raspberry, blackcurrant, blueberry, marshmallow, vanilla"
+},
+{
+  "name": "Royal Cookie: Maple Coffee",
+  "brewery": "Funky Fluid",
+  "style": "Stout - Imperial",
+  "abv": 12.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Dessert stout with coffee and maple syrup"
+},
+{
+  "name": "Barrel Aged Royal Cookie Coconut Brownie",
+  "brewery": "Funky Fluid",
+  "style": "Stout - Imperial",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Bourbon barrel aged imperial stout with cocoa and coconut"
+},
+{
+  "name": "Maple Coffee Reserva",
+  "brewery": "Funky Fluid",
+  "style": "Stout - Imperial",
+  "abv": 14.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Bourbon barrel aged imperial stout with maple and coffee"
+},
+{
+  "name": "Framboos",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Flanders Red Ale",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Barrel aged sour with raspberries"
+},
+{
+  "name": "Free Gelato: Passion Fruit, Mango & Peach",
+  "brewery": "Funky Fluid",
+  "style": "Non-Alcoholic - Sour",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Alcohol-free gelato sour"
+},
+{
+  "name": "Free Freaky",
+  "brewery": "Funky Fluid",
+  "style": "Non-Alcoholic - IPA",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Alcohol-free New England IPA"
+},
+{
+  "name": "Gelato XTREME: HYDRA",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Smoothie",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Mango, pineapple, white guava, toasted coconut"
+},
+{
+  "name": "Gelato XTREME: Mango Sticky Rice",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Smoothie",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Mango sticky rice smoothie sour"
+},
+{
+  "name": "Gelato: Notte",
+  "brewery": "Funky Fluid",
+  "style": "Sour - Smoothie",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Blueberry, blackberry, blackcurrant, marshmallow"
+},
+{
+  "name": "Ghostface (The Juicyville S01E03)",
+  "brewery": "Funky Fluid",
+  "style": "IPA - Triple New England",
+  "abv": 9.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "DDH Triple NEIPA"
+},
+{
+  "name": "Éire Go Deo",
+  "brewery": "Funky Fluid",
+  "style": "Red Ale - Irish",
+  "abv": 6.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Nitro Irish red ale"
+},
+{
+  "name": "Jedno Prosim",
+  "brewery": "Funky Fluid",
+  "style": "Lager - Světlé (Czech Pale)",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Czech-style lager"
+},
+{
+  "name": "Experymentatorium: Żoliborski Impotent Espresso Meksyk/Brazylia",
+  "brewery": "Harpagan Craft Beer",
+  "style": "IPA - Other",
+  "abv": 3.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Buzdygan Rozkoszy 2026",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Stout - Imperial",
+  "abv": 9.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Experymentatorium: Rozedrgany Epikurejczyk",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Stout - Imperial",
+  "abv": 9.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Blackcurrant Cheesecake Imperial Stout"
+},
+{
+  "name": "Experymentatorium: Pizza Driver Chorizo Edition",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Spiced",
+  "abv": 6.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Lubieżnie Po Bandzie 2026",
+  "brewery": "Harpagan Craft Beer",
+  "style": "IPA - American",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Specyał Agronoma",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 3.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "West Coast Grodziskie with cucumber"
+},
+{
+  "name": "Big Balls 2026",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Sour - Other Gose",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "HRR: Children of the Haze",
+  "brewery": "Harpagan Craft Beer",
+  "style": "IPA - New England",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazy IPA with tropical fruit and citrus"
+},
+{
+  "name": "Imbryczek Destrukcji new",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Wheat Beer - American Pale Wheat",
+  "abv": 5.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "American wheat with Lady Grey tea and lemongrass"
+},
+{
+  "name": "Mizianie Mamuta new",
+  "brewery": "Harpagan Craft Beer",
+  "style": "IPA - American",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Gods of Bartenders",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Bitter - Best",
+  "abv": 4.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Modern bitter"
+},
+{
+  "name": "HRR: Salve Tenebris",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Schwarzbier",
+  "abv": 4.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Dark lager"
+},
+{
+  "name": "HRR: Czarny Wierszalin",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Stout - Other",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Dark stout with chipotle"
+},
+{
+  "name": "HRR: Banita",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Pilsner - Other",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hoppy pils"
+},
+{
+  "name": "HRR: Pandora",
+  "brewery": "Harpagan Craft Beer",
+  "style": "IPA - Cold",
+  "abv": 6.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Cold IPA with Motueka, Riwaka and Iunga"
+},
+{
+  "name": "Leżaczek Ukojenia 2026",
+  "brewery": "Harpagan Craft Beer",
+  "style": "Pale Ale - Fruited",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+
+{
+  "name": "Freestyler",
+  "brewery": "Hopkultura",
+  "style": "Non-Alcoholic - IPA",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Disappear",
+  "brewery": "Hopkultura",
+  "style": "IPA - Australian",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Back in Black - Amburana",
+  "brewery": "Hopkultura",
+  "style": "Porter - Imperial",
+  "abv": 9.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial Baltic Porter with amburana"
+},
+{
+  "name": "Czeski Metal",
+  "brewery": "Hopkultura",
+  "style": "Pilsner - Czech",
+  "abv": 5.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Seasons In the Abyss",
+  "brewery": "Hopkultura",
+  "style": "Stout - Russian Imperial",
+  "abv": 10.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Salted caramel and tonka"
+},
+{
+  "name": "American Idiot",
+  "brewery": "Hopkultura",
+  "style": "IPA - Imperial",
+  "abv": 7.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Toxicity",
+  "brewery": "Hopkultura",
+  "style": "IPA - Cold",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "CTZ, Citra, Talus, Sabro, El Dorado"
+},
+{
+  "name": "Hey Joe",
+  "brewery": "Hopkultura",
+  "style": "Sour - Fruited",
+  "abv": 6.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Pineapple, passion fruit, peach"
+},
+{
+  "name": "Insane In the Brain",
+  "brewery": "Hopkultura",
+  "style": "Pilsner - New Zealand",
+  "abv": 4.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Columbus, Riwaka, Motueka, Nelson Sauvin"
+},
+{
+  "name": "Disasterpiece",
+  "brewery": "Hopkultura",
+  "style": "Stout - Russian Imperial",
+  "abv": 9.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazelnut"
+},
+{
+  "name": "Butterfly",
+  "brewery": "Hopkultura",
+  "style": "IPA - New England",
+  "abv": 5.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Sabro Cryo, Mosaic, Cascade"
+},
+
+{
+  "name": "Cookie Monster Ice Destilated",
+  "brewery": "Inne Beczki",
+  "style": "Freeze-Distilled Beer",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Chocolate Oatmeal Ice Milk Stout"
+},
+{
+  "name": "Mango Jerry Ice Destilated",
+  "brewery": "Inne Beczki",
+  "style": "Freeze-Distilled Beer",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Mango & Lime Ice Weizen"
+},
+{
+  "name": "Pils Fiction",
+  "brewery": "Inne Beczki",
+  "style": "Pilsner - Other",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hoppy pils"
+},
+{
+  "name": "Live Long And Burn Slow",
+  "brewery": "Inne Beczki",
+  "style": "IPA - New England",
+  "abv": 5.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazy IPA with Columbus, Citra, Mosaic, Simcoe"
+},
+{
+  "name": "Don't Shoot",
+  "brewery": "Inne Beczki",
+  "style": "IPA - American",
+  "abv": 5.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Modern West Coast IPA"
+},
+{
+  "name": "Aurora",
+  "brewery": "Inne Beczki",
+  "style": "IPA - Other",
+  "abv": 5.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Northern IPA"
+},
+{
+  "name": "Five Oranges",
+  "brewery": "Inne Beczki",
+  "style": "Wheat Beer - Witbier",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Witbier with five orange peels"
+},
+{
+  "name": "Grodziska 15",
+  "brewery": "Inne Beczki",
+  "style": "Non-Alcoholic - Other",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Alcohol-free grodziskie"
+},
+{
+  "name": "NoLo Hula",
+  "brewery": "Inne Beczki",
+  "style": "Non-Alcoholic - IPA",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Alcohol-free hazy IPA"
+},
+{
+  "name": "Win Win",
+  "brewery": "Inne Beczki",
+  "style": "Lager - Pale",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Great Wheat",
+  "brewery": "Inne Beczki",
+  "style": "Wheat Beer - Hefeweizen",
+  "abv": 5.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Take Ten",
+  "brewery": "Inne Beczki",
+  "style": "Pilsner - Czech",
+  "abv": 4.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Czech lager"
+},
+{
+  "name": "No Rush",
+  "brewery": "Inne Beczki",
+  "style": "IPA - American",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Cherry Elephant",
+  "brewery": "Inne Beczki",
+  "style": "Fruit Beer",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Beer with cherries"
+},
+{
+  "name": "Jungle IPA",
+  "brewery": "Inne Beczki",
+  "style": "IPA - American",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+
+{
+  "name": "Iced I'm Not Pastry Cooocooonut",
+  "brewery": "Lubrow Brewery",
+  "style": "Freeze-Distilled Beer",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Freeze-distilled imperial stout infused with coconut flakes"
+},
+{
+  "name": "Chmielewski",
+  "brewery": "Lubrow Brewery",
+  "style": "Pilsner - Other",
+  "abv": 4.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Polish pils"
+},
+{
+  "name": "Extra Special Bitter",
+  "brewery": "Lubrow Brewery",
+  "style": "Bitter - Extra Special",
+  "abv": 5.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Polska Gurom 5.0",
+  "brewery": "Lubrow Brewery",
+  "style": "IPA - Other",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Polish Foggy IPA"
+},
+{
+  "name": "Koźlak Grodziski",
+  "brewery": "Lubrow Brewery",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 5.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Grodziskie and bock hybrid"
+},
+{
+  "name": "Keto West Coast IPA",
+  "brewery": "Lubrow Brewery",
+  "style": "IPA - American",
+  "abv": 5.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Low carb and gluten free West Coast IPA"
+},
+{
+  "name": "IPA PA PARA PO!",
+  "brewery": "Lubrow Brewery",
+  "style": "IPA - New England",
+  "abv": 5.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Spontaan Grodziskie",
+  "brewery": "Lubrow Brett & Barrel",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 3.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "100% spontaneous fermentation grodziskie aged in oak barrels"
+},
+{
+  "name": "Dobre, Takie Nie Za Słodkie 26'",
+  "brewery": "Lubrow Brewery",
+  "style": "Sour - Other",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Sour with passion fruit and coffee"
+},
+{
+  "name": "Gerlach 2655",
+  "brewery": "Lubrow Brewery",
+  "style": "Stout - Imperial",
+  "abv": 11.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Classic Imperial Stout"
+},
+{
+  "name": "Hop Feast.THREE",
+  "brewery": "Lubrow Brewery",
+  "style": "IPA - Imperial",
+  "abv": 10.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Triple Black IPA"
+},
+{
+  "name": "Imperial I'm Not Pastry Orange Espresso",
+  "brewery": "Lubrow Brewery",
+  "style": "Stout - Imperial",
+  "abv": 11.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial stout with coffee and orange peel"
+},
+{
+  "name": "Imperial I'm Not Pastry Milk Oolong & Tonka",
+  "brewery": "Lubrow Brewery",
+  "style": "Stout - Imperial",
+  "abv": 11.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial stout with milk oolong, tonka and sea salt"
+},
+
+{
+  "name": "Magiczna Ścieżka Kaina Vol8",
+  "brewery": "Magic Road",
+  "style": "Freeze-Distilled Beer",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Piece of Cake",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "BARKA",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Peachy",
+  "brewery": "Magic Road",
+  "style": "Fruit Beer",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Cold Tomato",
+  "brewery": "Magic Road",
+  "style": "Sour - Tomato",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Nectar",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Double Trouble",
+  "brewery": "Magic Road",
+  "style": "Sour - Fruited",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Black & White",
+  "brewery": "Magic Road",
+  "style": "Stout - Imperial",
+  "abv": 11.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Stary Darka Śniadaniowy",
+  "brewery": "Magic Road",
+  "style": "Stout - Milk",
+  "abv": 11.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Milky Way",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Plum Pie",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Session From Raszyn",
+  "brewery": "Magic Road",
+  "style": "IPA - Session",
+  "abv": 4.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Citra single hop"
+},
+{
+  "name": "Pretty Green - Kiwi, Banana & Spirulina",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Wonders - Passionfruit, Banana & Coconut Milk",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Pretty - Tangerine, Calamansi & Vanilla",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Fifty Fifty - Clementine & Passionfruit",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 4.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Tomato Deluxe",
+  "brewery": "Magic Road",
+  "style": "Sour - Tomato",
+  "abv": 3.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Tomatoes, lovage, herbal pepper and sea salt"
+},
+{
+  "name": "Beauty Extreme - Carrot, Pienapple, Calamansi & Ginger",
+  "brewery": "Magic Road",
+  "style": "Sour - Smoothie",
+  "abv": 4.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Only Darkness Every Day",
+  "brewery": "Magic Road",
+  "style": "Stout - Imperial",
+  "abv": 11.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Dream BIG",
+  "brewery": "Magic Road",
+  "style": "Mead - Braggot",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Tarnina, cocoa, coffee, vanilla, buckwheat honey"
+},
+{
+  "name": "Pastry Hammer 2.0",
+  "brewery": "Magic Road",
+  "style": "Mead - Other",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Cherry, aronia, smoked plums"
+},
+{
+  "name": "Flamboyant",
+  "brewery": "Magic Road",
+  "style": "Stout - Imperial",
+  "abv": 10.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Pastry stout with Jamaica Blue Mountain coffee and maple syrup"
+},
+{
+  "name": "Clint",
+  "brewery": "Magic Road",
+  "style": "IPA - Imperial",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Double West Coast IPA Nelson Sauvin & Galaxy"
+},
+{
+  "name": "Yeah Bunny",
+  "brewery": "Magic Road",
+  "style": "IPA - American",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Kocia, Kocia, Łapci",
+  "brewery": "Magic Road",
+  "style": "IPA - Cold",
+  "abv": 5.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Zula, Amora Preta, Izabella"
+},
+{
+  "name": "Fancy",
+  "brewery": "Magic Road",
+  "style": "Fruit Beer",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Orange, pineapple, banana, calamansi, coconut"
+},
+
+{
+  "name": "Mazurskie KayakLemon",
+  "brewery": "Mazurski Browar",
+  "style": "Non-Alcoholic - Fruit Beer",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie Saison \"Summer\"",
+  "brewery": "Mazurski Browar",
+  "style": "Farmhouse Ale - Saison",
+  "abv": 4.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Saison with hibiscus and mint"
+},
+{
+  "name": "Mazurskie Saison \"Spring\"",
+  "brewery": "Mazurski Browar",
+  "style": "Farmhouse Ale - Saison",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Saison with jasmine flower"
+},
+{
+  "name": "Mazurskie Saison WINTER",
+  "brewery": "Mazurski Browar",
+  "style": "Farmhouse Ale - Saison",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Winter saison with orange peel, anise and cloves"
+},
+{
+  "name": "Mazurskie Pils HEMPOWY",
+  "brewery": "Mazurski Browar",
+  "style": "Pilsner - Other",
+  "abv": 4.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Pils with hemp"
+},
+{
+  "name": "Mazurskie Witbier",
+  "brewery": "Mazurski Browar",
+  "style": "Wheat Beer - Witbier",
+  "abv": 4.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie India Pale Ale",
+  "brewery": "Mazurski Browar",
+  "style": "IPA - American",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie Lager Ciemny",
+  "brewery": "Mazurski Browar",
+  "style": "Lager - Munich Dunkel",
+  "abv": 5.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie Pszeniczne",
+  "brewery": "Mazurski Browar",
+  "style": "Wheat Beer - Hefeweizen",
+  "abv": 5.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie FarmhouseAle z Pędami Sosny",
+  "brewery": "Mazurski Browar",
+  "style": "Farmhouse Ale - Other",
+  "abv": 5.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Farmhouse ale with pine shoots"
+},
+{
+  "name": "Mazurskie Pils_Akwen",
+  "brewery": "Mazurski Browar",
+  "style": "Pilsner - German",
+  "abv": 4.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "New Zealand Session IPA",
+  "brewery": "Mazurski Browar",
+  "style": "IPA - New Zealand",
+  "abv": 5.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Motueka and Riwaka"
+},
+{
+  "name": "Mazurskie Polish Session IPA",
+  "brewery": "Mazurski Browar",
+  "style": "IPA - Session",
+  "abv": 3.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Kayak Hoppy Wheat",
+  "brewery": "Mazurski Browar",
+  "style": "Non-Alcoholic - Wheat",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie Lager Jasny",
+  "brewery": "Mazurski Browar",
+  "style": "Pilsner - Czech",
+  "abv": 5.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie Saison\"Autumn\"",
+  "brewery": "Mazurski Browar",
+  "style": "Farmhouse Ale - Saison",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Autumn saison with lemon peel and ginger"
+},
+{
+  "name": "Mazurskie Porter/EXPRESS",
+  "brewery": "Mazurski Browar",
+  "style": "Porter - Baltic",
+  "abv": 9.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie Ale Czerwony",
+  "brewery": "Mazurski Browar",
+  "style": "Red Ale - American Amber",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Mazurskie SmokedWeizen",
+  "brewery": "Mazurski Browar",
+  "style": "Smoked Beer",
+  "abv": 5.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Smoked wheat beer"
+},
+{
+  "name": "Mazurskie Imperial_OatmealStout",
+  "brewery": "Mazurski Browar",
+  "style": "Stout - Imperial",
+  "abv": 8.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial oatmeal stout"
+},
+
+{
+  "name": "Bitter",
+  "brewery": "Miejski Browar Stargard",
+  "style": "Bitter - Best",
+  "abv": 4.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "British bitter"
+},
+{
+  "name": "Black IPA",
+  "brewery": "Miejski Browar Stargard",
+  "style": "IPA - Black",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Black IPA"
+},
+{
+  "name": "Stout",
+  "brewery": "Miejski Browar Stargard",
+  "style": "Stout - English",
+  "abv": 4.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "English stout"
+},
+{
+  "name": "Pils",
+  "brewery": "Miejski Browar Stargard",
+  "style": "Pilsner - German",
+  "abv": 4.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Pszeniczne",
+  "brewery": "Miejski Browar Stargard",
+  "style": "Wheat Beer - Hefeweizen",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Bezalkoholowe Tea Ale",
+  "brewery": "Miejski Browar Stargard",
+  "style": "Non-Alcoholic - Other",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Alcohol-free tea ale with Citrus Mango green tea"
+},
+{
+  "name": "POLISH WHEAT Z ZIELONĄ HERBATĄ",
+  "brewery": "Miejski Browar Stargard",
+  "style": "Wheat Beer - Other",
+  "abv": 5.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Polish wheat with green tea"
+},
+{
+  "name": "Lager",
+  "brewery": "Miejski Browar Stargard",
+  "style": "Lager - Helles",
+  "abv": 4.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+
+{
+  "name": "Delicja",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Other",
+  "abv": 13.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Trójniak with coffee and orange peel"
+},
+{
+  "name": "Dwójniak Panieński",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Traditional",
+  "abv": 16.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Dwójniak Powidzki",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Other",
+  "abv": 16.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Dwójniak Malinowy",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Melomel",
+  "abv": 16.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Raspberry mead"
+},
+{
+  "name": "966",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Other",
+  "abv": 14.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Spiced trójniak"
+},
+{
+  "name": "Agrest",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Melomel",
+  "abv": 13.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Czarna Porzeczka",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Melomel",
+  "abv": 14.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Blackcurrant trójniak"
+},
+{
+  "name": "Hycka",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Other",
+  "abv": 13.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Dzikie Pszczoły",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Traditional",
+  "abv": 13.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Trójniak sycony"
+},
+{
+  "name": "Dwójniak Tadeusz",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Traditional",
+  "abv": 16.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Traditional dwójniak aged in Polish oak and tempranillo barrels"
+},
+{
+  "name": "Dwójniak Zofia wiśniowy",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Melomel",
+  "abv": 16.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Cherry dwójniak"
+},
+{
+  "name": "Półtorak Kazimierz",
+  "brewery": "Miodosytnia Imbiorowicz",
+  "style": "Mead - Traditional",
+  "abv": 16.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Traditional półtorak aged in Polish oak"
+},
+
+{
+  "name": "Słodycz Łąki",
+  "brewery": "Miodosytnia Piwowar",
+  "style": "Mead - Metheglin",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Barrel-aged metheglin"
+},
+{
+  "name": "Amicum Proba",
+  "brewery": "Miodosytnia Piwowar",
+  "style": "Mead - Other",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Trójniak with lime and ginger"
+},
+{
+  "name": "Jańczyk",
+  "brewery": "Miodosytnia Piwowar",
+  "style": "Mead - Melomel",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Fruit trójniak with hibiscus"
+},
+{
+  "name": "Smoked Apple (Jabczak Trojniak)",
+  "brewery": "Miodosytnia Piwowar",
+  "style": "Mead - Traditional",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Apple trójniak with smoked apples"
+},
+{
+  "name": "Spicy Marek",
+  "brewery": "Miodosytnia Piwowar",
+  "style": "Mead - Other",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Fruit trójniak with cherry and chipotle"
+},
+{
+  "name": "Miód Pitny Porzeczkowiec",
+  "brewery": "Miodosytnia Piwowar",
+  "style": "Mead - Melomel",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Blackcurrant trójniak"
+},
+
+{
+  "name": "Po Prostu Ambrozja",
+  "brewery": "Moczybroda",
+  "style": "Non-Alcoholic - Sour",
+  "abv": 0.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Frankie Say Relax",
+  "brewery": "Moczybroda",
+  "style": "Porter - Baltic",
+  "abv": 8.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Autobahn Zu Hell",
+  "brewery": "Moczybroda",
+  "style": "Lager - Helles",
+  "abv": 5.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Czech This Out",
+  "brewery": "Moczybroda",
+  "style": "Lager - Polotmavé (Czech Amber)",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Jack Mangow",
+  "brewery": "Moczybroda",
+  "style": "IPA - Imperial",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Indiport",
+  "brewery": "Moczybroda",
+  "style": "Porter - Other",
+  "abv": 6.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Siemano Z Bergamo",
+  "brewery": "Moczybroda",
+  "style": "Lager - Other",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Lager with bergamot"
+},
+
+{
+  "name": "Český Ležák",
+  "brewery": "Nepo Brewing",
+  "style": "Lager - Světlé (Czech Pale)",
+  "abv": 4.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Czech style lager"
+},
+{
+  "name": "Douglas Lager",
+  "brewery": "Nepo Brewing",
+  "style": "Lager - Other",
+  "abv": 4.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Rauchzeste",
+  "brewery": "Nepo Brewing",
+  "style": "Historical Beer - Lichtenhainer",
+  "abv": 4.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Lichtenhainer with orange and smoked dried fruits"
+},
+{
+  "name": "Bitter Life",
+  "brewery": "Nepo Brewing",
+  "style": "IPA - Other",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Modern West Coast IPA with Nelson Sauvin and Simcoe"
+},
+{
+  "name": "West Rider",
+  "brewery": "Nepo Brewing",
+  "style": "IPA - Other",
+  "abv": 6.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Modern West Coast IPA with Motueka, El Dorado and Chinook"
+},
+{
+  "name": "Blast",
+  "brewery": "Nepo Brewing",
+  "style": "IPA - Imperial",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Ultra hazy DDH IPA"
+},
+{
+  "name": "Ultrasphere",
+  "brewery": "Nepo Brewing",
+  "style": "IPA - Other",
+  "abv": 6.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Ultra hazy TDH IPA"
+},
+{
+  "name": "Bet",
+  "brewery": "Nepo Brewing",
+  "style": "IPA - New England",
+  "abv": 6.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "DDH NEIPA"
+},
+{
+  "name": "Blueberry Cream",
+  "brewery": "Nepo Brewing",
+  "style": "Sour - Smoothie",
+  "abv": 6.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Blueberry, banana, cherry, coconut milk"
+},
+{
+  "name": "Mango Sticky Rice Special One-off WFP",
+  "brewery": "Nepo Brewing",
+  "style": "Sour - Smoothie",
+  "abv": 6.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Mango and coconut milk"
+},
+{
+  "name": "Fruit Fondue",
+  "brewery": "Nepo Brewing",
+  "style": "Sour - Smoothie",
+  "abv": 5.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Strawberry, banana, grapes, dark chocolate"
+},
+{
+  "name": "Smoothie Bowl: Peach Raspberry Melba",
+  "brewery": "Nepo Brewing",
+  "style": "Sour - Fruited",
+  "abv": 5.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Peach, raspberry, lychee, white chocolate"
+},
+{
+  "name": "Opium Cake",
+  "brewery": "Nepo Brewing",
+  "style": "Stout - Imperial",
+  "abv": 12.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Poppy seeds, figs, maple syrup"
+},
+{
+  "name": "Clara",
+  "brewery": "Nepo Brewing",
+  "style": "Lager - Other",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Mexican lager with lime and sea salt"
+},
+{
+  "name": "Black Grodzisz",
+  "brewery": "Nepo Brewing",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 3.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Grodziskie with blackcurrant"
+},
+{
+  "name": "Hyper Grodzisz",
+  "brewery": "Nepo Brewing",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 3.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Grodziskie with Hyperboost"
+},
+{
+  "name": "Gold Series: Chaos",
+  "brewery": "Nepo Brewing",
+  "style": "IPA - New England",
+  "abv": 6.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Ultra hazy DDH IPA"
+},
+{
+  "name": "Crazy Lines Series : Alpha Strike",
+  "brewery": "Nepo Brewing",
+  "style": "IPA - New England",
+  "abv": 6.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Smoothie Bowl - Golden Glow",
+  "brewery": "Nepo Brewing",
+  "style": "Sour - Smoothie",
+  "abv": 6.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Mango and sea buckthorn"
+},
+{
+  "name": "ECHO the 10th Edition",
+  "brewery": "Nepo Brewing",
+  "style": "Porter - Imperial",
+  "abv": 10.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "D-Tonacja 10th Edition",
+  "brewery": "Nepo Brewing",
+  "style": "Stout - Imperial",
+  "abv": 10.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Baltic Porter",
+  "brewery": "Nepo Brewing",
+  "style": "Porter - Baltic",
+  "abv": 8.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Classic Baltic porter"
+},
+{
+  "name": "Double Citrus Twist Forest",
+  "brewery": "Nepo Brewing",
+  "style": "IPA - Other",
+  "abv": 7.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Double Forest Hazy IPA with orange juice"
+},
+
+{
+  "name": "Best Line Player",
+  "brewery": "Palatum",
+  "style": "Bitter - Best",
+  "abv": 4.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Modern bitter"
+},
+{
+  "name": "Dizzy Monastery",
+  "brewery": "Palatum",
+  "style": "Pale Ale - Belgian",
+  "abv": 5.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Default IPA",
+  "brewery": "Palatum",
+  "style": "IPA - New England",
+  "abv": 6.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Default NEIPA"
+},
+{
+  "name": "Wild Graff",
+  "brewery": "Palatum",
+  "style": "Cider - Graff",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Brett graff"
+},
+{
+  "name": "Na Rondzie Wiatraczna",
+  "brewery": "Palatum",
+  "style": "IPA - New England",
+  "abv": 5.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Midwest IPA"
+},
+{
+  "name": "ICED Mongrel",
+  "brewery": "Palatum",
+  "style": "Freeze-Distilled Beer",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Blend of iced beers"
+},
+{
+  "name": "Fruity Frank ICED",
+  "brewery": "Palatum",
+  "style": "Freeze-Distilled Beer",
+  "abv": 10.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Iced Fruity Frank"
+},
+{
+  "name": "Espresso Double Stout (Indonesia Sumatra Mandheling)",
+  "brewery": "Palatum",
+  "style": "Stout - Imperial",
+  "abv": 8.4,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Double stout with Indonesia coffee"
+},
+{
+  "name": "Chąśnik",
+  "brewery": "Palatum",
+  "style": "Porter - Imperial",
+  "abv": 9.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial Baltic porter"
+},
+{
+  "name": "Relax & Have a Passion Fruit",
+  "brewery": "Palatum",
+  "style": "Sour - Fruited",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Juicy sour with passion fruit and salt"
+},
+{
+  "name": "Goldenus",
+  "brewery": "Palatum",
+  "style": "Belgian Blonde",
+  "abv": 5.8,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Driffting Horse",
+  "brewery": "Palatum",
+  "style": "IPA - Belgian",
+  "abv": 7.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Belgian IPA with Riwaka and Motueka"
+},
+
+{
+  "name": "Hopzz_ Edge",
+  "brewery": "PINTA",
+  "style": "IPA - Triple New England",
+  "abv": 10.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Triple hazy IPA with NZH-106"
+},
+{
+  "name": "Hopzz_ Midway",
+  "brewery": "PINTA",
+  "style": "IPA - Imperial",
+  "abv": 8.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazy DIPA with Peacharine"
+},
+{
+  "name": "Discovery Europe: France",
+  "brewery": "PINTA",
+  "style": "IPA - New England",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazy IPA"
+},
+{
+  "name": "Discovery Europe: Finland",
+  "brewery": "PINTA",
+  "style": "IPA - New England",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Hazy IPA"
+},
+{
+  "name": "Belgian Abbey Single",
+  "brewery": "PINTA",
+  "style": "Belgian Enkel",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Risfactor Coconut & Coffee",
+  "brewery": "PINTA",
+  "style": "Stout - Imperial",
+  "abv": 11.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial stout infused with coconut and coffee"
+},
+{
+  "name": "Czarna Dziura",
+  "brewery": "PINTA",
+  "style": "Schwarzbier",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Low Delivery",
+  "brewery": "PINTA",
+  "style": "Pale Ale - New England",
+  "abv": 4.2,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Low carb hazy pale ale"
+},
+{
+  "name": "Kwas Xy",
+  "brewery": "PINTA",
+  "style": "Sour - Catharina",
+  "abv": 4.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Catharina sour with passionfruit"
+},
+{
+  "name": "Kwas Theta Laphroaig BA",
+  "brewery": "PINTA",
+  "style": "Stout - Imperial",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Barrel-aged in Laphroaig casks"
+},
+{
+  "name": "A' La Grodziskie",
+  "brewery": "PINTA",
+  "style": "Historical Beer - Grodziskie",
+  "abv": 2.6,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Oak-smoked wheat malt grodziskie"
+},
+{
+  "name": "Kwas My (2024)",
+  "brewery": "PINTA",
+  "style": "Sour - Other",
+  "abv": 5.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Limoncello-inspired sour"
+},
+{
+  "name": "Bawarka",
+  "brewery": "PINTA",
+  "style": "Wheat Beer - Hefeweizen",
+  "abv": 5.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": ""
+},
+{
+  "name": "Pivečko",
+  "brewery": "PINTA",
+  "style": "Lager - Světlé (Czech Pale)",
+  "abv": 4.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Czech pale lager"
+},
+{
+  "name": "Atak Chmielu",
+  "brewery": "PINTA",
+  "style": "IPA - American",
+  "abv": 6.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "American IPA"
+},
+
+{
+  "name": "After Hours: Citrus Wild Ale",
+  "brewery": "PINTA Barrel Brewing",
+  "style": "Wild Ale - Other",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wild ale with mandarin, orange and lime"
+},
+{
+  "name": "After Hours: Red Wild Ale",
+  "brewery": "PINTA Barrel Brewing",
+  "style": "Wild Ale - Other",
+  "abv": 6.5,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wild ale with red grapes, raspberry and shadbush"
+},
+{
+  "name": "After Hours: Wild Ale",
+  "brewery": "PINTA Barrel Brewing",
+  "style": "Wild Ale - Other",
+  "abv": 5.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "House blend wild ale"
+},
+{
+  "name": "After Hours: Rose Wild Ale",
+  "brewery": "PINTA Barrel Brewing",
+  "style": "Wild Ale - Other",
+  "abv": 5.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wild ale with cherry, blackcurrant and chokeberry"
+},
+{
+  "name": "After Hours: Lemonade Wild Ale",
+  "brewery": "PINTA Barrel Brewing",
+  "style": "Wild Ale - Other",
+  "abv": 5.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wild ale with apple juice and lemon peel"
+},
+{
+  "name": "After Hours: Tropical Wild Ale",
+  "brewery": "PINTA Barrel Brewing",
+  "style": "Wild Ale - Other",
+  "abv": 6.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Wild ale with pineapple, mango and passion fruit"
+},
+{
+  "name": "Essence",
+  "brewery": "PINTA Barrel Brewing",
+  "style": "Stout - Imperial",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial stout with habanero and cocoa nibs"
+},
+{
+  "name": "Vortex",
+  "brewery": "PINTA Barrel Brewing",
+  "style": "Stout - Imperial",
+  "abv": 13.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Imperial stout with vanilla and cinnamon"
+},
+
+{
+  "name": "Thin Red Line 5",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Metheglin",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Buckwheat honey mead with smoked plums and peppers"
+},
+{
+  "name": "Hail the King",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Cyser",
+  "abv": 12.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Semi-sweet cyser dry-hopped with Nelson Sauvin"
+},
+{
+  "name": "Sprezzatura 2025",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Melomel",
+  "abv": 12.9,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Cherry and aronia melomel"
+},
+{
+  "name": "Time Is Mine",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Metheglin",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Sweet dwójniak mead with dried rosehips"
+},
+{
+  "name": "Useless Warning",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Cyser",
+  "abv": 13.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Cyser aged in bourbon barrels with vanilla and cinnamon"
+},
+{
+  "name": "Quantum Satis 2024",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Melomel",
+  "abv": 15.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Melomel with sloes and vanilla"
+},
+{
+  "name": "From Islay With Love",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Other",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Buckwheat dwójniak aged in peated whisky barrels"
+},
+{
+  "name": "Divine Intervention 2024",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Melomel",
+  "abv": 15.7,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Big cherry melomel"
+},
+{
+  "name": "Coffee Melomel 2024",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Other",
+  "abv": 13.3,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Melomel with coffee"
+},
+{
+  "name": "Half Buckwheat Half Amazing 2023",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Traditional",
+  "abv": 15.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Buckwheat dwójniak"
+},
+{
+  "name": "Berry Me In Smoke",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Other",
+  "abv": 12.0,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Melomel with berries and smoked apples"
+},
+{
+  "name": "Fire Cyser",
+  "brewery": "Quantum Satis Mead",
+  "style": "Mead - Cyser",
+  "abv": 15.1,
+  "zone": "",
+  "stand": "",
+  "source_url": "manual",
+  "description": "Sweet all-juice cyser"
+}
+]
