@@ -1,4 +1,4 @@
-kimport logging
+import logging
 import re
 import random as _random
 
@@ -439,23 +439,23 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     try:
-        if text in ["what can you do", "help", "commands", "bot help"]:
-            await _reply(update, _full_help_text())
+        if text in [
+            "what can you do",
+            "help",
+            "commands",
+            "bot help",
+            "help beer",
+            "help beers",
+            "beer help",
+            "beer commands",
+            "hint beer",
+            "hint beers",
+        ]:
+            if "beer" in text or "hint" in text:
+                await _reply(update, _beer_help_text())
+            else:
+                await _reply(update, bot_capabilities_text())
             return
-
-        if text in ["beer", "beer help", "help beer", "beers help"]:
-            await _reply(update, _beer_help_text())
-            return
-
-        if text in ["my chat id", "chat id", "what is my chat id"]:
-            await _reply(update, f"Your chat id is: {update.effective_chat.id}")
-            return
-
-        if text in ["list registered chats", "show registered chats"]:
-            chats = list_chats()
-            if not chats:
-                await _reply(update, "No registered chats yet.")
-                return
 
             lines = ["Registered chats:"]
             for c in chats:
