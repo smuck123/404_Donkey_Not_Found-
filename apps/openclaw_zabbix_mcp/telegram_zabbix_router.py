@@ -35,6 +35,8 @@ from fortigate_ai import (
 from wbf_telegram_commands import (
     next_beer,
     recommend,
+    hint,
+    build_hint_reply,
     drank,
     rate,
     history,
@@ -73,6 +75,7 @@ BEER_TRIGGER_WORDS = [
     "drink next", "cheap beers", "budget beers", "serving options",
     "map for brewery", "drunk donkey", "beer senior analyzer",
     "beer help", "help beer", "beers help",
+    "hint",
 ]
 
 PACKAGE_WORDS = ["can", "draft", "bottle"]
@@ -252,6 +255,8 @@ def _beer_help_text() -> str:
         "beer next --style ipa --after-id 123\n"
         "beer random 10\n"
         "beer random 8 --min-abv 8\n"
+        "hint citrus low bitterness funny mood\n"
+        "/hint citrus low bitterness funny mood\n"
         "\n"
         "Also works:\n"
         "beer\n"
@@ -445,6 +450,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if text in ["beer", "beer help", "help beer", "beers help"]:
             await _reply(update, _beer_help_text())
+            return
+
+        if text == "hint" or text.startswith("hint "):
+            hint_query = text_raw[4:].strip() if len(text_raw) >= 4 else ""
+            await _reply(update, build_hint_reply(update.effective_chat.id, hint_query))
             return
 
         if text in ["my chat id", "chat id", "what is my chat id"]:
@@ -754,6 +764,7 @@ def main():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("next_beer", next_beer))
     app.add_handler(CommandHandler("recommend", recommend))
+    app.add_handler(CommandHandler("hint", hint))
     app.add_handler(CommandHandler("drank", drank))
     app.add_handler(CommandHandler("rate", rate))
     app.add_handler(CommandHandler("history", history))

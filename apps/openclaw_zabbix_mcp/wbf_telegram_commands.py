@@ -1,3 +1,5 @@
+import random
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -12,6 +14,44 @@ assistant = WarsawBeerFestivalAssistant()
 
 def _args(context: ContextTypes.DEFAULT_TYPE) -> str:
     return " ".join(context.args or []).strip()
+
+
+def build_hint_reply(chat_id: int, hint_query: str) -> str:
+    assistant.ensure_data_loaded()
+    query = (hint_query or "").strip()
+    if not query:
+        return "Usage: /hint <taste or mood>. Example: /hint citrus easy funny"
+
+    beers = assistant.find_beers(query, limit=5)
+    if not beers:
+        return (
+            "🍺 Donkey hint mode:\n"
+            f"No database match for: {query!r}.\n"
+            "Try broader words like style, aroma, ABV, or brewery."
+        )
+
+    best = beers[0]
+    backup = beers[1] if len(beers) > 1 else None
+    stories = [
+        "This one arrived like a heroic mule in taproom armor and immediately solved Monday.",
+        "Legend says this beer once negotiated peace between a grumpy stout fan and a hop maniac.",
+        "If this pour had a soundtrack, it would be disco hooves and a dramatic slow-motion sip.",
+        "A tiny donkey bartender whispered: 'yes, this is the chaos you ordered.'",
+    ]
+    story = random.choice(stories)
+
+    lines = [
+        f"🍺 Hint match from festival DB for: {query}",
+        f"Main pick: #{best.get('id')} {best.get('name')} | {best.get('brewery') or 'n/a'} | {best.get('style') or 'n/a'} | ABV={best.get('abv') or 'n/a'}",
+        f"Mini story: {story}",
+    ]
+
+    if backup:
+        lines.append(
+            f"Backup pick: #{backup.get('id')} {backup.get('name')} | {backup.get('brewery') or 'n/a'} | {backup.get('style') or 'n/a'} | ABV={backup.get('abv') or 'n/a'}"
+        )
+
+    return "\n".join(lines)
 
 
 def _parse_fun_beer_filters(query: str) -> dict:
@@ -152,6 +192,12 @@ async def next_beer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("No matching beer found.")
         return
     await update.message.reply_text(format_beer(beer))
+
+
+async def hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = _args(context)
+    reply = build_hint_reply(update.effective_chat.id, query)
+    await update.message.reply_text(reply)
 
 
 async def recommend(update: Update, context: ContextTypes.DEFAULT_TYPE):
