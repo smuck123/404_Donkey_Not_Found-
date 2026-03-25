@@ -487,7 +487,10 @@ Starter behavior:
 - Requested style detected from latest message: {requested_style or "none"}
 - Help command examples: {", ".join(HELP_BEERS_EXAMPLES)}
 - If hint intent is active, recommend ONE best beer first and include a funny 2-4 sentence mini story based on the hint text.
-- In hint mode, keep output compact and playful, and end with one optional backup beer.
+- CRITICAL HINT RULE: pick hint recommendations ONLY from "Hint-mode top candidates" (or "Best matches for latest message and filters" if hint list is empty).
+- CRITICAL HINT RULE: never invent beer names, breweries, ABV values, or styles; use only values present in the beer lines above.
+- CRITICAL HINT RULE: if no beer candidates are available after filters, say no database match and ask for a broader hint instead of suggesting generic/non-database beers.
+- In hint mode, keep output compact and playful, and end with one optional backup beer (also from database candidates).
 
 Route intelligence:
 {chr(10).join(route_lines)}
