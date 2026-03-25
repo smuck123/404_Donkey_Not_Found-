@@ -387,190 +387,6 @@ def approve_site_to_site_vpn(action_id: str) -> str:
     return f"Approved and executed site-to-site VPN action: {action_id}"
 
 
-def show_top_drops() -> str:
-    results = _extract_results(get_fortigate_traffic_raw())
-    if not results:
-        return "No FortiGate traffic session data found."
-
-    rows = _session_summary_rows(results)
-    dropped = [r for r in rows if r["total_shaper_drops"] > 0]
-
-    if not dropped:
-        return "Top drops: no non-zero shaper drops seen in current live sessions."
-
-    dropped.sort(key=lambda x: (x["total_shaper_drops"], x["total_packets"], x["total_bytes"]), reverse=True)
-
-    lines = ["Top shaper drops:"]
-    for r in dropped[:20]:
-        lines.append(
-            f"- {r['src']} -> {r['dst']} {r['proto']}/{r['dport']} "
-            f"drops={r['total_shaper_drops']} tx_drops={r['tx_shaper_drops']} rx_drops={r['rx_shaper_drops']} "
-            f"policy={r['policyid']} bytes={r['total_bytes']} avg_mbps={r['mbps']}"
-        )
-
-    return "\n".join(lines)
-
-
-def show_suspicious_sources() -> str:
-    results = _extract_results(get_fortigate_traffic_raw())
-    if not results:
-        return "No FortiGate traffic session data found."
-
-    rows = _session_summary_rows(results)
-
-    stats = defaultdict(lambda: {
-        "sessions": 0,
-        "bytes": 0,
-        "packets": 0,
-        "drops": 0,
-        "countries": Counter(),
-        "ports": Counter(),
-        "policies": Counter(),
-        "destinations": Counter(),
-        "mbps_values": [],
-    })
-
-    for r in rows:
-        src = r["src"]
-        if _is_private_ip(src):
-            continue
-
-        st = stats[src]
-        st["sessions"] += 1
-        st["bytes"] += r["total_bytes"]
-        st["packets"] += r["total_packets"]
-        st["drops"] += r["total_shaper_drops"]
-        st["countries"][r["country"]] += 1
-        st["ports"][str(r["dport"])] += 1
-        st["policies"][r["policyid"]] += 1
-        st["destinations"][r["dst"]] += 1
-        if r["mbps"] > 0:
-            st["mbps_values"].append(r["mbps"])
-
-    if not stats:
-        return "Suspicious external sources: no external source IPs seen in current live sessions."
-
-    scored = []
-    for ip, st in stats.items():
-        score = 0
-        score += st["sessions"] * 2
-        score += min(st["packets"] // 50, 25)
-        score += min(st["bytes"] // 500000, 20)
-        score += st["drops"] * 5
-
-        avg_mbps = _safe_avg(st["mbps_values"])
-        if avg_mbps >= 1:
-            score += int(avg_mbps * 3)
-
-        scored.append({
-            "ip": ip,
-            "score": score,
-            "sessions": st["sessions"],
-            "bytes": st["bytes"],
-            "packets": st["packets"],
-            "drops": st["drops"],
-            "avg_mbps": avg_mbps,
-            "top_country": st["countries"].most_common(1)[0][0] if st["countries"] else "unknown",
-            "top_port": st["ports"].most_common(1)[0][0] if st["ports"] else "unknown",
-            "top_policy": st["policies"].most_common(1)[0][0] if st["policies"] else "unknown",
-            "top_dst": st["destinations"].most_common(1)[0][0] if st["destinations"] else "unknown",
-        })
-
-    scored.sort(key=lambda x: (x["score"], x["sessions"], x["bytes"], x["packets"]), reverse=True)
-
-    lines = ["Suspicious external source review:"]
-    for row in scored[:15]:
-        lines.append(
-            f"- {row['ip']} score={row['score']} sessions={row['sessions']} "
-            f"bytes={row['bytes']} packets={row['packets']} avg_mbps={row['avg_mbps']} "
-            f"drops={row['drops']} country={row['top_country']} port={row['top_port']} "
-            f"policy={row['top_policy']} top_dst={row['top_dst']}"
-        )
-
-    return "\n".join(lines)
-
-
-def build_block_review_hints() -> str:
-    results = _extract_results(get_fortigate_traffic_raw())
-    if not results:
-        return "Block review hints: no traffic session data found."
-
-    rows = _session_summary_rows(results)
-
-    stats = defaultdict(lambda: {
-        "sessions": 0,
-        "bytes": 0,
-        "packets": 0,
-        "drops": 0,
-        "mbps_values": [],
-        "ports": Counter(),
-        "destinations": Counter(),
-        "countries": Counter(),
-        "policies": Counter(),
-    })
-
-    for r in rows:
-        src = r["src"]
-        if _is_private_ip(src):
-            continue
-
-        st = stats[src]
-        st["sessions"] += 1
-        st["bytes"] += r["total_bytes"]
-        st["packets"] += r["total_packets"]
-        st["drops"] += r["total_shaper_drops"]
-        if r["mbps"] > 0:
-            st["mbps_values"].append(r["mbps"])
-        st["ports"][str(r["dport"])] += 1
-        st["destinations"][r["dst"]] += 1
-        st["countries"][r["country"]] += 1
-        st["policies"][r["policyid"]] += 1
-
-    hints = []
-    for ip, st in stats.items():
-        avg_mbps = _safe_avg(st["mbps_values"])
-        score = 0
-        score += st["sessions"] * 2
-        score += min(st["packets"] // 50, 25)
-        score += min(st["bytes"] // 500000, 20)
-        score += st["drops"] * 5
-        if avg_mbps >= 1:
-            score += int(avg_mbps * 3)
-
-        if score < 40:
-            continue
-
-        hints.append({
-            "ip": ip,
-            "score": score,
-            "sessions": st["sessions"],
-            "bytes": st["bytes"],
-            "packets": st["packets"],
-            "drops": st["drops"],
-            "avg_mbps": avg_mbps,
-            "top_port": st["ports"].most_common(1)[0][0] if st["ports"] else "unknown",
-            "top_dst": st["destinations"].most_common(1)[0][0] if st["destinations"] else "unknown",
-            "top_country": st["countries"].most_common(1)[0][0] if st["countries"] else "unknown",
-            "top_policy": st["policies"].most_common(1)[0][0] if st["policies"] else "unknown",
-        })
-
-    if not hints:
-        return "Block review hints: no external IP currently crosses the review threshold."
-
-    hints.sort(key=lambda x: (x["score"], x["sessions"], x["bytes"]), reverse=True)
-
-    lines = ["Block review hints:"]
-    for h in hints[:10]:
-        lines.append(
-            f"- Review {h['ip']} score={h['score']} sessions={h['sessions']} "
-            f"bytes={h['bytes']} packets={h['packets']} avg_mbps={h['avg_mbps']} drops={h['drops']} "
-            f"port={h['top_port']} top_dst={h['top_dst']} country={h['top_country']} policy={h['top_policy']}"
-        )
-
-    lines.append("These are review hints only, not automatic block decisions.")
-    return "\n".join(lines)
-
-
 def summarize_fortigate_traffic() -> str:
     raw = get_fortigate_traffic_raw()
     results = _extract_results(raw)
@@ -584,66 +400,23 @@ def summarize_fortigate_traffic() -> str:
     dst_counter = Counter()
     service_counter = Counter()
     proto_counter = Counter()
-    action_counter = Counter()
-    country_counter = Counter()
-    policy_counter = Counter()
-    srcintf_counter = Counter()
-    dstintf_counter = Counter()
-
-    src_bytes = defaultdict(int)
-    dst_bytes = defaultdict(int)
-    mbps_samples = []
-
-    total_sent = 0
-    total_recv = 0
-    total_tx_packets = 0
-    total_rx_packets = 0
-    total_shaper_drops = 0
 
     for r in rows:
         src_counter[r["src"]] += 1
         dst_counter[r["dst"]] += 1
         service_counter[r["service"]] += 1
         proto_counter[r["proto"]] += 1
-        action_counter[r["action"]] += 1
-        country_counter[r["country"]] += 1
-        policy_counter[r["policyid"]] += 1
-        srcintf_counter[r["srcintf"]] += 1
-        dstintf_counter[r["dstintf"]] += 1
-
-        src_bytes[r["src"]] += r["total_bytes"]
-        dst_bytes[r["dst"]] += r["total_bytes"]
-
-        total_sent += r["sentbyte"]
-        total_recv += r["rcvdbyte"]
-        total_tx_packets += r["tx_packets"]
-        total_rx_packets += r["rx_packets"]
-        total_shaper_drops += r["total_shaper_drops"]
-
-        if r["mbps"] > 0:
-            mbps_samples.append(r["mbps"])
-
-    avg_session_mbps = _safe_avg(mbps_samples)
-    peak_session_mbps = round(max(mbps_samples), 3) if mbps_samples else 0.0
-    aggregate_est_mbps = round(sum(mbps_samples), 3) if mbps_samples else 0.0
 
     lines = []
     lines.append(f"Traffic status: {len(rows)} sessions analyzed")
-    lines.append(
-        f"Volume: sent={total_sent}B received={total_recv}B "
-        f"tx_packets={total_tx_packets} rx_packets={total_rx_packets} shaper_drops={total_shaper_drops}"
-    )
-    lines.append(
-        f"Speed estimate: avg_session={avg_session_mbps} Mb/s peak_session={peak_session_mbps} Mb/s aggregate_est={aggregate_est_mbps} Mb/s"
-    )
 
     lines.append("Top source talkers:")
     for ip, count in src_counter.most_common(5):
-        lines.append(f"- {ip}: {count} sessions, {src_bytes[ip]}B")
+        lines.append(f"- {ip}: {count} sessions")
 
     lines.append("Top destinations:")
     for ip, count in dst_counter.most_common(5):
-        lines.append(f"- {ip}: {count} sessions, {dst_bytes[ip]}B")
+        lines.append(f"- {ip}: {count} sessions")
 
     lines.append("Top services:")
     for svc, count in service_counter.most_common(5):
@@ -652,38 +425,6 @@ def summarize_fortigate_traffic() -> str:
     lines.append("Top protocols:")
     for proto, count in proto_counter.most_common(5):
         lines.append(f"- {proto}: {count} sessions")
-
-    lines.append("Top countries:")
-    for country, count in country_counter.most_common(5):
-        lines.append(f"- {country}: {count} sessions")
-
-    lines.append("Top policy IDs:")
-    for pid, count in policy_counter.most_common(5):
-        lines.append(f"- policy {pid}: {count} sessions")
-
-    lines.append("Interfaces:")
-    for iface, count in srcintf_counter.most_common(3):
-        lines.append(f"- src {iface}: {count} sessions")
-    for iface, count in dstintf_counter.most_common(3):
-        lines.append(f"- dst {iface}: {count} sessions")
-
-    top_drops = sorted(rows, key=lambda x: x["total_shaper_drops"], reverse=True)
-    non_zero_drops = [r for r in top_drops if r["total_shaper_drops"] > 0][:5]
-    if non_zero_drops:
-        lines.append("Top shaper drops:")
-        for r in non_zero_drops:
-            lines.append(
-                f"- {r['src']} -> {r['dst']} {r['proto']}/{r['dport']} drops={r['total_shaper_drops']} policy={r['policyid']}"
-            )
-    else:
-        lines.append("Top shaper drops:")
-        lines.append("- No non-zero shaper drops in current live sessions")
-
-    lines.append("Next checks:")
-    lines.append("- Review dominant source clients on internal interfaces")
-    lines.append("- Check whether top destinations and countries are expected")
-    lines.append("- Review policy concentration if one policy dominates most traffic")
-    lines.append("- Treat block hints as review suggestions, not automatic block decisions")
 
     return "\n".join(lines)
 
@@ -699,32 +440,19 @@ def show_top_talkers() -> str:
 
     src_counter = Counter()
     dst_counter = Counter()
-    src_bytes = defaultdict(int)
-    dst_bytes = defaultdict(int)
-    src_mbps = defaultdict(list)
-    dst_mbps = defaultdict(list)
 
     for r in rows:
         src_counter[r["src"]] += 1
         dst_counter[r["dst"]] += 1
-        src_bytes[r["src"]] += r["total_bytes"]
-        dst_bytes[r["dst"]] += r["total_bytes"]
-        if r["mbps"] > 0:
-            src_mbps[r["src"]].append(r["mbps"])
-            dst_mbps[r["dst"]].append(r["mbps"])
 
     lines = ["Top source talkers:"]
     for ip, count in src_counter.most_common(10):
-        lines.append(
-            f"- {ip}: {count} sessions, {src_bytes[ip]}B, avg_mbps={_safe_avg(src_mbps[ip])}"
-        )
+        lines.append(f"- {ip}: {count} sessions")
 
     lines.append("")
     lines.append("Top destination talkers:")
     for ip, count in dst_counter.most_common(10):
-        lines.append(
-            f"- {ip}: {count} sessions, {dst_bytes[ip]}B, avg_mbps={_safe_avg(dst_mbps[ip])}"
-        )
+        lines.append(f"- {ip}: {count} sessions")
 
     return "\n".join(lines)
 
@@ -747,239 +475,6 @@ def show_blocked_ips() -> str:
     return "\n".join(lines)
 
 
-def show_fortigate_interfaces() -> str:
-    raw = get_system_interface()
-    results = _extract_results(raw)
-
-    if not results:
-        return f"No FortiGate interfaces found. Raw response: {json.dumps(raw)[:700]}"
-
-    lines = ["FortiGate interfaces:"]
-    for row in results[:30]:
-        name = row.get("name", "unknown")
-        alias = row.get("alias", "")
-        ip = row.get("ip", row.get("ipv4-address", ""))
-        status = row.get("status", row.get("link", "unknown"))
-        role = row.get("role", "")
-        bits = [f"- {name}"]
-        if alias:
-            bits.append(f"alias={alias}")
-        if role:
-            bits.append(f"role={role}")
-        if ip:
-            bits.append(f"ip={ip}")
-        bits.append(f"status={status}")
-        lines.append(" ".join(bits))
-
-    return "\n".join(lines)
-
-
-def show_fortigate_vpn() -> str:
-    p1 = _extract_results(get_vpn_ipsec_phase1())
-    p2 = _extract_results(get_vpn_ipsec_phase2())
-
-    lines = ["FortiGate VPN summary:"]
-    lines.append(f"- Phase1 entries: {len(p1)}")
-    lines.append(f"- Phase2 entries: {len(p2)}")
-
-    if p1:
-        lines.append("Phase1:")
-        for row in p1[:20]:
-            name = row.get("name", "unknown")
-            interface = row.get("interface", "")
-            remote = row.get("remote-gw", row.get("remote_gw", ""))
-            lines.append(f"- {name} interface={interface} remote={remote}".strip())
-
-    if p2:
-        lines.append("Phase2:")
-        for row in p2[:20]:
-            name = row.get("name", "unknown")
-            phase1 = row.get("phase1name", "")
-            src = row.get("src-subnet", row.get("src_subnet", ""))
-            dst = row.get("dst-subnet", row.get("dst_subnet", ""))
-            lines.append(f"- {name} phase1={phase1} src={src} dst={dst}".strip())
-
-    return "\n".join(lines)
-
-
-def show_fortigate_routes() -> str:
-    results = _extract_results(get_router_static())
-    if not results:
-        return "No static routes found."
-
-    lines = ["FortiGate static routes:"]
-    for row in results[:30]:
-        dst = row.get("dst", row.get("dstaddr", "unknown"))
-        gateway = row.get("gateway", row.get("device", "unknown"))
-        device = row.get("device", "")
-        distance = row.get("distance", "")
-        lines.append(f"- dst={dst} gateway={gateway} device={device} distance={distance}".strip())
-
-    return "\n".join(lines)
-
-
-def find_fortigate_policy(search_text: str) -> str:
-    results = _extract_results(get_firewall_policies())
-    if not results:
-        return "No firewall policies found."
-
-    q = search_text.lower().strip()
-    matches = []
-
-    for row in results:
-        blob = json.dumps(row, ensure_ascii=False).lower()
-        if q in blob:
-            matches.append(row)
-
-    if not matches:
-        return f"No FortiGate policies matched: {search_text}"
-
-    lines = [f"Matching FortiGate policies for: {search_text}"]
-    for row in matches[:20]:
-        pid = row.get("policyid", row.get("id", "unknown"))
-        name = row.get("name", "")
-        action = row.get("action", "")
-        srcintf = row.get("srcintf", "")
-        dstintf = row.get("dstintf", "")
-        schedule = row.get("schedule", "")
-        service = row.get("service", "")
-        lines.append(
-            f"- policyid={pid} name={name} action={action} srcintf={srcintf} dstintf={dstintf} schedule={schedule} service={service}"
-        )
-
-    return "\n".join(lines)
-
-
-def find_fortigate_address(search_text: str) -> str:
-    results = _extract_results(get_firewall_addresses())
-    if not results:
-        return "No firewall addresses found."
-
-    q = search_text.lower().strip()
-    matches = []
-
-    for row in results:
-        blob = json.dumps(row, ensure_ascii=False).lower()
-        if q in blob:
-            matches.append(row)
-
-    if not matches:
-        return f"No FortiGate addresses matched: {search_text}"
-
-    lines = [f"Matching FortiGate addresses for: {search_text}"]
-    for row in matches[:30]:
-        name = row.get("name", "unknown")
-        subnet = row.get("subnet", row.get("fqdn", row.get("type", "")))
-        comment = row.get("comment", "")
-        lines.append(f"- {name} subnet={subnet} comment={comment}".strip())
-
-    return "\n".join(lines)
-
-
-def show_fortigate_sessions_for_ip(ip_address: str) -> str:
-    results = _extract_results(get_fortigate_traffic_raw())
-    if not results:
-        return "No FortiGate traffic session data found."
-
-    rows = _session_summary_rows(results)
-
-    matches = []
-    for r in rows:
-        if ip_address == r["src"] or ip_address == r["dst"]:
-            matches.append(r)
-
-    if not matches:
-        return f"No sessions found for IP {ip_address}"
-
-    lines = [f"FortiGate sessions for IP {ip_address}: count={len(matches)}"]
-    for r in matches[:30]:
-        lines.append(
-            f"- {r['src']} -> {r['dst']} port={r['dport']} proto={r['proto']} "
-            f"policy={r['policyid']} country={r['country']} bytes={r['total_bytes']} "
-            f"packets={r['total_packets']} avg_mbps={r['mbps']} drops={r['total_shaper_drops']}"
-        )
-
-    return "\n".join(lines)
-
-
-def show_fortigate_sessions_for_port(port: str) -> str:
-    results = _extract_results(get_fortigate_traffic_raw())
-    if not results:
-        return "No FortiGate traffic session data found."
-
-    rows = _session_summary_rows(results)
-    port = str(port).strip()
-
-    matches = [r for r in rows if str(r["dport"]) == port]
-
-    if not matches:
-        return f"No sessions found for port {port}"
-
-    counter = Counter()
-    country_counter = Counter()
-    total_bytes = 0
-    total_packets = 0
-    mbps_values = []
-
-    for r in matches:
-        counter[r["dst"]] += 1
-        country_counter[r["country"]] += 1
-        total_bytes += r["total_bytes"]
-        total_packets += r["total_packets"]
-        if r["mbps"] > 0:
-            mbps_values.append(r["mbps"])
-
-    lines = [f"FortiGate sessions for port {port}: count={len(matches)}"]
-    lines.append(
-        f"Volume: bytes={total_bytes} packets={total_packets} avg_mbps={_safe_avg(mbps_values)} peak_mbps={round(max(mbps_values), 3) if mbps_values else 0.0}"
-    )
-    lines.append("Top destinations:")
-    for dst, count in counter.most_common(15):
-        lines.append(f"- {dst}: {count} sessions")
-
-    lines.append("Top countries:")
-    for country, count in country_counter.most_common(10):
-        lines.append(f"- {country}: {count} sessions")
-
-    return "\n".join(lines)
-
-
-def investigate_firewall() -> str:
-    zabbix_part = summarize_host_24h_with_ai(FIREWALL_HOST)
-    forti_part = summarize_fortigate_snapshot()
-    traffic_part = summarize_fortigate_traffic()
-    drops_part = show_top_drops()
-    review_part = build_block_review_hints()
-
-    return (
-        "Firewall investigation\n"
-        "======================\n"
-        f"{zabbix_part}\n\n"
-        "----------------------\n"
-        f"{forti_part}\n\n"
-        "----------------------\n"
-        f"{traffic_part}\n\n"
-        "----------------------\n"
-        f"{drops_part}\n\n"
-        "----------------------\n"
-        f"{review_part}"
-    )
-
-
-def build_fortigate_report() -> str:
-    return (
-        "FortiGate 8h report\n"
-        "===================\n"
-        f"{summarize_fortigate_snapshot()}\n\n"
-        "-------------------\n"
-        f"{summarize_fortigate_traffic()}\n\n"
-        "-------------------\n"
-        f"{show_top_drops()}\n\n"
-        "-------------------\n"
-        f"{build_block_review_hints()}"
-    )
-
-
 def bot_capabilities_text() -> str:
     return (
         "I can do:\n"
@@ -999,18 +494,7 @@ def bot_capabilities_text() -> str:
         "- summarize traffic for NAME\n"
         "- summarize fortigate\n"
         "- summarize fortigate traffic\n"
-        "- investigate firewall\n"
-        "- show fortigate interfaces\n"
-        "- show fortigate vpn\n"
-        "- show fortigate routes\n"
-        "- find fortigate policy TEXT\n"
-        "- find fortigate address TEXT\n"
-        "- show fortigate sessions for IP\n"
-        "- show fortigate sessions port PORT\n"
         "- show top talkers\n"
-        "- show top drops\n"
-        "- show suspicious fortigate sources\n"
-        "- show fortigate block hints\n"
         "- show blocked ips\n"
         "- what fortigate api can call\n"
         "- plan block ip X.X.X.X\n"
@@ -1024,19 +508,33 @@ def bot_capabilities_text() -> str:
         "- tell story\n"
         "- story about TOPIC\n"
         "- joke\n"
-        "- explain TEXT"
-        "\n\nWarsaw Beer Festival assistant commands:\n"
+        "- explain TEXT\n\n"
+        "Beer help:\n"
+        "- beer\n"
+        "- beer help\n"
+        "- help beer\n"
+        "- beer styles\n"
+        "- beer breweries\n"
+        "- beer brewery AleBrowar\n"
+        "- beer cheap style \"IPA\" max 12\n"
+        "- beer find style ipa\n"
+        "- beer find style ipa brewery birbant min 7 cheap\n"
+        "- beer find text \"citra galaxy\"\n"
+        "- beer next --style ipa --after-id 123\n"
+        "- beer random 10\n"
+        "- beer random 8 --min-abv 8\n\n"
+        "Slash beer commands:\n"
         "- /next_beer\n"
         "- /recommend <query>\n"
         "- /drank <beer name>\n"
         "- /rate <beer name> <1-5>\n"
         "- /history\n"
         "- /set_max_abv <value>\n"
-        "- /set_location <zone>\n"
-        "- /next_event\n"
-        "- /events_today\n"
-        "- /beer_and_event\n"
+        "- /set_location <location>\n"
         "- /random_beer\n"
         "- /find_beer <name>\n"
-        "- /find_brewery <name>"
+        "- /find_brewery <name>\n"
+        "- /cheap_beers\n"
+        "- /serving_options <beer name>\n"
+        "- /brewery_map <brewery name>\n"
     )
