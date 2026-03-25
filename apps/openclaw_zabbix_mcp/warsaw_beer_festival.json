@@ -547,52 +547,32 @@
         "rating": null,
         "brewery": "Desitka",
         "location": null,
-        "description": null,
+        "description": "Helles",
         "serving_options": []
-      }
-    ]
-  },
-  {
-    "brewery": "Helles",
-    "location": null,
-    "note": null,
-    "beers": [
+      },
       {
         "name": "500ml Draft",
         "style": null,
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Helles",
+        "brewery": "Desitka",
         "location": null,
-        "description": null,
+        "description": "Piwo Jopejskie Rum & Mead Barrel Age (Smoked Mackerel Special Edition)",
         "serving_options": []
-      }
-    ]
-  },
-  {
-    "brewery": "Piwo Jopejskie Rum & Mead Barrel Age (Smoked Mackerel Special Edition)",
-    "location": null,
-    "note": null,
-    "beers": [
+      },
       {
         "name": "100ml Draft",
         "style": null,
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Piwo Jopejskie Rum & Mead Barrel Age (Smoked Mackerel Special Edition)",
+        "brewery": "Desitka",
         "location": null,
-        "description": null,
+        "description": "Piwo Jopejskie Rum & Mead Barrel Age",
         "serving_options": []
       }
     ]
-  },
-  {
-    "brewery": "Piwo Jopejskie Rum & Mead Barrel Age",
-    "location": null,
-    "note": null,
-    "beers": []
   },
   {
     "brewery": "Iced Piwo Jopejskie",
@@ -690,7 +670,7 @@
     "note": null,
     "beers": [
       {
-        "name": "14% ABV Nöösker Roosna-Alliku, Järva maakond  Rated 3.5 out of 5 on Untappd",
+        "name": "14% ABV Nöösker Roosna-Alliku, Järva maakond Rated 3.5 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1003,7 +983,7 @@
     "note": null,
     "beers": [
       {
-        "name": "BROFAKTURA Siedlce, Masovian Voivodeship  Rated 3.75 out of 5 on Untappd",
+        "name": "BROFAKTURA Siedlce, Masovian Voivodeship Rated 3.75 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1442,23 +1422,16 @@
         "rating": null,
         "brewery": "BRO HERO: SZYMAN - WILD TRAMINER GRAPES MUST RED WINE BARREL AGED",
         "location": null,
-        "description": null,
+        "description": "Nafciarz Mead & Laphroaig Barrel Aged",
         "serving_options": []
-      }
-    ]
-  },
-  {
-    "brewery": "Nafciarz Mead & Laphroaig Barrel Aged",
-    "location": null,
-    "note": null,
-    "beers": [
+      },
       {
         "name": "Browar Artezan",
         "style": null,
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Nafciarz Mead & Laphroaig Barrel Aged",
+        "brewery": "BRO HERO: SZYMAN - WILD TRAMINER GRAPES MUST RED WINE BARREL AGED",
         "location": null,
         "description": null,
         "serving_options": []
@@ -1471,7 +1444,7 @@
     "note": null,
     "beers": [
       {
-        "name": "300ml Draft\t zł40.00",
+        "name": "300ml Draft zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1489,7 +1462,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł15.00",
+        "name": "100ml zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1518,7 +1491,7 @@
         "serving_options": []
       },
       {
-        "name": "100ml\t zł15.00",
+        "name": "100ml zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1536,7 +1509,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł20.00",
+        "name": "100ml zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1554,7 +1527,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł20.00",
+        "name": "100ml zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1572,7 +1545,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł10.00",
+        "name": "100ml zł10.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1590,7 +1563,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł10.00",
+        "name": "100ml zł10.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1608,7 +1581,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł10.00",
+        "name": "100ml zł10.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1626,7 +1599,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł15.00",
+        "name": "100ml zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1637,7 +1610,7 @@
         "serving_options": []
       },
       {
-        "name": "300ml Draft\t zł50.00",
+        "name": "300ml Draft zł50.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1648,7 +1621,7 @@
         "serving_options": []
       },
       {
-        "name": "300ml Draft\t zł50.00",
+        "name": "300ml Draft zł50.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1659,7 +1632,7 @@
         "serving_options": []
       },
       {
-        "name": "500ml Bottle\t zł100.00",
+        "name": "500ml Bottle zł100.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1677,7 +1650,7 @@
     "note": null,
     "beers": [
       {
-        "name": "300ml Draft\t zł50.00",
+        "name": "300ml Draft zł50.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1695,7 +1668,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł55.00",
+        "name": "330ml Bottle zł55.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1713,7 +1686,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł30.00",
+        "name": "500ml Draft zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1731,7 +1704,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł25.00",
+        "name": "500ml Draft zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1749,7 +1722,7 @@
     "note": null,
     "beers": [
       {
-        "name": "300ml Draft\t zł20.00",
+        "name": "300ml Draft zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1779,7 +1752,7 @@
         "serving_options": []
       },
       {
-        "name": "500ml Draft\t zł25.00",
+        "name": "500ml Draft zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1797,7 +1770,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł20.00",
+        "name": "500ml Draft zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1815,7 +1788,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł25.00",
+        "name": "500ml Draft zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1833,7 +1806,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł20.00",
+        "name": "500ml Draft zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -1851,7 +1824,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł10.00",
+        "name": "500ml Draft zł10.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -3205,7 +3178,7 @@
         "serving_options": []
       },
       {
-        "name": "6% ABV Browar Dziki Wschód Lublin, Lubelskie  Rated 4.25 out of 5 on Untappd",
+        "name": "6% ABV Browar Dziki Wschód Lublin, Lubelskie Rated 4.25 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -3554,7 +3527,7 @@
         "serving_options": []
       },
       {
-        "name": "7% ABV Browar Dziki Wschód Lublin, Lubelskie  Rated 4.0 out of 5 on Untappd",
+        "name": "7% ABV Browar Dziki Wschód Lublin, Lubelskie Rated 4.0 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -4327,7 +4300,7 @@
     "note": null,
     "beers": [
       {
-        "name": "9% ABV 28 IBU Browar Łańcut Łańcut, Podkarpackie Voivodeship  Rated 3.5 out of 5 on Untappd",
+        "name": "9% ABV 28 IBU Browar Łańcut Łańcut, Podkarpackie Voivodeship Rated 3.5 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -4989,24 +4962,31 @@
             "raw_text": "750ml Btl"
           }
         ]
-      }
-    ]
-  },
-  {
-    "brewery": "Grand Prix WKP 2025 - AIPA",
-    "location": "Zwoleń, Województwo mazowieckie",
-    "note": null,
-    "beers": [
+      },
       {
-        "name": "300ml Draft",
-        "style": null,
-        "abv": null,
+        "name": "Grand Prix WKP 2025 - AIPA",
+        "style": "IPA - American",
+        "abv": 6.0,
         "ibu": null,
         "rating": null,
-        "brewery": "Grand Prix WKP 2025 - AIPA",
-        "location": null,
+        "brewery": "Maryensztadt",
+        "location": "Zwoleń, Województwo mazowieckie",
         "description": null,
         "serving_options": [
+          {
+            "size": "100ml",
+            "package": "Draft",
+            "price_pln": null,
+            "price_eur": null,
+            "raw_text": "100ml Draft"
+          },
+          {
+            "size": "300ml",
+            "package": "Draft",
+            "price_pln": null,
+            "price_eur": null,
+            "raw_text": "300ml Draft"
+          },
           {
             "size": "750ml",
             "package": "Btl",
@@ -5136,7 +5116,7 @@
     ]
   },
   {
-    "brewery": "Wild & Funky Blend Brett Ale White Wine  BA & Brett Ale Rioja BA",
+    "brewery": "Wild & Funky Blend Brett Ale White Wine BA & Brett Ale Rioja BA",
     "location": "Zwoleń, Województwo mazowieckie",
     "note": null,
     "beers": [
@@ -5146,7 +5126,7 @@
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Wild & Funky Blend Brett Ale White Wine  BA & Brett Ale Rioja BA",
+        "brewery": "Wild & Funky Blend Brett Ale White Wine BA & Brett Ale Rioja BA",
         "location": null,
         "description": "Darkness My Friends - Baltic Porter Beef Jerky & Piri Piri",
         "serving_options": []
@@ -5157,7 +5137,7 @@
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Wild & Funky Blend Brett Ale White Wine  BA & Brett Ale Rioja BA",
+        "brewery": "Wild & Funky Blend Brett Ale White Wine BA & Brett Ale Rioja BA",
         "location": null,
         "description": "Darkness My Friends Imperial Baltic Porter Coffee & Date Syrup",
         "serving_options": []
@@ -5168,7 +5148,7 @@
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Wild & Funky Blend Brett Ale White Wine  BA & Brett Ale Rioja BA",
+        "brewery": "Wild & Funky Blend Brett Ale White Wine BA & Brett Ale Rioja BA",
         "location": null,
         "description": null,
         "serving_options": [
@@ -5506,23 +5486,16 @@
         "rating": null,
         "brewery": "Freeky Pina Colada",
         "location": null,
-        "description": null,
+        "description": "Freeky NEIPA",
         "serving_options": []
-      }
-    ]
-  },
-  {
-    "brewery": "Freeky NEIPA",
-    "location": null,
-    "note": null,
-    "beers": [
+      },
       {
         "name": "Browar Monsters",
         "style": null,
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Freeky NEIPA",
+        "brewery": "Freeky Pina Colada",
         "location": null,
         "description": null,
         "serving_options": []
@@ -6828,7 +6801,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Bottle\t zł20.00",
+        "name": "500ml Bottle zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6846,7 +6819,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł80.00",
+        "name": "330ml Bottle zł80.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6864,7 +6837,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł80.00",
+        "name": "330ml Bottle zł80.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6882,7 +6855,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł80.00",
+        "name": "330ml Bottle zł80.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6900,7 +6873,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł80.00",
+        "name": "330ml Bottle zł80.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6918,7 +6891,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł80.00",
+        "name": "330ml Bottle zł80.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6936,7 +6909,7 @@
     "note": null,
     "beers": [
       {
-        "name": "300ml Draft\t zł60.00",
+        "name": "300ml Draft zł60.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6954,7 +6927,7 @@
     "note": null,
     "beers": [
       {
-        "name": "300ml Draft\t zł60.00",
+        "name": "300ml Draft zł60.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6972,7 +6945,7 @@
     "note": null,
     "beers": [
       {
-        "name": "300ml Draft\t zł60.00",
+        "name": "300ml Draft zł60.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -6990,7 +6963,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł80.00",
+        "name": "330ml Bottle zł80.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -7008,7 +6981,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł80.00",
+        "name": "330ml Bottle zł80.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -7026,7 +6999,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł80.00",
+        "name": "330ml Bottle zł80.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -7044,7 +7017,7 @@
     "note": null,
     "beers": [
       {
-        "name": "300ml Draft\t zł60.00",
+        "name": "300ml Draft zł60.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -7062,7 +7035,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł40.00",
+        "name": "500ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -7094,15 +7067,21 @@
   },
   {
     "brewery": "Aroma Spots",
-    "location": null,
+    "location": "Stu Mostów Wrocław, Dolnośląskie",
     "note": null,
-    "beers": []
-  },
-  {
-    "brewery": "FRESH DELIVERY | NEIPA NELSON BLISS HOP KIEF",
-    "location": null,
-    "note": null,
-    "beers": []
+    "beers": [
+      {
+        "name": "FRESH DELIVERY | NEIPA NELSON BLISS HOP KIEF",
+        "style": "IPA - New England",
+        "abv": 6.5,
+        "ibu": null,
+        "rating": 4.0,
+        "brewery": "Browar",
+        "location": "Stu Mostów Wrocław, Dolnośląskie",
+        "description": "FRESH DELIVERY – the most fresh, juicy, and experimental series from Browar Stu Mostów. A line focused on intensely hopped beers, highlighting the best and most exciting hops from around the world, released monthly to a selection of top multitaps and craft shops across Poland.",
+        "serving_options": []
+      }
+    ]
   },
   {
     "brewery": "BGM 2026 Local Bond",
@@ -7469,24 +7448,31 @@
             "raw_text": "500ml Draft"
           }
         ]
-      }
-    ]
-  },
-  {
-    "brewery": "Helles",
-    "location": "Warszawski Warsaw, Masovian Voivodeship",
-    "note": null,
-    "beers": [
+      },
       {
-        "name": "300ml Draft",
-        "style": null,
-        "abv": null,
+        "name": "Helles",
+        "style": "Lager - Helles",
+        "abv": 4.7,
         "ibu": null,
-        "rating": null,
-        "brewery": "Helles",
-        "location": null,
+        "rating": 3.75,
+        "brewery": "Browar",
+        "location": "Warszawski Warsaw, Masovian Voivodeship",
         "description": null,
         "serving_options": [
+          {
+            "size": "100ml",
+            "package": "Draft",
+            "price_pln": null,
+            "price_eur": null,
+            "raw_text": "100ml Draft"
+          },
+          {
+            "size": "300ml",
+            "package": "Draft",
+            "price_pln": null,
+            "price_eur": null,
+            "raw_text": "300ml Draft"
+          },
           {
             "size": "500ml",
             "package": "Draft",
@@ -8886,7 +8872,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł15.00",
+        "name": "500ml Can zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -8904,7 +8890,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Can\t zł10.00",
+        "name": "330ml Can zł10.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -8922,7 +8908,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł20.00",
+        "name": "500ml Can zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -8940,7 +8926,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -8951,7 +8937,7 @@
         "serving_options": []
       },
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -8969,7 +8955,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -8987,7 +8973,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł10.00",
+        "name": "500ml Can zł10.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9005,7 +8991,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9023,7 +9009,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9041,7 +9027,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9059,7 +9045,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł20.00",
+        "name": "500ml Can zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9077,7 +9063,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9095,7 +9081,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9113,7 +9099,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9131,7 +9117,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł40.00",
+        "name": "500ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9149,7 +9135,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł40.00",
+        "name": "500ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9167,7 +9153,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł40.00",
+        "name": "473ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9185,7 +9171,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł60.00",
+        "name": "330ml Bottle zł60.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9203,7 +9189,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Bottle\t zł70.00",
+        "name": "330ml Bottle zł70.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9221,7 +9207,7 @@
     "note": null,
     "beers": [
       {
-        "name": "750ml Bottle\t zł75.00",
+        "name": "750ml Bottle zł75.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9239,7 +9225,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł20.00",
+        "name": "100ml zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9268,7 +9254,7 @@
         "serving_options": []
       },
       {
-        "name": "500ml Bottle\t zł250.00",
+        "name": "500ml Bottle zł250.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9279,7 +9265,7 @@
         "serving_options": []
       },
       {
-        "name": "500ml Bottle\t zł250.00",
+        "name": "500ml Bottle zł250.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9297,7 +9283,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł20.00",
+        "name": "500ml Can zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9315,7 +9301,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł20.00",
+        "name": "500ml Can zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9333,7 +9319,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł20.00",
+        "name": "500ml Can zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9351,7 +9337,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł15.00",
+        "name": "500ml Can zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9369,7 +9355,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł15.00",
+        "name": "500ml Can zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9387,7 +9373,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł15.00",
+        "name": "500ml Can zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9405,7 +9391,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł15.00",
+        "name": "500ml Can zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9434,7 +9420,7 @@
         "serving_options": []
       },
       {
-        "name": "500ml Can\t zł15.00",
+        "name": "500ml Can zł15.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9452,7 +9438,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9470,7 +9456,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9488,7 +9474,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9506,7 +9492,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9524,7 +9510,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł30.00",
+        "name": "100ml zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9535,7 +9521,7 @@
         "serving_options": []
       },
       {
-        "name": "100ml\t zł20.00",
+        "name": "100ml zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9553,7 +9539,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł20.00",
+        "name": "100ml zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9571,7 +9557,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł20.00",
+        "name": "100ml zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9589,7 +9575,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł25.00",
+        "name": "100ml zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9607,7 +9593,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł25.00",
+        "name": "100ml zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9625,7 +9611,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł25.00",
+        "name": "100ml zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9643,7 +9629,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł30.00",
+        "name": "100ml zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9661,7 +9647,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł30.00",
+        "name": "100ml zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9679,7 +9665,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł40.00",
+        "name": "473ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9697,7 +9683,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł40.00",
+        "name": "473ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9715,7 +9701,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł40.00",
+        "name": "473ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9733,7 +9719,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł40.00",
+        "name": "473ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9762,7 +9748,7 @@
         "serving_options": []
       },
       {
-        "name": "473ml Can\t zł40.00",
+        "name": "473ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9780,7 +9766,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł40.00",
+        "name": "473ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9798,7 +9784,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł40.00",
+        "name": "473ml Can zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9816,7 +9802,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł30.00",
+        "name": "100ml zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9834,7 +9820,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł50.00",
+        "name": "100ml zł50.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9852,7 +9838,7 @@
     "note": null,
     "beers": [
       {
-        "name": "150mL Draft\t zł50.00",
+        "name": "150mL Draft zł50.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9870,7 +9856,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł50.00",
+        "name": "100ml zł50.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9888,7 +9874,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł45.00",
+        "name": "473ml Can zł45.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9906,7 +9892,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł45.00",
+        "name": "500ml Draft zł45.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9924,7 +9910,7 @@
     "note": null,
     "beers": [
       {
-        "name": "473ml Can\t zł45.00",
+        "name": "473ml Can zł45.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9942,7 +9928,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł25.00",
+        "name": "100ml zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9960,7 +9946,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł25.00",
+        "name": "100ml zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9978,7 +9964,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł20.00",
+        "name": "100ml zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -9996,7 +9982,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł20.00",
+        "name": "100ml zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10014,7 +10000,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł25.00",
+        "name": "100ml zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10032,7 +10018,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł25.00",
+        "name": "100ml zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10050,7 +10036,7 @@
     "note": null,
     "beers": [
       {
-        "name": "100ml\t zł30.00",
+        "name": "100ml zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10068,7 +10054,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł40.00",
+        "name": "500ml Draft zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10086,7 +10072,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł30.00",
+        "name": "500ml Draft zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10104,7 +10090,7 @@
     "note": null,
     "beers": [
       {
-        "name": "330ml Can\t zł30.00",
+        "name": "330ml Can zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10122,7 +10108,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł50.00",
+        "name": "500ml Draft zł50.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10140,7 +10126,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł40.00",
+        "name": "500ml Draft zł40.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10158,7 +10144,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10176,7 +10162,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10194,7 +10180,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10212,7 +10198,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł35.00",
+        "name": "500ml Can zł35.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10230,7 +10216,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10248,7 +10234,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10266,7 +10252,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł30.00",
+        "name": "500ml Draft zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10284,7 +10270,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10302,7 +10288,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł25.00",
+        "name": "500ml Can zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10320,7 +10306,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł25.00",
+        "name": "500ml Draft zł25.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10338,7 +10324,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł30.00",
+        "name": "500ml Can zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10356,7 +10342,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł30.00",
+        "name": "500ml Can zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10374,7 +10360,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Can\t zł30.00",
+        "name": "500ml Can zł30.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10392,7 +10378,7 @@
     "note": null,
     "beers": [
       {
-        "name": "3% ABV Funky Fluid Warszawa, Mazowieckie  Rated 3.5 out of 5 on Untappd",
+        "name": "3% ABV Funky Fluid Warszawa, Mazowieckie Rated 3.5 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10403,7 +10389,7 @@
         "serving_options": []
       },
       {
-        "name": "500ml Draft\t zł20.00",
+        "name": "500ml Draft zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10421,7 +10407,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł20.00",
+        "name": "500ml Draft zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10439,7 +10425,7 @@
     "note": null,
     "beers": [
       {
-        "name": "500ml Draft\t zł20.00",
+        "name": "500ml Draft zł20.00",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -10810,7 +10796,7 @@
     "note": null,
     "beers": [
       {
-        "name": "5% ABV 25 IBU Hopkultura Gdów, Lesser Poland Voivodeship  Rated 3.75 out of 5 on Untappd",
+        "name": "5% ABV 25 IBU Hopkultura Gdów, Lesser Poland Voivodeship Rated 3.75 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -11450,24 +11436,46 @@
             "raw_text": "500ml Draft"
           }
         ]
-      }
-    ]
-  },
-  {
-    "brewery": "IPA PA PARA PO!",
-    "location": null,
-    "note": null,
-    "beers": [
+      },
       {
-        "name": "500ml Draft",
-        "style": null,
-        "abv": null,
-        "ibu": null,
-        "rating": null,
-        "brewery": "IPA PA PARA PO!",
-        "location": null,
-        "description": null,
-        "serving_options": []
+        "name": "IPA PA PARA PO!",
+        "style": "IPA - New England",
+        "abv": 5.6,
+        "ibu": 45.0,
+        "rating": 3.75,
+        "brewery": "Lubrow",
+        "location": "Brewery Borcz, Pomeranian Voivodeship",
+        "description": "New Batch! Hops: Citra Dynaboost, Mosaic Spectrum, Talus, Nectaron",
+        "serving_options": [
+          {
+            "size": "100ml",
+            "package": "Draft",
+            "price_pln": null,
+            "price_eur": null,
+            "raw_text": "100ml Draft"
+          },
+          {
+            "size": "300ml",
+            "package": "Draft",
+            "price_pln": null,
+            "price_eur": null,
+            "raw_text": "300ml Draft"
+          },
+          {
+            "size": "0.5L",
+            "package": "Can",
+            "price_pln": null,
+            "price_eur": null,
+            "raw_text": "0.5L Can"
+          },
+          {
+            "size": "500ml",
+            "package": "Draft",
+            "price_pln": null,
+            "price_eur": null,
+            "raw_text": "500ml Draft"
+          }
+        ]
       }
     ]
   },
@@ -13786,7 +13794,7 @@
     "note": null,
     "beers": [
       {
-        "name": "7% ABV PINTA Wieprz, województwo śląskie  Rated 3.75 out of 5 on Untappd",
+        "name": "7% ABV PINTA Wieprz, województwo śląskie Rated 3.75 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -14189,7 +14197,7 @@
         "rating": null,
         "brewery": "Vortex",
         "location": null,
-        "description": null,
+        "description": "No items found",
         "serving_options": []
       },
       {
@@ -14301,7 +14309,7 @@
     "note": null,
     "beers": [
       {
-        "name": "7% ABV Quantum Satis Domasław, Dolnośląskie  Rated 4.5 out of 5 on Untappd",
+        "name": "7% ABV Quantum Satis Domasław, Dolnośląskie Rated 4.5 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -14355,23 +14363,16 @@
         "rating": null,
         "brewery": "Divine Intervention 2024",
         "location": null,
-        "description": null,
+        "description": "Coffee Melomel 2024",
         "serving_options": []
-      }
-    ]
-  },
-  {
-    "brewery": "Coffee Melomel 2024",
-    "location": null,
-    "note": null,
-    "beers": [
+      },
       {
-        "name": "3% ABV Quantum Satis Domasław, Dolnośląskie  Rated 4.25 out of 5 on Untappd",
+        "name": "3% ABV Quantum Satis Domasław, Dolnośląskie Rated 4.25 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Coffee Melomel 2024",
+        "brewery": "Divine Intervention 2024",
         "location": null,
         "description": null,
         "serving_options": []
@@ -14382,7 +14383,7 @@
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Coffee Melomel 2024",
+        "brewery": "Divine Intervention 2024",
         "location": null,
         "description": null,
         "serving_options": []
@@ -15173,7 +15174,7 @@
     "note": null,
     "beers": [
       {
-        "name": "2% ABV 40 IBU ReCraft Świętochłowice, Województwo śląskie  Rated 3.5 out of 5 on Untappd",
+        "name": "2% ABV 40 IBU ReCraft Świętochłowice, Województwo śląskie Rated 3.5 out of 5 on Untappd",
         "style": null,
         "abv": null,
         "ibu": null,
@@ -15427,23 +15428,16 @@
         "rating": null,
         "brewery": "Milcoffeel",
         "location": null,
-        "description": null,
+        "description": "Wave Theory Double NEIPA",
         "serving_options": []
-      }
-    ]
-  },
-  {
-    "brewery": "Wave Theory Double NEIPA",
-    "location": null,
-    "note": null,
-    "beers": [
+      },
       {
         "name": "5L Can",
         "style": null,
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Wave Theory Double NEIPA",
+        "brewery": "Milcoffeel",
         "location": null,
         "description": null,
         "serving_options": []
@@ -15815,23 +15809,16 @@
         "rating": null,
         "brewery": "Lawenda",
         "location": null,
-        "description": null,
+        "description": "Lipa z Poziomką",
         "serving_options": []
-      }
-    ]
-  },
-  {
-    "brewery": "Lipa z Poziomką",
-    "location": null,
-    "note": null,
-    "beers": [
+      },
       {
         "name": "500ml Bottle",
         "style": null,
         "abv": null,
         "ibu": null,
         "rating": null,
-        "brewery": "Lipa z Poziomką",
+        "brewery": "Lawenda",
         "location": null,
         "description": null,
         "serving_options": []
