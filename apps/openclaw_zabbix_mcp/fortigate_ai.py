@@ -429,6 +429,33 @@ def summarize_fortigate_traffic() -> str:
     return "\n".join(lines)
 
 
+def build_fortigate_report() -> str:
+    """
+    Backward-compatible report builder used by fortigate_report_sender.py.
+    """
+    sections = []
+
+    try:
+        sections.append(summarize_fortigate_snapshot())
+    except Exception as e:
+        sections.append(f"FortiGate configuration summary failed: {e}")
+
+    try:
+        sections.append(summarize_fortigate_traffic())
+    except Exception as e:
+        sections.append(f"FortiGate traffic summary failed: {e}")
+
+    try:
+        zabbix_summary = summarize_host_24h_with_ai(FIREWALL_HOST)
+        if zabbix_summary:
+            sections.append("Zabbix 24h host summary:")
+            sections.append(str(zabbix_summary))
+    except Exception as e:
+        sections.append(f"Zabbix host summary failed for {FIREWALL_HOST}: {e}")
+
+    return "\n\n".join(sections).strip()
+
+
 def show_top_talkers() -> str:
     raw = get_fortigate_traffic_raw()
     results = _extract_results(raw)
